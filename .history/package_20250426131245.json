@@ -1,0 +1,25 @@
+{
+  "name": "wirebase",
+  "version": "1.0.0",
+  "description": "A social media platform combining medieval dungeon fantasy aesthetics with Windows 98 retro web design",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "express": "^4.18.2",
+    "express-handlebars": "^7.0.7",
+    "express-session": "^1.17.3",
+    "feed": "^4.2.2",
+    "mongoose": "^7.2.2",
+    "multer": "^1.4.5-lts.1",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0",
+    "three": "^0.152.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}

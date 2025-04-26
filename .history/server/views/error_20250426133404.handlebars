@@ -1,0 +1,126 @@
+<div class="error-container theme-{{theme}}">
+    <div class="win98-window error-window">
+        <div class="win98-window-header">
+            <span class="win98-window-title">{{title}}</span>
+            <div class="win98-window-controls">
+                <span class="win98-window-control">_</span>
+                <span class="win98-window-control">□</span>
+                <span class="win98-window-control">×</span>
+            </div>
+        </div>
+        <div class="win98-window-content">
+            <div class="error-content">
+                <div class="error-icon">
+                    {{#if (eq errorCode 404)}}
+                        <img src="/images/404-icon.png" alt="404 Error" class="pixel-image">
+                    {{else}}
+                        <img src="/images/error-icon.png" alt="Error" class="pixel-image">
+                    {{/if}}
+                </div>
+                
+                <div class="error-message">
+                    <h2>{{errorCode}} Error</h2>
+                    <p>{{message}}</p>
+                    
+                    {{#if (eq errorCode 404)}}
+                        <p>The page you're looking for has been lost in the dungeon...</p>
+                    {{else}}
+                        <p>Something has gone terribly wrong in the realm...</p>
+                    {{/if}}
+                    
+                    <div class="error-actions">
+                        <a href="/" class="win98-button">Return to Homepage</a>
+                        <button onclick="window.history.back()" class="win98-button">Go Back</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {{#if (eq theme 'broken-window')}}
+        <div class="broken-glass-overlay"></div>
+    {{/if}}
+</div>
+
+<style>
+    .error-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        position: relative;
+    }
+    
+    .error-window {
+        max-width: 600px;
+        width: 100%;
+        box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .error-content {
+        display: flex;
+        padding: 20px;
+        align-items: center;
+    }
+    
+    .error-icon {
+        margin-right: 20px;
+    }
+    
+    .error-icon img {
+        width: 80px;
+        height: 80px;
+        image-rendering: pixelated;
+    }
+    
+    .error-message h2 {
+        margin-top: 0;
+        color: var(--medium-purple);
+    }
+    
+    .error-actions {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+    }
+    
+    /* Dark Dungeon Theme */
+    .theme-dark-dungeon .error-window {
+        background-color: var(--dark-purple);
+        border-color: var(--medium-purple) var(--dark-stone) var(--dark-stone) var(--medium-purple);
+    }
+    
+    .theme-dark-dungeon .win98-window-header {
+        background-color: var(--medium-purple);
+        color: var(--gold);
+    }
+    
+    .theme-dark-dungeon .win98-window-content {
+        color: var(--gold);
+    }
+    
+    .theme-dark-dungeon .error-message h2 {
+        color: var(--gold);
+    }
+    
+    /* Broken Window Theme for 500 errors */
+    .theme-broken-window .error-window {
+        background-color: var(--win98-gray);
+        border-color: var(--win98-border-darker) var(--win98-border-light) var(--win98-border-light) var(--win98-border-darker);
+    }
+    
+    .theme-broken-window .win98-window-header {
+        background-color: #aa0000;
+    }
+    
+    .broken-glass-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        background-image: url('data:image/png;base64,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');
+        opacity: 0.6;
+    }
+</style>

@@ -1,0 +1,377 @@
+<div class="dungeon-login-container">
+    <div class="torches-container">
+        <div class="torch left"></div>
+        <div class="torch right"></div>
+    </div>
+
+    <div class="win98-window dungeon login-window">
+        <div class="win98-window-header">
+            <span class="win98-window-title">Wirebase Login</span>
+            <div class="win98-window-controls">
+                <span class="win98-window-control">_</span>
+                <span class="win98-window-control">□</span>
+                <span class="win98-window-control">×</span>
+            </div>
+        </div>
+        <div class="win98-window-content">
+            <div class="medieval-scroll">
+                <div class="login-header">
+                    <img src="/images/wirebase-logo.svg" alt="Wirebase" class="login-logo">
+                    <h2>Enter The Realm</h2>
+                    <div class="separator">
+                        <span class="separator-icon">⚔️</span>
+                    </div>
+                </div>
+                
+                {{#if error_msg}}
+                    <div class="login-error">
+                        <span class="error-icon">⚠️</span>
+                        <span class="error-message">{{error_msg}}</span>
+                    </div>
+                {{/if}}
+                
+                <form action="/users/login" method="POST" class="login-form">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" class="win98-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" class="win98-input" required>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="win98-button medieval">Enter</button>
+                        <a href="/users/forgot-password" class="forgot-link">Forgot Password?</a>
+                    </div>
+                </form>
+                
+                <div class="signup-section">
+                    <p>New to the realm?</p>
+                    <a href="/users/register" class="win98-button">Create an Account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="dungeon-decorations">
+        <div class="decoration chains left"></div>
+        <div class="decoration chains right"></div>
+        <div class="decoration skull"></div>
+    </div>
+</div>
+
+<style>
+    .dungeon-login-container {
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        padding: 50px 20px;
+    }
+    
+    .login-window {
+        max-width: 500px;
+        width: 100%;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+        position: relative;
+        z-index: 10;
+    }
+    
+    .medieval-scroll {
+        background-color: var(--dark-purple);
+        background-image: url('/images/parchment-texture.png');
+        background-blend-mode: overlay;
+        background-size: 200px;
+        border: 1px solid var(--gold);
+        padding: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .medieval-scroll::before,
+    .medieval-scroll::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 20px;
+        background-image: url('/images/scroll-edge.png');
+        background-size: contain;
+        background-repeat: repeat-x;
+        left: 0;
+    }
+    
+    .medieval-scroll::before {
+        top: 0;
+    }
+    
+    .medieval-scroll::after {
+        bottom: 0;
+        transform: rotate(180deg);
+    }
+    
+    .login-header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+    
+    .login-logo {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 10px;
+        filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+        animation: pulse 3s infinite;
+    }
+    
+    .login-header h2 {
+        color: var(--gold);
+        font-size: 2.2rem;
+        margin: 10px 0;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+    }
+    
+    .separator {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 20px 0;
+    }
+    
+    .separator::before,
+    .separator::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid var(--gold);
+    }
+    
+    .separator::before {
+        margin-right: 15px;
+        background: linear-gradient(to right, transparent, var(--gold));
+    }
+    
+    .separator::after {
+        margin-left: 15px;
+        background: linear-gradient(to left, transparent, var(--gold));
+    }
+    
+    .separator-icon {
+        font-size: 1.5rem;
+        color: var(--gold);
+        filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5));
+    }
+    
+    .login-error {
+        background-color: rgba(139, 0, 0, 0.3);
+        border: 1px solid #8b0000;
+        padding: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .error-icon {
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--gold);
+        font-family: 'GothicPixels', 'MedievalSharp', cursive;
+    }
+    
+    .win98-input {
+        width: 100%;
+        padding: 8px;
+        background-color: #000;
+        color: var(--light-purple);
+        border: 2px solid;
+        border-color: var(--dark-stone) var(--light-purple) var(--light-purple) var(--dark-stone);
+    }
+    
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 25px;
+    }
+    
+    .forgot-link {
+        color: var(--orange);
+        font-size: 0.9rem;
+    }
+    
+    .forgot-link:hover {
+        color: var(--bright-gold);
+    }
+    
+    .signup-section {
+        margin-top: 30px;
+        text-align: center;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 215, 0, 0.3);
+    }
+    
+    .signup-section p {
+        margin-bottom: 15px;
+        color: var(--light-purple);
+    }
+    
+    /* Torches and decorations */
+    .torches-container {
+        position: absolute;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 20%;
+        top: 30%;
+    }
+    
+    .torch {
+        width: 15px;
+        height: 30px;
+        background-color: var(--dark-orange);
+        position: relative;
+        z-index: 5;
+    }
+    
+    .torch.left {
+        transform: translateX(-50px);
+    }
+    
+    .torch.right {
+        transform: translateX(50px);
+    }
+    
+    .torch::before {
+        content: '';
+        position: absolute;
+        width: 30px;
+        height: 40px;
+        background: radial-gradient(ellipse at center bottom, var(--orange) 0%, var(--bright-orange) 30%, rgba(255, 127, 0, 0) 70%);
+        top: -35px;
+        left: -7px;
+        filter: blur(2px);
+        transform-origin: center bottom;
+        animation: flicker 4s infinite alternate;
+    }
+    
+    .dungeon-decorations {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        overflow: hidden;
+        pointer-events: none;
+    }
+    
+    .decoration {
+        position: absolute;
+        background-size: contain;
+        background-repeat: no-repeat;
+        opacity: 0.7;
+    }
+    
+    .chains {
+        width: 100px;
+        height: 300px;
+        background-image: url('/images/chains.png');
+        top: 10%;
+    }
+    
+    .chains.left {
+        left: 10%;
+        transform: rotate(-5deg);
+    }
+    
+    .chains.right {
+        right: 10%;
+        transform: scaleX(-1) rotate(-5deg);
+    }
+    
+    .skull {
+        width: 80px;
+        height: 80px;
+        background-image: url('/images/skull.png');
+        bottom: 10%;
+        right: 15%;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .login-window {
+            max-width: 90%;
+        }
+        
+        .torches-container {
+            padding: 0 5%;
+        }
+        
+        .medieval-scroll {
+            padding: 20px 15px;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add particles to the login background
+        const container = document.querySelector('.dungeon-login-container');
+        
+        if (container) {
+            for (let i = 0; i < 30; i++) {
+                createDustParticle(container);
+            }
+        }
+        
+        function createDustParticle(container) {
+            const particle = document.createElement('div');
+            
+            // Random properties
+            const size = Math.random() * 3 + 1;
+            const posX = Math.random() * 100;
+            const posY = Math.random() * 100;
+            const opacity = Math.random() * 0.3 + 0.1;
+            const duration = Math.random() * 30 + 15;
+            const delay = Math.random() * 10;
+            
+            // Style the particle
+            particle.className = 'dust-particle';
+            particle.style.position = 'absolute';
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.borderRadius = '50%';
+            particle.style.backgroundColor = '#ffd700';
+            particle.style.left = `${posX}%`;
+            particle.style.top = `${posY}%`;
+            particle.style.opacity = opacity;
+            particle.style.boxShadow = '0 0 3px rgba(255, 215, 0, 0.5)';
+            particle.style.animation = `float-dust ${duration}s linear ${delay}s infinite`;
+            particle.style.zIndex = '2';
+            
+            container.appendChild(particle);
+        }
+        
+        // Add a special hovering effect to the login button
+        const loginButton = document.querySelector('.login-form .win98-button');
+        if (loginButton) {
+            loginButton.addEventListener('mouseover', function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3), 0 0 10px rgba(255, 215, 0, 0.3)';
+            });
+            
+            loginButton.addEventListener('mouseout', function() {
+                this.style.transform = '';
+                this.style.boxShadow = '';
+            });
+        }
+    });
+</script>

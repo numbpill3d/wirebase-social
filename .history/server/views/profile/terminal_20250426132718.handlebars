@@ -1,0 +1,344 @@
+<div class="profile-terminal-container">
+    <div class="win98-window terminal-window">
+        <div class="win98-window-header">
+            <span class="win98-window-title">Wirebase Terminal Mode</span>
+            <div class="win98-window-controls">
+                <span class="win98-window-control">_</span>
+                <span class="win98-window-control">□</span>
+                <span class="win98-window-control">×</span>
+            </div>
+        </div>
+        <div class="win98-window-content terminal-content">
+            <div class="terminal-header-info">
+                <div class="terminal-welcome">
+                    <pre>
+ __      __  ___   ___   ___   ___    ___    _    ___   ___ 
+ \ \    / / |_ _| | _ \ | __| | _ )  /   \  | |  | __| / __|
+  \ \/\/ /   | |  |   / | _|  | _ \ | - | | | |_ | _|  \__ \
+   \_/\_/   |___| |_|_\ |___| |___/ |_|_|_| |___||___| |___/
+                                                            
+ TERMINAL MODE v1.0 - Customize your profile with direct commands
+ User: {{user.username}} | Last Login: {{formatDate user.lastActive}}
+ Type 'help' for a list of commands
+                    </pre>
+                </div>
+            </div>
+            
+            <div class="terminal-output" id="terminal-output"></div>
+            
+            <div class="terminal-input-line">
+                <span class="terminal-prompt">[{{user.username}}@wirebase]&gt; </span>
+                <input type="text" id="terminal-input" class="terminal-input" autofocus>
+            </div>
+        </div>
+    </div>
+    
+    <div class="win98-window preview-window">
+        <div class="win98-window-header">
+            <span class="win98-window-title">Profile Preview</span>
+            <div class="win98-window-controls">
+                <span class="win98-window-control">_</span>
+                <span class="win98-window-control">□</span>
+                <span class="win98-window-control">×</span>
+            </div>
+        </div>
+        <div class="win98-window-content">
+            <div class="preview-content" id="profile-preview">
+                <div class="profile-header-preview">
+                    <img src="{{user.avatar}}" alt="{{user.displayName}}" class="pixel-avatar">
+                    <div class="profile-info">
+                        <h3>{{user.displayName}} <span class="glyph">{{user.customGlyph}}</span></h3>
+                        <p class="status">{{user.statusMessage}}</p>
+                    </div>
+                </div>
+                
+                <div class="custom-content-preview" id="html-preview">
+                    {{{user.profileHtml}}}
+                </div>
+                
+                <style id="css-preview">
+                    {{{user.profileCss}}}
+                </style>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const terminal = document.getElementById('terminal-output');
+        const input = document.getElementById('terminal-input');
+        const htmlPreview = document.getElementById('html-preview');
+        const cssPreview = document.getElementById('css-preview');
+        
+        // Initial HTML and CSS content
+        let currentHtml = `{{{user.profileHtml}}}`;
+        let currentCss = `{{{user.profileCss}}}`;
+        
+        // Current editing mode
+        let editingMode = null;
+        let editingContent = '';
+        
+        // Add initial welcome message
+        addOutput('Welcome to Terminal Mode. You can edit your profile HTML and CSS directly here.');
+        addOutput('Type "help" for available commands.');
+        
+        // Handle input
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const command = input.value;
+                addOutput(`<span class="terminal-prompt">[{{user.username}}@wirebase]&gt; </span>${command}`);
+                processCommand(command);
+                input.value = '';
+            }
+        });
+        
+        function addOutput(text) {
+            terminal.innerHTML += `<div class="terminal-line">${text}</div>`;
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+        
+        function processCommand(command) {
+            // If currently in edit mode
+            if (editingMode) {
+                if (command.trim() === ':wq' || command.trim() === ':save') {
+                    // Save and exit edit mode
+                    if (editingMode === 'html') {
+                        currentHtml = editingContent;
+                        htmlPreview.innerHTML = currentHtml;
+                        saveProfile('html', currentHtml);
+                    } else if (editingMode === 'css') {
+                        currentCss = editingContent;
+                        cssPreview.innerHTML = currentCss;
+                        saveProfile('css', currentCss);
+                    }
+                    addOutput(`${editingMode.toUpperCase()} changes saved.`);
+                    editingMode = null;
+                    editingContent = '';
+                } else if (command.trim() === ':q!' || command.trim() === ':cancel') {
+                    // Quit without saving
+                    addOutput(`Exited ${editingMode.toUpperCase()} edit mode without saving.`);
+                    editingMode = null;
+                    editingContent = '';
+                } else {
+                    // Add to editing content
+                    editingContent += command + '\n';
+                    updatePreview();
+                }
+                return;
+            }
+            
+            // Regular commands
+            const cmdParts = command.trim().split(' ');
+            const cmd = cmdParts[0].toLowerCase();
+            
+            switch (cmd) {
+                case 'help':
+                    addOutput('Available commands:');
+                    addOutput('  edit html - Edit your profile HTML');
+                    addOutput('  edit css - Edit your profile CSS');
+                    addOutput('  view html - View your current HTML code');
+                    addOutput('  view css - View your current CSS code');
+                    addOutput('  clear - Clear the terminal');
+                    addOutput('  preview - Toggle preview window');
+                    addOutput('  reset - Reset HTML/CSS to default');
+                    addOutput('');
+                    addOutput('While editing:');
+                    addOutput('  :wq or :save - Save changes and exit edit mode');
+                    addOutput('  :q! or :cancel - Discard changes and exit edit mode');
+                    break;
+                
+                case 'edit':
+                    if (cmdParts[1] === 'html') {
+                        editingMode = 'html';
+                        editingContent = currentHtml;
+                        addOutput('Editing HTML. Enter your HTML code line by line.');
+                        addOutput('Type ":wq" or ":save" to save and exit, or ":q!" or ":cancel" to exit without saving.');
+                        addOutput('--- HTML EDIT MODE ---');
+                    } else if (cmdParts[1] === 'css') {
+                        editingMode = 'css';
+                        editingContent = currentCss;
+                        addOutput('Editing CSS. Enter your CSS code line by line.');
+                        addOutput('Type ":wq" or ":save" to save and exit, or ":q!" or ":cancel" to exit without saving.');
+                        addOutput('--- CSS EDIT MODE ---');
+                    } else {
+                        addOutput('Usage: edit [html|css]');
+                    }
+                    break;
+                
+                case 'view':
+                    if (cmdParts[1] === 'html') {
+                        addOutput('<pre class="code-view">' + escapeHTML(currentHtml) + '</pre>');
+                    } else if (cmdParts[1] === 'css') {
+                        addOutput('<pre class="code-view">' + escapeHTML(currentCss) + '</pre>');
+                    } else {
+                        addOutput('Usage: view [html|css]');
+                    }
+                    break;
+                
+                case 'clear':
+                    terminal.innerHTML = '';
+                    break;
+                
+                case 'preview':
+                    const previewWindow = document.querySelector('.preview-window');
+                    if (previewWindow.style.display === 'none') {
+                        previewWindow.style.display = 'block';
+                        addOutput('Preview window shown.');
+                    } else {
+                        previewWindow.style.display = 'none';
+                        addOutput('Preview window hidden.');
+                    }
+                    break;
+                
+                case 'reset':
+                    if (confirm('Are you sure you want to reset your profile to default?')) {
+                        currentHtml = '<div class="profile-default">Welcome to my Wirebase profile!</div>';
+                        currentCss = '.profile-default { padding: 20px; border: 2px solid #8a2be2; background-color: #2a1a41; color: #ffd700; font-family: "MS Sans Serif", sans-serif; text-align: center; }';
+                        htmlPreview.innerHTML = currentHtml;
+                        cssPreview.innerHTML = currentCss;
+                        saveProfile('html', currentHtml);
+                        saveProfile('css', currentCss);
+                        addOutput('Profile reset to default.');
+                    } else {
+                        addOutput('Reset cancelled.');
+                    }
+                    break;
+                
+                default:
+                    addOutput(`Command not recognized: ${cmd}. Type "help" for available commands.`);
+                    break;
+            }
+        }
+        
+        function updatePreview() {
+            if (editingMode === 'html') {
+                htmlPreview.innerHTML = editingContent;
+            } else if (editingMode === 'css') {
+                cssPreview.innerHTML = editingContent;
+            }
+        }
+        
+        function saveProfile(type, content) {
+            fetch(`/profile/edit/${type}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    [`profile${type.charAt(0).toUpperCase() + type.slice(1)}`]: content
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    addOutput(`${type.toUpperCase()} saved successfully.`);
+                } else {
+                    addOutput('Error saving profile: ' + data.error);
+                }
+            })
+            .catch(error => {
+                addOutput('Error saving profile: ' + error);
+            });
+        }
+        
+        function escapeHTML(str) {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+    });
+</script>
+
+<style>
+    .profile-terminal-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    
+    @media (max-width: 768px) {
+        .profile-terminal-container {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .terminal-window {
+        min-height: 400px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .terminal-content {
+        background-color: #000;
+        color: #0f0;
+        font-family: 'VT323', monospace;
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .terminal-header-info {
+        margin-bottom: 15px;
+    }
+    
+    .terminal-output {
+        flex-grow: 1;
+        overflow-y: auto;
+        margin-bottom: 10px;
+    }
+    
+    .terminal-input-line {
+        display: flex;
+    }
+    
+    .terminal-prompt {
+        color: #0f0;
+        user-select: none;
+    }
+    
+    .terminal-input {
+        background-color: transparent;
+        border: none;
+        color: #0f0;
+        font-family: 'VT323', monospace;
+        font-size: 16px;
+        outline: none;
+        flex-grow: 1;
+    }
+    
+    .preview-window {
+        min-height: 400px;
+    }
+    
+    .preview-content {
+        height: 100%;
+        overflow-y: auto;
+    }
+    
+    .terminal-welcome pre {
+        color: #0f0;
+        font-size: 14px;
+        line-height: 1.2;
+    }
+    
+    .terminal-line {
+        margin-bottom: 5px;
+        white-space: pre-wrap;
+    }
+    
+    .code-view {
+        background-color: #1a1a1a;
+        padding: 10px;
+        color: #ddd;
+        border: 1px solid #444;
+        overflow-x: auto;
+        margin: 5px 0;
+    }
+</style>
