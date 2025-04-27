@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: wirebase
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false
+        
+databases:
+  - name: wirebase-mongodb
+    plan: free
+    databaseName: wirebase
+    user: wirebase

@@ -1,0 +1,572 @@
+<div class="dungeon-register-container">
+    <div class="torches-container">
+        <div class="torch left"></div>
+        <div class="torch right"></div>
+    </div>
+
+    <div class="win98-window dungeon register-window">
+        <div class="win98-window-header">
+            <span class="win98-window-title">Wirebase Registration</span>
+            <div class="win98-window-controls">
+                <span class="win98-window-control">_</span>
+                <span class="win98-window-control">□</span>
+                <span class="win98-window-control">×</span>
+            </div>
+        </div>
+        <div class="win98-window-content">
+            <div class="medieval-scroll">
+                <div class="register-header">
+                    <img src="/images/wirebase-logo.svg" alt="Wirebase" class="register-logo">
+                    <h2>Create Your Realm</h2>
+                    <div class="separator">
+                        <span class="separator-icon">🏰</span>
+                    </div>
+                </div>
+                
+                {{#if errors}}
+                    <div class="register-errors">
+                        <ul class="error-list">
+                            {{#each errors}}
+                                <li><span class="error-icon">⚠️</span> {{this.msg}}</li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                {{/if}}
+                
+                <form action="/users/register" method="POST" class="register-form">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" class="win98-input" value="{{username}}" required>
+                        <small class="input-help">3-20 characters, letters, numbers, underscores, hyphens only</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" class="win98-input" value="{{email}}" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" class="win98-input" required>
+                            <small class="input-help">At least 6 characters</small>
+                        </div>
+                        
+                        <div class="form-group half">
+                            <label for="password2">Confirm Password</label>
+                            <input type="password" id="password2" name="password2" class="win98-input" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="displayName">Display Name (optional)</label>
+                        <input type="text" id="displayName" name="displayName" class="win98-input" value="{{displayName}}">
+                        <small class="input-help">How you'll appear to others</small>
+                    </div>
+                    
+                    <div class="custom-details">
+                        <h3>Customize Your Character</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group half">
+                                <label for="customGlyph">Personal Glyph</label>
+                                <div class="glyph-picker">
+                                    <input type="text" id="customGlyph" name="customGlyph" class="win98-input glyph-input" value="⚔️" maxlength="2">
+                                    <div class="glyph-options">
+                                        <button type="button" class="glyph-option" data-glyph="⚔️">⚔️</button>
+                                        <button type="button" class="glyph-option" data-glyph="🧙">🧙</button>
+                                        <button type="button" class="glyph-option" data-glyph="🛡️">🛡️</button>
+                                        <button type="button" class="glyph-option" data-glyph="👑">👑</button>
+                                        <button type="button" class="glyph-option" data-glyph="🏹">🏹</button>
+                                        <button type="button" class="glyph-option" data-glyph="🔮">🔮</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group half">
+                                <label for="statusMessage">Status Message</label>
+                                <input type="text" id="statusMessage" name="statusMessage" class="win98-input" placeholder="Enter your status...">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="terms-agreement">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="agreeTerms" class="win98-checkbox" required>
+                            I agree to the <a href="/terms" target="_blank">Terms of Service</a> and <a href="/privacy" target="_blank">Privacy Policy</a>
+                        </label>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="win98-button medieval">Create Account</button>
+                        <a href="/users/login" class="login-link">Already registered? Login</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="dungeon-decorations">
+        <div class="decoration chains left"></div>
+        <div class="decoration chains right"></div>
+        <div class="decoration skull"></div>
+    </div>
+</div>
+
+<style>
+    .dungeon-register-container {
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        padding: 50px 20px;
+    }
+    
+    .register-window {
+        max-width: 600px;
+        width: 100%;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+        position: relative;
+        z-index: 10;
+    }
+    
+    .medieval-scroll {
+        background-color: var(--dark-purple);
+        background-image: url('/images/parchment-texture.png');
+        background-blend-mode: overlay;
+        background-size: 200px;
+        border: 1px solid var(--gold);
+        padding: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .medieval-scroll::before,
+    .medieval-scroll::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 20px;
+        background-image: url('/images/scroll-edge.png');
+        background-size: contain;
+        background-repeat: repeat-x;
+        left: 0;
+    }
+    
+    .medieval-scroll::before {
+        top: 0;
+    }
+    
+    .medieval-scroll::after {
+        bottom: 0;
+        transform: rotate(180deg);
+    }
+    
+    .register-header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+    
+    .register-logo {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 10px;
+        filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+        animation: pulse 3s infinite;
+    }
+    
+    .register-header h2 {
+        color: var(--gold);
+        font-size: 2.2rem;
+        margin: 10px 0;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+    }
+    
+    .separator {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 20px 0;
+    }
+    
+    .separator::before,
+    .separator::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid var(--gold);
+    }
+    
+    .separator::before {
+        margin-right: 15px;
+        background: linear-gradient(to right, transparent, var(--gold));
+    }
+    
+    .separator::after {
+        margin-left: 15px;
+        background: linear-gradient(to left, transparent, var(--gold));
+    }
+    
+    .separator-icon {
+        font-size: 1.5rem;
+        color: var(--gold);
+        filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5));
+    }
+    
+    .register-errors {
+        background-color: rgba(139, 0, 0, 0.3);
+        border: 1px solid #8b0000;
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .error-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .error-list li {
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .error-icon {
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-row {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .form-group.half {
+        flex: 1;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--gold);
+        font-family: 'GothicPixels', 'MedievalSharp', cursive;
+    }
+    
+    .win98-input {
+        width: 100%;
+        padding: 8px;
+        background-color: #000;
+        color: var(--light-purple);
+        border: 2px solid;
+        border-color: var(--dark-stone) var(--light-purple) var(--light-purple) var(--dark-stone);
+    }
+    
+    .input-help {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--stone-gray);
+        margin-top: 3px;
+    }
+    
+    .custom-details {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid var(--medium-purple);
+        background-color: rgba(75, 40, 131, 0.3);
+    }
+    
+    .custom-details h3 {
+        margin-top: 0;
+        color: var(--gold);
+        font-size: 1.3rem;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    
+    .glyph-picker {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .glyph-input {
+        text-align: center;
+        font-size: 1.5rem;
+    }
+    
+    .glyph-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 5px;
+    }
+    
+    .glyph-option {
+        background-color: var(--medium-purple);
+        border: 1px solid var(--light-purple);
+        font-size: 1.2rem;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+    
+    .glyph-option:hover {
+        background-color: var(--light-purple);
+    }
+    
+    .terms-agreement {
+        margin-bottom: 20px;
+    }
+    
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    .checkbox-label input {
+        margin-right: 10px;
+    }
+    
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 25px;
+    }
+    
+    .login-link {
+        color: var(--orange);
+        font-size: 0.9rem;
+    }
+    
+    .login-link:hover {
+        color: var(--bright-gold);
+    }
+    
+    /* Torches and decorations */
+    .torches-container {
+        position: absolute;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 20%;
+        top: 30%;
+    }
+    
+    .torch {
+        width: 15px;
+        height: 30px;
+        background-color: var(--dark-orange);
+        position: relative;
+        z-index: 5;
+    }
+    
+    .torch.left {
+        transform: translateX(-50px);
+    }
+    
+    .torch.right {
+        transform: translateX(50px);
+    }
+    
+    .torch::before {
+        content: '';
+        position: absolute;
+        width: 30px;
+        height: 40px;
+        background: radial-gradient(ellipse at center bottom, var(--orange) 0%, var(--bright-orange) 30%, rgba(255, 127, 0, 0) 70%);
+        top: -35px;
+        left: -7px;
+        filter: blur(2px);
+        transform-origin: center bottom;
+        animation: flicker 4s infinite alternate;
+    }
+    
+    .dungeon-decorations {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        overflow: hidden;
+        pointer-events: none;
+    }
+    
+    .decoration {
+        position: absolute;
+        background-size: contain;
+        background-repeat: no-repeat;
+        opacity: 0.7;
+    }
+    
+    .chains {
+        width: 100px;
+        height: 300px;
+        background-image: url('/images/chains.png');
+        top: 10%;
+    }
+    
+    .chains.left {
+        left: 10%;
+        transform: rotate(-5deg);
+    }
+    
+    .chains.right {
+        right: 10%;
+        transform: scaleX(-1) rotate(-5deg);
+    }
+    
+    .skull {
+        width: 80px;
+        height: 80px;
+        background-image: url('/images/skull.png');
+        bottom: 10%;
+        right: 15%;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .register-window {
+            max-width: 95%;
+        }
+        
+        .form-row {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .form-group.half {
+            flex: none;
+        }
+        
+        .torches-container {
+            padding: 0 5%;
+        }
+        
+        .medieval-scroll {
+            padding: 20px 15px;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Glyph picker functionality
+        const glyphOptions = document.querySelectorAll('.glyph-option');
+        const glyphInput = document.getElementById('customGlyph');
+        
+        glyphOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const glyph = this.getAttribute('data-glyph');
+                glyphInput.value = glyph;
+            });
+        });
+        
+        // Form validation
+        const registerForm = document.querySelector('.register-form');
+        const passwordInput = document.getElementById('password');
+        const password2Input = document.getElementById('password2');
+        const usernameInput = document.getElementById('username');
+        
+        registerForm.addEventListener('submit', function(e) {
+            let valid = true;
+            
+            // Clear previous errors
+            const errorContainer = document.querySelector('.register-errors');
+            if (errorContainer) {
+                errorContainer.remove();
+            }
+            
+            // Create a new error container
+            const errors = [];
+            
+            // Check username format
+            const usernamePattern = /^[a-zA-Z0-9_-]{3,20}$/;
+            if (!usernamePattern.test(usernameInput.value)) {
+                errors.push('Username must be 3-20 characters and contain only letters, numbers, underscores, and hyphens');
+                valid = false;
+            }
+            
+            // Check password length
+            if (passwordInput.value.length < 6) {
+                errors.push('Password must be at least 6 characters');
+                valid = false;
+            }
+            
+            // Check if passwords match
+            if (passwordInput.value !== password2Input.value) {
+                errors.push('Passwords do not match');
+                valid = false;
+            }
+            
+            // Display errors if any
+            if (!valid) {
+                e.preventDefault();
+                
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'register-errors';
+                errorDiv.innerHTML = '<ul class="error-list"></ul>';
+                
+                const errorList = errorDiv.querySelector('.error-list');
+                
+                errors.forEach(error => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span class="error-icon">⚠️</span> ${error}`;
+                    errorList.appendChild(li);
+                });
+                
+                const formHeader = document.querySelector('.register-header');
+                formHeader.insertAdjacentElement('afterend', errorDiv);
+                
+                // Scroll to errors
+                errorDiv.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+        
+        // Add dust particles to the login background
+        const container = document.querySelector('.dungeon-register-container');
+        
+        if (container) {
+            for (let i = 0; i < 30; i++) {
+                createDustParticle(container);
+            }
+        }
+        
+        function createDustParticle(container) {
+            const particle = document.createElement('div');
+            
+            // Random properties
+            const size = Math.random() * 3 + 1;
+            const posX = Math.random() * 100;
+            const posY = Math.random() * 100;
+            const opacity = Math.random() * 0.3 + 0.1;
+            const duration = Math.random() * 30 + 15;
+            const delay = Math.random() * 10;
+            
+            // Style the particle
+            particle.className = 'dust-particle';
+            particle.style.position = 'absolute';
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.borderRadius = '50%';
+            particle.style.backgroundColor = '#ffd700';
+            particle.style.left = `${posX}%`;
+            particle.style.top = `${posY}%`;
+            particle.style.opacity = opacity;
+            particle.style.boxShadow = '0 0 3px rgba(255, 215, 0, 0.5)';
+            particle.style.animation = `float-dust ${duration}s linear ${delay}s infinite`;
+            particle.style.zIndex = '2';
+            
+            container.appendChild(particle);
+        }
+    });
+</script>
