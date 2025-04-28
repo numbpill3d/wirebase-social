@@ -762,8 +762,331 @@ function detectBrowserForSkin() {
     return;
 }
 
-// Browser skin-related functions have been removed
-// The real browser already provides navigation elements and window controls
+/**
+ * Apply browser skin to the UI
+ */
+function applySkin(skin) {
+    // Remove existing skin
+    document.querySelectorAll('.browser-skin-frame, .browser-skin-overlay').forEach(el => el.remove());
+    
+    switch (skin) {
+        case 'netscape':
+            applyNetscapeSkin();
+            break;
+        case 'ie5':
+            applyIESkin();
+            break;
+        case 'lynx':
+            applyLynxSkin();
+            break;
+        default:
+            // Default skin (no changes)
+            break;
+    }
+}
+
+/**
+ * Apply Netscape Navigator skin
+ */
+function applyNetscapeSkin() {
+    // Add Netscape frame
+    const frame = document.createElement('div');
+    frame.className = 'browser-skin-frame netscape-frame';
+    
+    // Add frame HTML
+    frame.innerHTML = `
+        <div class="browser-title-bar">
+            <div class="browser-title">Netscape Navigator - Wirebase</div>
+            <div class="browser-controls">
+                <button class="browser-control">_</button>
+                <button class="browser-control">□</button>
+                <button class="browser-control">×</button>
+            </div>
+        </div>
+        <div class="browser-toolbar">
+            <button class="browser-button">Back</button>
+            <button class="browser-button">Forward</button>
+            <button class="browser-button">Reload</button>
+            <button class="browser-button">Home</button>
+            <div class="browser-address-bar">https://wirebase.com/</div>
+        </div>
+    `;
+    
+    // Insert at top of body
+    document.body.insertBefore(frame, document.body.firstChild);
+    
+    // Add Netscape style overlay
+    const style = document.createElement('style');
+    style.className = 'browser-skin-overlay';
+    style.textContent = `
+        body {
+            background-color: #c0c0c0 !important;
+            padding-top: 60px !important;
+        }
+        
+        .browser-skin-frame {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 9998;
+        }
+        
+        .browser-title-bar {
+            background-color: #000080;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 5px;
+        }
+        
+        .browser-toolbar {
+            background-color: #c0c0c0;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .browser-button {
+            margin-right: 5px;
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 2px 5px;
+            font-size: 12px;
+        }
+        
+        .browser-address-bar {
+            flex-grow: 1;
+            background-color: white;
+            border: 2px solid;
+            border-color: #808080 #ffffff #ffffff #808080;
+            padding: 2px 5px;
+            margin-left: 10px;
+        }
+    `;
+    
+    document.head.appendChild(style);
+}
+
+/**
+ * Apply Internet Explorer 5 skin
+ */
+function applyIESkin() {
+    // Similar to Netscape but with IE styling
+    const frame = document.createElement('div');
+    frame.className = 'browser-skin-frame ie-frame';
+    
+    // Add frame HTML - similar to Netscape but with IE styling
+    frame.innerHTML = `
+        <div class="browser-title-bar">
+            <img src="/images/ie-icon-small.png" class="browser-icon pixel-image">
+            <div class="browser-title">Microsoft Internet Explorer - Wirebase</div>
+            <div class="browser-controls">
+                <button class="browser-control">_</button>
+                <button class="browser-control">□</button>
+                <button class="browser-control">×</button>
+            </div>
+        </div>
+        <div class="browser-toolbar">
+            <button class="browser-button">Back</button>
+            <button class="browser-button">Forward</button>
+            <button class="browser-button">Stop</button>
+            <button class="browser-button">Refresh</button>
+            <button class="browser-button">Home</button>
+            <div class="browser-address-bar">https://wirebase.com/</div>
+            <button class="browser-button">Go</button>
+        </div>
+    `;
+    
+    // Insert at top of body
+    document.body.insertBefore(frame, document.body.firstChild);
+    
+    // Add IE style overlay
+    const style = document.createElement('style');
+    style.className = 'browser-skin-overlay';
+    style.textContent = `
+        body {
+            background-color: #c0c0c0 !important;
+            padding-top: 60px !important;
+        }
+        
+        .browser-skin-frame {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 9998;
+        }
+        
+        .browser-title-bar {
+            background: linear-gradient(to right, #1084d0, #5a73b8) !important;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 5px;
+            align-items: center;
+        }
+        
+        .browser-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 5px;
+        }
+        
+        .browser-toolbar {
+            background-color: #c0c0c0;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .browser-button {
+            margin-right: 5px;
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 2px 5px;
+            font-size: 12px;
+        }
+        
+        .browser-address-bar {
+            flex-grow: 1;
+            background-color: white;
+            border: 2px solid;
+            border-color: #808080 #ffffff #ffffff #808080;
+            padding: 2px 5px;
+            margin: 0 5px;
+        }
+    `;
+    
+    document.head.appendChild(style);
+}
+
+/**
+ * Apply Lynx text browser skin
+ */
+function applyLynxSkin() {
+    // Apply text-only browser appearance
+    const style = document.createElement('style');
+    style.className = 'browser-skin-overlay';
+    style.textContent = `
+        body {
+            background-color: #000000 !important;
+            color: #00ff00 !important;
+            font-family: 'VT323', monospace !important;
+            line-height: 1.3 !important;
+        }
+        
+        * {
+            background-color: #000000 !important;
+            color: #00ff00 !important;
+            font-family: 'VT323', monospace !important;
+            border-color: #00ff00 !important;
+            text-shadow: none !important;
+            box-shadow: none !important;
+        }
+        
+        img, video, iframe {
+            display: none !important;
+        }
+        
+        a {
+            color: #ffff00 !important;
+            text-decoration: underline !important;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            text-transform: uppercase !important;
+        }
+        
+        .win98-window {
+            border: 1px solid #00ff00 !important;
+        }
+        
+        .win98-window-header {
+            background-color: #005500 !important;
+        }
+        
+        .win98-button {
+            border: 1px solid #00ff00 !important;
+        }
+    `;
+    
+    document.head.appendChild(style);
+    
+    // Add termimal header
+    const frame = document.createElement('div');
+    frame.className = 'browser-skin-frame lynx-frame';
+    frame.innerHTML = `
+        <div class="lynx-header">
+            <div class="lynx-title">Lynx Line Mode Browser - Wirebase</div>
+            <div class="lynx-url">URL: https://wirebase.com/</div>
+        </div>
+        <div class="lynx-toolbar">
+            <span>Commands: Use arrow keys to move, Enter to follow links, q to quit</span>
+        </div>
+    `;
+    
+    // Style the frame
+    const frameStyle = document.createElement('style');
+    frameStyle.className = 'browser-skin-overlay';
+    frameStyle.textContent = `
+        .lynx-header {
+            background-color: #000000 !important;
+            color: #00ff00 !important;
+            padding: 5px !important;
+            border-bottom: 1px solid #00ff00 !important;
+        }
+        
+        .lynx-toolbar {
+            background-color: #000000 !important;
+            color: #00ff00 !important;
+            padding: 5px !important;
+            border-bottom: 1px solid #00ff00 !important;
+            font-size: 14px !important;
+        }
+        
+        .lynx-frame {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            z-index: 9998 !important;
+        }
+        
+        body {
+            padding-top: 60px !important;
+        }
+    `;
+    
+    document.head.appendChild(frameStyle);
+    document.body.insertBefore(frame, document.body.firstChild);
+}
+
+/**
+ * Get browser name
+ */
+function getBrowserName() {
+    const userAgent = navigator.userAgent;
+    let browserName;
+    
+    if (userAgent.match(/chrome|chromium|crios/i)) {
+        browserName = "Chrome";
+    } else if (userAgent.match(/firefox|fxios/i)) {
+        browserName = "Firefox";
+    } else if (userAgent.match(/safari/i)) {
+        browserName = "Safari";
+    } else if (userAgent.match(/opr\//i)) {
+        browserName = "Opera";
+    } else if (userAgent.match(/edg/i)) {
+        browserName = "Edge";
+    } else {
+        browserName = "Unknown";
+    }
+    
+    return browserName;
+}
 
 /**
  * Add custom cursors based on theme
