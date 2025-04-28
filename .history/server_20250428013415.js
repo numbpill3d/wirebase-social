@@ -13,8 +13,6 @@ const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
 const { supabase, supabaseAdmin } = require('./server/utils/database');
-
-// Configure Knex with connection pooling and better error handling
 const knex = require('knex')({
   client: 'pg',
   connection: {
@@ -25,37 +23,11 @@ const knex = require('knex')({
     database: 'postgres',
     ssl: { rejectUnauthorized: false }
   },
-  pool: {
-    min: 0,
-    max: 10,
-    acquireTimeoutMillis: 30000, // 30 seconds timeout
-    createTimeoutMillis: 30000,
-    idleTimeoutMillis: 30000,
-    createRetryIntervalMillis: 200
-  },
-  acquireConnectionTimeout: 60000, // 60 seconds for acquire connection timeout
-  debug: process.env.NODE_ENV !== 'production'
+  pool: { min: 0, max: 7 }
+}).on('error', (err) => {
+  console.error('Unexpected error on idle client', err);
+  process.exit(-1);
 });
-
-// Add better error handling
-knex.on('error', (err) => {
-  console.error('Unexpected database error:', err);
-  // Log error but don't exit process in production to maintain uptime
-  if (process.env.NODE_ENV !== 'production') {
-    process.exit(-1);
-  }
-});
-
-// Verify database connection
-knex.raw('SELECT 1')
-  .then(() => console.log('Database connection established successfully'))
-  .catch(err => {
-    console.error('Failed to connect to database:', err);
-    // Only exit in development to assist with debugging
-    if (process.env.NODE_ENV !== 'production') {
-      process.exit(-1);
-    }
-  });
 
 // Initialize app
 const app = express();
@@ -75,36 +47,25 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Session configuration with Knex store - optimized settings
+// Session configuration with Knex store
 const store = new KnexSessionStore({
   knex,
   tablename: 'sessions',
   createtable: true,
-  clearInterval: 3600000, // Clear expired sessions hourly instead of every minute
-  sidfieldname: 'sid',
-  // Performance optimizations
-  disableKeepExtensions: false, // Keep extensions to avoid hitting database on every request
-  disableReaper: false, // Run reaper to clean up old sessions
-  reapInterval: 3600000, // Reap every hour
-  reapMaxConcurrent: 10, // Maximum concurrent delete operations
-  // Serialize/deserialize function options
-  serializer: JSON.stringify,
-  deserializer: JSON.parse
+  clearInterval: 60000,
+  sidfieldname: 'sid'
 });
 
 app.use(session({
   store: store,
   secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: false, // Only save sessions when necessary
-  rolling: true, // Reset expiration timer on each request
-  name: 'wirebase.sid', // Custom cookie name for better security
-  cookie: {
+  saveUninitialized: false,
+  cookie: { 
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    httpOnly: true // Prevent client-side JS from accessing cookie
-  }
+    sameSite: 'lax'
+  } 
 }));
 
 // Initialize passport for authentication

@@ -360,112 +360,60 @@ class ScrapyardItem {
   }
   
   /**
-   * Query items with advanced filtering capabilities (Supabase optimized version)
-   * @param {Object} options - Query options (sort, filter, limit)
-   * @returns {Promise<Array>} - Query results
-   */
-  static async query(options = {}) {
-    try {
-      // Initialize query
-      let query = supabase
-        .from('scrapyard_items')
-        .select(`
-          *,
-          creator:creator (
-            id, username, display_name, avatar, custom_glyph
-          )
-        `);
-      
-      // Add filters
-      if (options.filter) {
-        Object.entries(options.filter).forEach(([key, value]) => {
-          // Handle special cases
-          if (key === 'tags' && Array.isArray(value)) {
-            // Filter by tags (partial array match)
-            query = query.contains('tags', value);
-          } else if (key === 'search' && typeof value === 'string') {
-            // Full-text search on title and description
-            query = query.or(`title.ilike.%${value}%,description.ilike.%${value}%`);
-          } else {
-            // Standard equality filter
-            const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
-            query = query.eq(snakeKey, value);
-          }
-        });
-      }
-      
-      // Add sorting
-      if (options.sort) {
-        const [field, direction] = Object.entries(options.sort)[0];
-        // Handle special case for vote score (requires post-processing)
-        if (field === 'voteScore') {
-          // We'll sort after fetching
-        } else {
-          const snakeKey = field.replace(/([A-Z])/g, '_$1').toLowerCase();
-          query = query.order(snakeKey, { ascending: direction === 1 });
-        }
-      }
-      
-      // Add pagination
-      if (options.limit) {
-        query = query.limit(options.limit);
-      }
-      
-      if (options.offset) {
-        query = query.range(options.offset, options.offset + (options.limit || 20) - 1);
-      }
-      
-      // Execute query
-      const { data, error } = await query;
-      if (error) throw error;
-      
-      let result = data.map(item => ScrapyardItem.formatItem(item));
-      
-      // Handle special sorting for vote score
-      if (options.sort && Object.keys(options.sort)[0] === 'voteScore') {
-        const direction = Object.values(options.sort)[0];
-        result.sort((a, b) => {
-          const scoreA = a.getVoteScore();
-          const scoreB = b.getVoteScore();
-          return direction === 1 ? scoreA - scoreB : scoreB - scoreA;
-        });
-      }
-      
-      return result;
-    } catch (error) {
-      console.error('Error in advanced query:', error);
-      return [];
-    }
-  }
-  
-  /**
-   * Aggregate items with MongoDB-like pipeline (legacy compatibility method)
+   * Aggregate items with MongoDB-like pipeline
    * @param {Array} pipeline - Aggregation pipeline
    * @returns {Promise<Array>} - Aggregated results
    */
   static async aggregate(pipeline) {
     try {
-      console.warn('Using legacy MongoDB-style aggregation. Consider switching to query() method.');
+      // This is a simplified aggregation implementation for Supabase
+      // Full MongoDB aggregation support would require more complex logic
       
-      // Support for common aggregation patterns
+      // Example implementation for upvote/downvote aggregation
       if (pipeline.some(stage => stage.$addFields?.voteScore)) {
-        // Convert to new query format
-        const options = {};
+        // Fetch all items and compute vote score in memory
+        const { data, error } = await supabase
+          .from('scrapyard_items')
+          .select('*');
+          
+        if (error) throw error;
         
-        // Extract sort from pipeline if it exists
+        // Process the pipeline stages manually (simplified)
+        const result = data.map(item => {
+          const upvotes = item.upvotes?.length || 0;
+          const downvotes = item.downvotes?.length || 0;
+          
+          return {
+            ...item,
+            voteScore: upvotes - downvotes
+          };
+        });
+        
+        // Apply sorting if in the pipeline
         const sortStage = pipeline.find(stage => stage.$sort);
         if (sortStage) {
-          options.sort = sortStage.$sort;
+          const sortField = Object.keys(sortStage.$sort)[0];
+          const sortDir = sortStage.$sort[sortField];
+          
+          result.sort((a, b) => {
+            if (sortField === 'voteScore') {
+              return sortDir === 1 ? a.voteScore - b.voteScore : b.voteScore - a.voteScore;
+            } else if (sortField === 'createdAt') {
+              return sortDir === 1 
+                ? new Date(a.created_at) - new Date(b.created_at)
+                : new Date(b.created_at) - new Date(a.created_at);
+            }
+            return 0;
+          });
         }
         
-        // Extract limit from pipeline if it exists
+        // Apply limit if in the pipeline
         const limitStage = pipeline.find(stage => stage.$limit);
         if (limitStage) {
-          options.limit = limitStage.$limit;
+          return result.slice(0, limitStage.$limit).map(item => ScrapyardItem.formatItem(item));
         }
         
-        // Use the new optimized query method
-        return await ScrapyardItem.query(options);
+        return result.map(item => ScrapyardItem.formatItem(item));
       }
       
       console.warn('Unsupported aggregation pipeline for Supabase');

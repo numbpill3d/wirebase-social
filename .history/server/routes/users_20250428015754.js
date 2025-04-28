@@ -194,19 +194,18 @@ router.post('/settings', ensureAuthenticated, async (req, res) => {
   const { displayName, email, statusMessage, customGlyph } = req.body;
   
   try {
-    // Prepare update data
-    const updateData = {
-      displayName: displayName || req.user.displayName,
-      email: email || req.user.email,
-      statusMessage: statusMessage || req.user.statusMessage
-    };
+    const user = await User.findById(req.user._id);
+    
+    // Update fields
+    user.displayName = displayName || user.displayName;
+    user.email = email || user.email;
+    user.statusMessage = statusMessage || user.statusMessage;
     
     if (customGlyph && customGlyph.length <= 2) {
-      updateData.customGlyph = customGlyph;
+      user.customGlyph = customGlyph;
     }
     
-    // Use Supabase method to update
-    await User.findByIdAndUpdate(req.user.id, updateData);
+    await user.save();
     
     req.flash('success_msg', 'Account settings updated');
     res.redirect('/users/settings');
@@ -246,8 +245,8 @@ router.post('/change-password', ensureAuthenticated, async (req, res) => {
   }
   
   try {
-    // Get user with password for verification
-    const user = await User.findByIdWithPassword(req.user.id);
+    // Get user with password
+    const user = await User.findById(req.user._id);
     
     // Check current password
     const isMatch = await bcrypt.compare(currentPassword, user.password);
@@ -262,8 +261,11 @@ router.post('/change-password', ensureAuthenticated, async (req, res) => {
       });
     }
     
-    // Update with new password - hashing will be handled by the User model
-    await User.findByIdAndUpdate(req.user.id, { password: newPassword });
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    
+    await user.save();
     
     req.flash('success_msg', 'Password updated successfully');
     res.redirect('/users/settings');

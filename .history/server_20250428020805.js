@@ -75,36 +75,25 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Session configuration with Knex store - optimized settings
+// Session configuration with Knex store
 const store = new KnexSessionStore({
   knex,
   tablename: 'sessions',
   createtable: true,
-  clearInterval: 3600000, // Clear expired sessions hourly instead of every minute
-  sidfieldname: 'sid',
-  // Performance optimizations
-  disableKeepExtensions: false, // Keep extensions to avoid hitting database on every request
-  disableReaper: false, // Run reaper to clean up old sessions
-  reapInterval: 3600000, // Reap every hour
-  reapMaxConcurrent: 10, // Maximum concurrent delete operations
-  // Serialize/deserialize function options
-  serializer: JSON.stringify,
-  deserializer: JSON.parse
+  clearInterval: 60000,
+  sidfieldname: 'sid'
 });
 
 app.use(session({
   store: store,
   secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: false, // Only save sessions when necessary
-  rolling: true, // Reset expiration timer on each request
-  name: 'wirebase.sid', // Custom cookie name for better security
-  cookie: {
+  saveUninitialized: false,
+  cookie: { 
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    httpOnly: true // Prevent client-side JS from accessing cookie
-  }
+    sameSite: 'lax'
+  } 
 }));
 
 // Initialize passport for authentication
