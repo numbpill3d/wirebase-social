@@ -3,28 +3,6 @@ const router = express.Router();
 const User = require('../models/User');
 const ScrapyardItem = require('../models/ScrapyardItem');
 
-// Enhanced error middleware
-const errorHandler = (err, req, res, next) => {
-  console.error('Error:', err);
-  
-  const errorTypes = {
-    'ValidationError': { status: 400, theme: 'broken-scroll' },
-    'AuthenticationError': { status: 401, theme: 'locked-dungeon' },
-    'NotFoundError': { status: 404, theme: 'empty-chest' },
-    'default': { status: 500, theme: 'broken-window' }
-  };
-
-  const { status, theme } = errorTypes[err.name] || errorTypes.default;
-  
-  res.status(status).render('error', {
-    title: `${status} - ${err.message || 'Server Error'}`,
-    errorCode: status,
-    message: err.message || 'An unexpected error occurred',
-    theme,
-    stack: process.env.NODE_ENV === 'development' ? err.stack : null
-  });
-};
-
 // Home page route
 router.get('/', async (req, res) => {
   try {

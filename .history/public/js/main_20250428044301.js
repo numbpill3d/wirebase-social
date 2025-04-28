@@ -979,35 +979,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Add scroll-triggered animations
-const observerOptions = {
-  threshold: 0.2,
-  rootMargin: '0px 0px -50px 0px'
-};
-
-const scrollObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('fade-in-visible');
-      scrollObserver.unobserve(entry.target);
-    }
-  });
-}, observerOptions);
-
-document.querySelectorAll('.fade-in').forEach(el => {
-  scrollObserver.observe(el);
-});
-
-// Parallax scroll effect for background elements
-document.addEventListener('scroll', () => {
-  const parallaxElements = document.querySelectorAll('.parallax');
-  parallaxElements.forEach(el => {
-    const speed = el.dataset.speed || 0.5;
-    const yPos = -(window.pageYOffset * speed);
-    el.style.transform = `translateY(${yPos}px)`;
-  });
-});
-
 // Improve keyboard navigation
 document.addEventListener('DOMContentLoaded', () => {
   // Add focus indicators
@@ -1060,58 +1031,3 @@ function trapFocus(element) {
     }
   });
 }
-
-// Performance optimizations
-document.addEventListener('DOMContentLoaded', function() {
-    // Lazy load images
-    const lazyImages = document.querySelectorAll('img[data-src]');
-    const imageObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const img = entry.target;
-                img.src = img.dataset.src;
-                img.removeAttribute('data-src');
-                observer.unobserve(img);
-            }
-        });
-    });
-
-    lazyImages.forEach(img => imageObserver.observe(img));
-
-    // Debounced scroll handlers
-    const debounce = (fn, delay) => {
-        let timeoutId;
-        return (...args) => {
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => fn.apply(this, args), delay);
-        };
-    };
-
-    // Cache DOM elements
-    const cachedElements = new Map();
-    const getElement = (selector) => {
-        if (!cachedElements.has(selector)) {
-            cachedElements.set(selector, document.querySelector(selector));
-        }
-        return cachedElements.get(selector);
-    };
-
-    // Initialize features with performance in mind
-    const initializeFeatures = () => {
-        setupWindows98Elements();
-        setupMedievalEffects();
-        
-        // Defer non-critical features
-        requestIdleCallback(() => {
-            setupTerminalMode();
-            setupStreetpass();
-        });
-
-        // Load CRT effect only if enabled
-        if (window.CRT_EFFECT_ENABLED) {
-            import('./crt-effect.js').then(module => module.setupCRTEffect());
-        }
-    };
-
-    initializeFeatures();
-});

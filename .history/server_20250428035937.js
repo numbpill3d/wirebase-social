@@ -84,39 +84,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Add request timeout middleware
-const timeout = require('connect-timeout');
-
-app.use(timeout('15s'));
-app.use((req, res, next) => {
-  if (!req.timedout) next();
-});
-
-// Clean up any unfinished uploads on timeout
-app.use((err, req, res, next) => {
-  if (req.timedout && req.file) {
-    fs.unlink(req.file.path, (unlinkError) => {
-      if (unlinkError) {
-        console.error('Failed to cleanup timed out upload:', unlinkError);
-      }
-    });
-  }
-  next(err);
-});
-
-// Add response time header
-app.use((req, res, next) => {
-  const start = process.hrtime();
-  
-  res.on('finish', () => {
-    const [seconds, nanoseconds] = process.hrtime(start);
-    const ms = (seconds * 1000) + (nanoseconds / 1000000);
-    res.setHeader('X-Response-Time', `${ms.toFixed(2)}ms`);
-  });
-  
-  next();
-});
-
 // Session configuration with Knex store - optimized settings
 const store = new KnexSessionStore({
   knex,

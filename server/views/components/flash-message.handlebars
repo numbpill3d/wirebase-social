@@ -1,0 +1,13 @@
+<div class="flash-message {{type}}" 
+     role="alert" 
+     aria-live="polite"
+     aria-atomic="true">
+    <div class="flash-content">
+        {{message}}
+    </div>
+    <button class="close-flash" 
+            aria-label="Close message" 
+            onclick="this.parentElement.remove()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>

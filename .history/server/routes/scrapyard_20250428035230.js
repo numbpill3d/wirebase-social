@@ -61,51 +61,61 @@ const upload = multer({
   }
 });
 
-// Optimize top items query with proper indexing
-const getTopItems = async (limit = 8) => {
-  const query = `
-    WITH vote_counts AS (
-      SELECT 
-        item_id,
-        COUNT(CASE WHEN vote_type = 'upvote' THEN 1 END) as upvotes,
-        COUNT(CASE WHEN vote_type = 'downvote' THEN 1 END) as downvotes
-      FROM votes
-      GROUP BY item_id
-    )
-    SELECT i.*, 
-           COALESCE(v.upvotes, 0) - COALESCE(v.downvotes, 0) as score,
-           u.username, u.display_name, u.avatar, u.custom_glyph
-    FROM scrapyard_items i
-    LEFT JOIN vote_counts v ON i.id = v.item_id
-    LEFT JOIN users u ON i.creator_id = u.id
-    ORDER BY score DESC, i.created_at DESC
-    LIMIT $1
-  `;
-  
-  return await knex.raw(query, [limit]);
-};
-
 // Main Scrapyard marketplace page
 router.get('/', async (req, res) => {
   try {
-    const [topItems, recentItems, featuredItems] = await Promise.all([
-      getTopItems(8),
-      getRecentItems(12),
-      getFeaturedItems(6)
+    // Get featured items
+    const featuredItems = await ScrapyardItem.find({ featured: true })
+      .sort({ createdAt: -1 })
+      .limit(6)
+      .populate('creator', 'username displayName avatar customGlyph');
+    
+    // Get recent items for each category
+    const categories = ['widget', 'template', 'icon', 'banner', 'gif'];
+    const recentItems = {};
+    
+    for (const category of categories) {
+      recentItems[category] = await ScrapyardItem.find({ category })
+        .sort({ createdAt: -1 })
+        .limit(4)
+        .populate('creator', 'username displayName avatar customGlyph');
+    }
+    
+    // Get top items by votes
+    const topItems = await ScrapyardItem.aggregate([
+      {
+        $addFields: {
+          voteScore: {
+            $subtract: [
+              { $size: { $ifNull: ['$votes.upvotes', []] } },
+              { $size: { $ifNull: ['$votes.downvotes', []] } }
+            ]
+          }
+        }
+      },
+      { $sort: { voteScore: -1, createdAt: -1 } },
+      { $limit: 8 }
     ]);
+    
+    // Populate creator for top items
+    await ScrapyardItem.populate(topItems, {
+      path: 'creator',
+      select: 'username displayName avatar customGlyph'
+    });
     
     res.render('scrapyard/index', {
       title: 'The Scrapyard - Wirebase',
-      topItems: topItems.rows,
-      recentItems,
       featuredItems,
-      pageTheme: res.locals.pageTheme
+      recentItems,
+      topItems,
+      pageTheme: 'dark-dungeon'
     });
   } catch (err) {
-    console.error('Scrapyard error:', err);
+    console.error(err);
     res.status(500).render('error', {
-      title: 'Error',
-      message: 'Failed to load Scrapyard',
+      title: 'Server Error',
+      errorCode: 500,
+      message: 'There was an error loading the Scrapyard',
       theme: 'broken-window'
     });
   }
