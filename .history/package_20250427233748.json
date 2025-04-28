@@ -1,0 +1,52 @@
+{
+  "name": "wirebase",
+  "version": "1.0.0",
+  "description": "A social media platform combining medieval dungeon fantasy aesthetics with Windows 98 retro web design",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "seed": "node scripts/seed.js",
+    "lint": "eslint .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.7",
+    "bcrypt": "^5.1.0",
+    "connect-session-knex": "^3.0.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-handlebars": "^7.0.7",
+    "express-session": "^1.17.3",
+    "feed": "^4.2.2",
+    "knex": "^3.1.0",
+    "multer": "^1.4.5-lts.1",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0",
+    "pg": "^8.11.3",
+    "three": "^0.152.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.38.0",
+    "nodemon": "^2.0.22"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/wirebase.git"
+  },
+  "keywords": [
+    "social-media",
+    "medieval",
+    "windows98",
+    "retro",
+    "dungeon",
+    "fantasy",
+    "supabase"
+  ],
+  "author": "",
+  "license": "MIT"
+}
