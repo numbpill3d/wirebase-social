@@ -27,40 +27,41 @@ async function initializeDatabase() {
       .select('id')
       .limit(1);
         
-    if (error && error.code === '42P01') { // Table doesn't exist
-      console.log('Creating users table...');
-      await supabaseAdmin.query(`
-        CREATE TABLE users (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          username TEXT UNIQUE NOT NULL,
-          email TEXT UNIQUE NOT NULL,
-          password TEXT NOT NULL,
-          display_name TEXT,
-          profile_html TEXT,
-          profile_css TEXT,
-          avatar TEXT DEFAULT '/images/default-avatar.png',
-          custom_glyph TEXT DEFAULT '⚔️',
-          status_message TEXT DEFAULT 'Just joined Wirebase',
-          status_icon TEXT DEFAULT 'online',
-          loot_tokens INTEGER DEFAULT 10,
-          badges JSONB DEFAULT '[]'::jsonb,
-          followers JSONB DEFAULT '[]'::jsonb,
-          following JSONB DEFAULT '[]'::jsonb,
-          streetpass_visitors JSONB DEFAULT '[]'::jsonb,
-          streetpass_enabled BOOLEAN DEFAULT true,
-          custom_emotes JSONB DEFAULT '[]'::jsonb,
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-          last_active TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-          role TEXT DEFAULT 'user'
-        );
-        
-        -- Add extension for UUID support if not exists
-        CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-        
-        -- Create index on username and email
-        CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
-        CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-      `);
+      if (error && error.code === '42P01') { // Table doesn't exist
+        console.log('Creating users table...');
+        await supabaseAdmin.query(`
+          CREATE TABLE users (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+            username TEXT UNIQUE NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            display_name TEXT,
+            profile_html TEXT,
+            profile_css TEXT,
+            avatar TEXT DEFAULT '/images/default-avatar.png',
+            custom_glyph TEXT DEFAULT '⚔️',
+            status_message TEXT DEFAULT 'Just joined Wirebase',
+            status_icon TEXT DEFAULT 'online',
+            loot_tokens INTEGER DEFAULT 10,
+            badges JSONB DEFAULT '[]'::jsonb,
+            followers JSONB DEFAULT '[]'::jsonb,
+            following JSONB DEFAULT '[]'::jsonb,
+            streetpass_visitors JSONB DEFAULT '[]'::jsonb,
+            streetpass_enabled BOOLEAN DEFAULT true,
+            custom_emotes JSONB DEFAULT '[]'::jsonb,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+            last_active TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+            role TEXT DEFAULT 'user'
+          );
+          
+          -- Add extension for UUID support if not exists
+          CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+          
+          -- Create index on username and email
+          CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+          CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+        `);
+      }
     }
     
     // Create scrapyard_items table if not exists
