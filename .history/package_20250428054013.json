@@ -28,8 +28,7 @@
     "passport-local": "^1.0.0",
     "pg": "^8.11.3",
     "three": "^0.152.2",
-    "uuid": "^9.0.1",
-    "wirebase": "file:"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "eslint": "^8.38.0",
