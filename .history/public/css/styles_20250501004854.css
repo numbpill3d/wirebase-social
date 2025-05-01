@@ -537,29 +537,11 @@ ul {
 }
 
 .win98-window-controls {
-  display: flex; /* Show window controls */
-  gap: 2px; /* Space between buttons */
+  display: none; /* Hide window controls since browser already provides these */
 }
 
 .win98-window-control {
-  display: inline-block; /* Show window control buttons */
-  width: 16px; /* Standard Win98 button size */
-  height: 14px; /* Standard Win98 button size */
-  background-color: var(--win98-gray);
-  border: 2px solid;
-  border-color: var(--win98-border-light) var(--win98-border-darker) var(--win98-border-darker) var(--win98-border-light);
-  color: black;
-  font-size: 10px;
-  line-height: 10px; /* Center the glyph vertically */
-  text-align: center;
-  cursor: default; /* Indicate non-interactiveness */
-  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
-  user-select: none; /* Prevent text selection */
-}
-
-.win98-window-control:active {
-  border-color: var(--win98-border-darker) var(--win98-border-light) var(--win98-border-light) var(--win98-border-darker);
-  box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.2);
+  display: none; /* Hide window control buttons */
 }
 
 .win98-window-content {
