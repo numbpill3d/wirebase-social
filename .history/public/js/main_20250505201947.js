@@ -1132,9 +1132,7 @@ class EventManager {
   }
 
   addListener(element, event, callback) {
-    if (!element) {
-      return;
-    }
+    if (!element) return;
 
     element.addEventListener(event, callback);
 

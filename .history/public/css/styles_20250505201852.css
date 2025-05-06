@@ -552,7 +552,7 @@ ul {
   font-size: 10px;
   line-height: 10px; /* Center the glyph vertically */
   text-align: center;
-  cursor: pointer; /* Make it clear these are clickable */
+  cursor: default; /* Indicate non-interactiveness */
   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
   user-select: none; /* Prevent text selection */
 }
@@ -1875,10 +1875,6 @@ button, select, input[type="submit"] {
     grid-template-columns: 1fr 1fr;
     gap: 20px;
     margin-bottom: 20px;
-}
-
-.terminal-preview, .profile-preview {
-    min-width: 250px;
 }
 
 @media (max-width: 768px) {

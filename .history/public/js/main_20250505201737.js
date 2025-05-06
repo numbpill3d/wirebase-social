@@ -85,34 +85,14 @@ function setupWindows98Elements() {
             } else if (controlText === '□' || this.classList.contains('maximize')) {
                 // Toggle maximize class
                 windowElement.classList.toggle('maximized');
-
-                // Get the parent container to maximize within
-                const container = windowElement.closest('.container') || document.body;
-
                 if (windowElement.classList.contains('maximized')) {
-                    // Save original dimensions
                     windowElement.setAttribute('data-original-width', windowElement.style.width || '');
                     windowElement.setAttribute('data-original-height', windowElement.style.height || '');
-                    windowElement.setAttribute('data-original-position', windowElement.style.position || '');
-                    windowElement.setAttribute('data-original-top', windowElement.style.top || '');
-                    windowElement.setAttribute('data-original-left', windowElement.style.left || '');
-                    windowElement.setAttribute('data-original-z-index', windowElement.style.zIndex || '');
-
-                    // Set maximized dimensions and position
                     windowElement.style.width = '100%';
                     windowElement.style.height = 'calc(100vh - 100px)';
-                    windowElement.style.position = 'fixed';
-                    windowElement.style.top = '50px';
-                    windowElement.style.left = '0';
-                    windowElement.style.zIndex = '9999';
                 } else {
-                    // Restore original dimensions and position
                     windowElement.style.width = windowElement.getAttribute('data-original-width') || '';
                     windowElement.style.height = windowElement.getAttribute('data-original-height') || '';
-                    windowElement.style.position = windowElement.getAttribute('data-original-position') || '';
-                    windowElement.style.top = windowElement.getAttribute('data-original-top') || '';
-                    windowElement.style.left = windowElement.getAttribute('data-original-left') || '';
-                    windowElement.style.zIndex = windowElement.getAttribute('data-original-z-index') || '';
                 }
             }
         });
@@ -797,21 +777,25 @@ function detectBrowserForSkin() {
 
 /**
  * Add custom cursors based on theme
- * Note: Using standard cursors instead of custom image cursors for better compatibility
  */
 function setupCustomCursors() {
-    // Use standard cursors for better compatibility
-    const cursorStyle = document.createElement('style');
-    cursorStyle.textContent = `
-        body { cursor: default; }
-        a, button, .win98-button, .clickable, .win98-window-control {
-            cursor: pointer !important;
-        }
-        input[type="text"], textarea {
-            cursor: text !important;
-        }
-    `;
-    document.head.appendChild(cursorStyle);
+    const theme = document.body.classList.contains('theme-dungeon') ? 'dungeon' : 'windows';
+
+    if (theme === 'dungeon') {
+        document.body.style.cursor = `url('/images/cursors/dungeon-normal.cur'), auto`;
+
+        // Add style for cursors
+        const cursorStyle = document.createElement('style');
+        cursorStyle.textContent = `
+            a, button, .win98-button, .clickable {
+                cursor: url('/images/cursors/dungeon-pointer.cur'), pointer !important;
+            }
+            input[type="text"], textarea {
+                cursor: url('/images/cursors/dungeon-text.cur'), text !important;
+            }
+        `;
+        document.head.appendChild(cursorStyle);
+    }
 }
 
 /**
@@ -983,13 +967,21 @@ function getRandomVisitor() {
     };
 }
 
-// Play startup sound if first time (moved from duplicate event listener)
-if (!sessionStorage.getItem('startupSoundPlayed')) {
-    setTimeout(() => {
-        playSound('startup');
-        sessionStorage.setItem('startupSoundPlayed', 'true');
-    }, 1000);
-}
+// Initialize when DOM is ready - Note: This is a duplicate of the initialization at the top of the file
+// Keep this for backward compatibility
+document.addEventListener('DOMContentLoaded', function() {
+    setupWindows98Elements();
+    setupMedievalEffects();
+    setupCustomCursors();
+
+    // Play startup sound if first time
+    if (!sessionStorage.getItem('startupSoundPlayed')) {
+        setTimeout(() => {
+            playSound('startup');
+            sessionStorage.setItem('startupSoundPlayed', 'true');
+        }, 1000);
+    }
+});
 
 // Add scroll-triggered animations
 const observerOptions = {
@@ -1010,7 +1002,15 @@ document.querySelectorAll('.fade-in').forEach(el => {
   scrollObserver.observe(el);
 });
 
-// Parallax scroll effect is now handled by the throttled scroll handler
+// Parallax scroll effect for background elements
+document.addEventListener('scroll', () => {
+  const parallaxElements = document.querySelectorAll('.parallax');
+  parallaxElements.forEach(el => {
+    const speed = el.dataset.speed || 0.5;
+    const yPos = -(window.pageYOffset * speed);
+    el.style.transform = `translateY(${yPos}px)`;
+  });
+});
 
 // Improve keyboard navigation
 document.addEventListener('DOMContentLoaded', () => {
@@ -1082,28 +1082,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
     lazyImages.forEach(img => imageObserver.observe(img));
 
-    // Add debounced scroll handler for performance
-    const scrollHandler = () => {
-        // Handle scroll events in a performance-friendly way
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-        // Add subtle parallax effect to background elements
-        document.querySelectorAll('.parallax').forEach(el => {
-            const speed = el.dataset.speed || 0.5;
-            const yPos = -(scrollTop * speed);
-            el.style.transform = `translateY(${yPos}px)`;
-        });
+    // Debounced scroll handlers
+    const debounce = (fn, delay) => {
+        let timeoutId;
+        return (...args) => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => fn.apply(this, args), delay);
+        };
     };
 
-    // Throttle scroll events for better performance
-    let lastScrollTime = 0;
-    window.addEventListener('scroll', () => {
-        const now = Date.now();
-        if (now - lastScrollTime > 50) { // 50ms throttle
-            lastScrollTime = now;
-            scrollHandler();
+    // Cache DOM elements
+    const cachedElements = new Map();
+    const getElement = (selector) => {
+        if (!cachedElements.has(selector)) {
+            cachedElements.set(selector, document.querySelector(selector));
         }
-    });
+        return cachedElements.get(selector);
+    };
 
     // Initialize features with performance in mind
     const initializeFeatures = () => {
@@ -1132,9 +1127,7 @@ class EventManager {
   }
 
   addListener(element, event, callback) {
-    if (!element) {
-      return;
-    }
+    if (!element) return;
 
     element.addEventListener(event, callback);
 

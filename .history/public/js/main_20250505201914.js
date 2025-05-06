@@ -797,21 +797,25 @@ function detectBrowserForSkin() {
 
 /**
  * Add custom cursors based on theme
- * Note: Using standard cursors instead of custom image cursors for better compatibility
  */
 function setupCustomCursors() {
-    // Use standard cursors for better compatibility
-    const cursorStyle = document.createElement('style');
-    cursorStyle.textContent = `
-        body { cursor: default; }
-        a, button, .win98-button, .clickable, .win98-window-control {
-            cursor: pointer !important;
-        }
-        input[type="text"], textarea {
-            cursor: text !important;
-        }
-    `;
-    document.head.appendChild(cursorStyle);
+    const theme = document.body.classList.contains('theme-dungeon') ? 'dungeon' : 'windows';
+
+    if (theme === 'dungeon') {
+        document.body.style.cursor = `url('/images/cursors/dungeon-normal.cur'), auto`;
+
+        // Add style for cursors
+        const cursorStyle = document.createElement('style');
+        cursorStyle.textContent = `
+            a, button, .win98-button, .clickable {
+                cursor: url('/images/cursors/dungeon-pointer.cur'), pointer !important;
+            }
+            input[type="text"], textarea {
+                cursor: url('/images/cursors/dungeon-text.cur'), text !important;
+            }
+        `;
+        document.head.appendChild(cursorStyle);
+    }
 }
 
 /**
@@ -1010,7 +1014,15 @@ document.querySelectorAll('.fade-in').forEach(el => {
   scrollObserver.observe(el);
 });
 
-// Parallax scroll effect is now handled by the throttled scroll handler
+// Parallax scroll effect for background elements
+document.addEventListener('scroll', () => {
+  const parallaxElements = document.querySelectorAll('.parallax');
+  parallaxElements.forEach(el => {
+    const speed = el.dataset.speed || 0.5;
+    const yPos = -(window.pageYOffset * speed);
+    el.style.transform = `translateY(${yPos}px)`;
+  });
+});
 
 // Improve keyboard navigation
 document.addEventListener('DOMContentLoaded', () => {
@@ -1082,28 +1094,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
     lazyImages.forEach(img => imageObserver.observe(img));
 
-    // Add debounced scroll handler for performance
-    const scrollHandler = () => {
-        // Handle scroll events in a performance-friendly way
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-        // Add subtle parallax effect to background elements
-        document.querySelectorAll('.parallax').forEach(el => {
-            const speed = el.dataset.speed || 0.5;
-            const yPos = -(scrollTop * speed);
-            el.style.transform = `translateY(${yPos}px)`;
-        });
+    // Debounced scroll handlers
+    const debounce = (fn, delay) => {
+        let timeoutId;
+        return (...args) => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => fn.apply(this, args), delay);
+        };
     };
 
-    // Throttle scroll events for better performance
-    let lastScrollTime = 0;
-    window.addEventListener('scroll', () => {
-        const now = Date.now();
-        if (now - lastScrollTime > 50) { // 50ms throttle
-            lastScrollTime = now;
-            scrollHandler();
+    // Cache DOM elements
+    const cachedElements = new Map();
+    const getElement = (selector) => {
+        if (!cachedElements.has(selector)) {
+            cachedElements.set(selector, document.querySelector(selector));
         }
-    });
+        return cachedElements.get(selector);
+    };
 
     // Initialize features with performance in mind
     const initializeFeatures = () => {
@@ -1132,9 +1139,7 @@ class EventManager {
   }
 
   addListener(element, event, callback) {
-    if (!element) {
-      return;
-    }
+    if (!element) return;
 
     element.addEventListener(event, callback);
 

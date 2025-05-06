@@ -1010,7 +1010,15 @@ document.querySelectorAll('.fade-in').forEach(el => {
   scrollObserver.observe(el);
 });
 
-// Parallax scroll effect is now handled by the throttled scroll handler
+// Parallax scroll effect for background elements
+document.addEventListener('scroll', () => {
+  const parallaxElements = document.querySelectorAll('.parallax');
+  parallaxElements.forEach(el => {
+    const speed = el.dataset.speed || 0.5;
+    const yPos = -(window.pageYOffset * speed);
+    el.style.transform = `translateY(${yPos}px)`;
+  });
+});
 
 // Improve keyboard navigation
 document.addEventListener('DOMContentLoaded', () => {
@@ -1132,9 +1140,7 @@ class EventManager {
   }
 
   addListener(element, event, callback) {
-    if (!element) {
-      return;
-    }
+    if (!element) return;
 
     element.addEventListener(event, callback);
 

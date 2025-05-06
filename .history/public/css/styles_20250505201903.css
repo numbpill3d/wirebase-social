@@ -1877,10 +1877,6 @@ button, select, input[type="submit"] {
     margin-bottom: 20px;
 }
 
-.terminal-preview, .profile-preview {
-    min-width: 250px;
-}
-
 @media (max-width: 768px) {
     .customize-grid {
         grid-template-columns: 1fr;
