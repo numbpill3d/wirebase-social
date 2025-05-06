@@ -1,12 +1,8 @@
 // Main server file for Wirebase
-try {
-  // Try to load dotenv if available
-  const dotenv = require('dotenv');
-  dotenv.config();
-  console.log('Environment variables loaded from .env file');
-} catch (err) {
-  console.warn('dotenv module not found, using existing environment variables');
-}
+const dotenv = require('dotenv');
+
+// Load environment variables first
+dotenv.config();
 
 // Import performance optimization utilities
 const {
@@ -179,21 +175,16 @@ const store = new KnexSessionStore({
   tablename: 'sessions',
   createtable: true,
   // Fix potential memory leak with proper cleanup
-  clearInterval: 86400000, // Clear expired sessions daily (24 hours)
+  clearInterval: 3600000, // Clear expired sessions hourly
   sidfieldname: 'sid',
   // Performance optimizations
-  disableKeepExtensions: true, // Disable extensions to reduce DB load
-  disableReaper: false, // Keep reaper to clean up old sessions
-  reapInterval: 7200000, // Reap every 2 hours
-  reapMaxConcurrent: 5, // Reduce concurrent delete operations
+  disableKeepExtensions: false, // Keep extensions to avoid hitting database on every request
+  disableReaper: false, // Run reaper to clean up old sessions
+  reapInterval: 3600000, // Reap every hour
+  reapMaxConcurrent: 10, // Maximum concurrent delete operations
   // Serialize/deserialize function options
   serializer: JSON.stringify,
-  deserializer: JSON.parse,
-  // Add connection pool settings specific to session store
-  pool: {
-    min: 1,
-    max: 5
-  }
+  deserializer: JSON.parse
 });
 
 app.use(session({
@@ -201,16 +192,14 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false, // Only save sessions when necessary
-  rolling: false, // Disable rolling to reduce database writes
+  rolling: true, // Reset expiration timer on each request
   name: 'wirebase.sid', // Custom cookie name for better security
   cookie: {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days (reduced from 30)
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     httpOnly: true // Prevent client-side JS from accessing cookie
-  },
-  // Add touch option to reduce database writes
-  touchAfter: 24 * 3600 // Only update session once per day instead of on every request
+  }
 }));
 
 // Initialize passport for authentication
@@ -337,6 +326,3 @@ process.on('uncaughtException', (error) => {
 app.listen(PORT, () => {
   console.log(`Wirebase server running in ${NODE_ENV} mode on port ${PORT}`);
 });
-
-// Export knex instance for use in other modules
-module.exports = { knex };

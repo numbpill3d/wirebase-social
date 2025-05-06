@@ -1,12 +1,8 @@
 // Main server file for Wirebase
-try {
-  // Try to load dotenv if available
-  const dotenv = require('dotenv');
-  dotenv.config();
-  console.log('Environment variables loaded from .env file');
-} catch (err) {
-  console.warn('dotenv module not found, using existing environment variables');
-}
+const dotenv = require('dotenv');
+
+// Load environment variables first
+dotenv.config();
 
 // Import performance optimization utilities
 const {
@@ -337,6 +333,3 @@ process.on('uncaughtException', (error) => {
 app.listen(PORT, () => {
   console.log(`Wirebase server running in ${NODE_ENV} mode on port ${PORT}`);
 });
-
-// Export knex instance for use in other modules
-module.exports = { knex };
