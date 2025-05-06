@@ -498,7 +498,6 @@ router.post('/item/:id/comment', ensureAuthenticated, async (req, res) => {
 router.get('/search', async (req, res, next) => {
   try {
     const { q = '', category = 'all' } = req.query;
-    const query = q;
 
     if (!query) {
       return res.redirect('/scrapyard');
@@ -559,11 +558,10 @@ router.get('/search', async (req, res, next) => {
 });
 
 // Download/Use counter
-router.post('/item/:id/download', async (req, res, next) => {
+router.post('/item/:id/download', async (req, res) => {
   try {
-    const { id } = req.params;
     // Increment download count
-    await ScrapyardItem.findByIdAndUpdate(id, { $inc: { downloads: 1 } });
+    await ScrapyardItem.findByIdAndUpdate(req.params.id, { $inc: { downloads: 1 } });
     res.json({ success: true });
   } catch (err) {
     console.error(err);

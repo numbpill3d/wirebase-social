@@ -131,9 +131,9 @@ router.get('/', async (req, res, next) => {
 });
 
 // View specific category
-router.get('/category/:category', async (req, res, next) => {
+router.get('/category/:category', async (req, res) => {
   try {
-    const { category } = req.params;
+    const category = req.params.category;
     const validCategories = ['widget', 'template', 'icon', 'banner', 'gif'];
 
     if (!validCategories.includes(category)) {
@@ -206,10 +206,9 @@ router.get('/category/:category', async (req, res, next) => {
 });
 
 // View a specific item
-router.get('/item/:id', async (req, res, next) => {
+router.get('/item/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    const item = await ScrapyardItem.findById(id)
+    const item = await ScrapyardItem.findById(req.params.id)
       .populate('creator', 'username displayName avatar customGlyph statusMessage')
       .populate('comments.user', 'username displayName avatar customGlyph');
 
@@ -263,7 +262,7 @@ router.get('/item/:id', async (req, res, next) => {
 });
 
 // Submit a new item page
-router.get('/submit', ensureAuthenticated, (_, res) => {
+router.get('/submit', ensureAuthenticated, (req, res) => {
   res.render('scrapyard/submit', {
     title: 'Submit to Scrapyard - Wirebase',
     pageTheme: 'dark-dungeon'
@@ -495,10 +494,10 @@ router.post('/item/:id/comment', ensureAuthenticated, async (req, res) => {
 });
 
 // Search the Scrapyard
-router.get('/search', async (req, res, next) => {
+router.get('/search', async (req, res) => {
   try {
-    const { q = '', category = 'all' } = req.query;
-    const query = q;
+    const query = req.query.q || '';
+    const category = req.query.category || 'all';
 
     if (!query) {
       return res.redirect('/scrapyard');
@@ -559,11 +558,10 @@ router.get('/search', async (req, res, next) => {
 });
 
 // Download/Use counter
-router.post('/item/:id/download', async (req, res, next) => {
+router.post('/item/:id/download', async (req, res) => {
   try {
-    const { id } = req.params;
     // Increment download count
-    await ScrapyardItem.findByIdAndUpdate(id, { $inc: { downloads: 1 } });
+    await ScrapyardItem.findByIdAndUpdate(req.params.id, { $inc: { downloads: 1 } });
     res.json({ success: true });
   } catch (err) {
     console.error(err);

@@ -61,51 +61,21 @@ const upload = multer({
   }
 });
 
-// Helper functions for fetching items
-const getTopItems = async (limit = 8) => {
-  try {
-    const items = await ScrapyardItem.find()
-      .sort({ usageCount: -1, createdAt: -1 })
-      .limit(limit)
-      .populate('creator', 'username displayName avatar customGlyph');
-
-    return { rows: items };
-  } catch (error) {
-    console.error('Error getting top items:', error);
-    return { rows: [] };
-  }
-};
-
-const getRecentItems = async (limit = 12) => {
-  try {
-    const categories = ['widget', 'template', 'icon', 'banner', 'gif'];
-    const recentItems = {};
-
-    for (const category of categories) {
-      recentItems[category] = await ScrapyardItem.find({ category })
-        .sort({ createdAt: -1 })
-        .limit(Math.ceil(limit / categories.length))
-        .populate('creator', 'username displayName avatar customGlyph');
+// Get top items by votes - fix potential null reference
+const topItems = await ScrapyardItem.aggregate([
+  {
+    $addFields: {
+      voteScore: {
+        $subtract: [
+          { $size: { $ifNull: ['$votes.upvotes', []] } },
+          { $size: { $ifNull: ['$votes.downvotes', []] } }
+        ]
+      }
     }
-
-    return recentItems;
-  } catch (error) {
-    console.error('Error getting recent items:', error);
-    return {};
-  }
-};
-
-const getFeaturedItems = async (limit = 6) => {
-  try {
-    return await ScrapyardItem.find({ featured: true })
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .populate('creator', 'username displayName avatar customGlyph');
-  } catch (error) {
-    console.error('Error getting featured items:', error);
-    return [];
-  }
-};
+  },
+  { $sort: { voteScore: -1, createdAt: -1 } },
+  { $limit: 8 }
+]);
 
 // Main Scrapyard marketplace page
 router.get('/', async (req, res, next) => {
@@ -131,9 +101,9 @@ router.get('/', async (req, res, next) => {
 });
 
 // View specific category
-router.get('/category/:category', async (req, res, next) => {
+router.get('/category/:category', async (req, res) => {
   try {
-    const { category } = req.params;
+    const category = req.params.category;
     const validCategories = ['widget', 'template', 'icon', 'banner', 'gif'];
 
     if (!validCategories.includes(category)) {
@@ -206,10 +176,9 @@ router.get('/category/:category', async (req, res, next) => {
 });
 
 // View a specific item
-router.get('/item/:id', async (req, res, next) => {
+router.get('/item/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    const item = await ScrapyardItem.findById(id)
+    const item = await ScrapyardItem.findById(req.params.id)
       .populate('creator', 'username displayName avatar customGlyph statusMessage')
       .populate('comments.user', 'username displayName avatar customGlyph');
 
@@ -263,7 +232,7 @@ router.get('/item/:id', async (req, res, next) => {
 });
 
 // Submit a new item page
-router.get('/submit', ensureAuthenticated, (_, res) => {
+router.get('/submit', ensureAuthenticated, (req, res) => {
   res.render('scrapyard/submit', {
     title: 'Submit to Scrapyard - Wirebase',
     pageTheme: 'dark-dungeon'
@@ -495,10 +464,10 @@ router.post('/item/:id/comment', ensureAuthenticated, async (req, res) => {
 });
 
 // Search the Scrapyard
-router.get('/search', async (req, res, next) => {
+router.get('/search', async (req, res) => {
   try {
-    const { q = '', category = 'all' } = req.query;
-    const query = q;
+    const query = req.query.q || '';
+    const category = req.query.category || 'all';
 
     if (!query) {
       return res.redirect('/scrapyard');
@@ -559,11 +528,10 @@ router.get('/search', async (req, res, next) => {
 });
 
 // Download/Use counter
-router.post('/item/:id/download', async (req, res, next) => {
+router.post('/item/:id/download', async (req, res) => {
   try {
-    const { id } = req.params;
     // Increment download count
-    await ScrapyardItem.findByIdAndUpdate(id, { $inc: { downloads: 1 } });
+    await ScrapyardItem.findByIdAndUpdate(req.params.id, { $inc: { downloads: 1 } });
     res.json({ success: true });
   } catch (err) {
     console.error(err);

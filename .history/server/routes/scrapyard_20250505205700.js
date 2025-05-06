@@ -495,10 +495,10 @@ router.post('/item/:id/comment', ensureAuthenticated, async (req, res) => {
 });
 
 // Search the Scrapyard
-router.get('/search', async (req, res, next) => {
+router.get('/search', async (req, res) => {
   try {
-    const { q = '', category = 'all' } = req.query;
-    const query = q;
+    const query = req.query.q || '';
+    const category = req.query.category || 'all';
 
     if (!query) {
       return res.redirect('/scrapyard');
@@ -559,11 +559,10 @@ router.get('/search', async (req, res, next) => {
 });
 
 // Download/Use counter
-router.post('/item/:id/download', async (req, res, next) => {
+router.post('/item/:id/download', async (req, res) => {
   try {
-    const { id } = req.params;
     // Increment download count
-    await ScrapyardItem.findByIdAndUpdate(id, { $inc: { downloads: 1 } });
+    await ScrapyardItem.findByIdAndUpdate(req.params.id, { $inc: { downloads: 1 } });
     res.json({ success: true });
   } catch (err) {
     console.error(err);

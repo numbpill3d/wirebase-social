@@ -1,5 +1,6 @@
 // Main server file for Wirebase
 const dotenv = require('dotenv');
+const helmet = require('helmet');
 
 // Load environment variables first
 dotenv.config();
@@ -10,13 +11,6 @@ const {
   resourceHints,
   cacheControl
 } = require('./server/utils/performance');
-
-// Import security utilities
-const {
-  helmetMiddleware,
-  rateLimiter,
-  xssMiddleware
-} = require('./server/utils/security');
 
 const express = require('express');
 const { engine } = require('express-handlebars');
@@ -92,10 +86,9 @@ app.set('view engine', 'handlebars');
 app.set('views', './server/views');
 
 // Middleware
-app.use(helmetMiddleware); // Enhanced security headers
+app.use(helmet()); // Security headers
 app.use(compressionMiddleware); // Compress responses
 app.use(resourceHints); // Add resource hints
-app.use(xssMiddleware); // Prevent XSS attacks
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public'), {
@@ -104,9 +97,6 @@ app.use(express.static(path.join(__dirname, 'public'), {
   lastModified: true
 }));
 app.use(cacheControl); // Add cache control headers
-
-// Apply rate limiting to API routes
-app.use('/api', rateLimiter);
 
 // Add request timeout middleware
 const timeout = require('connect-timeout');

@@ -1,0 +1,193 @@
+/* Wirebase - Accessibility Enhancements */
+
+/* Skip link - hidden until focused */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--win98-blue);
+  color: white;
+  padding: 8px;
+  z-index: 9999;
+  transition: top 0.3s;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 2px solid var(--gold);
+}
+
+/* Enhanced focus styles */
+:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Custom focus style for Windows 98 elements */
+.win98-button:focus,
+.win98-window-control:focus {
+  outline: 2px dotted black;
+  outline-offset: 2px;
+}
+
+/* Make focus visible for keyboard users but not for mouse users */
+.focus-visible {
+  outline: 3px solid var(--bright-gold);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.5);
+}
+
+/* High contrast mode adjustments */
+@media (prefers-contrast: high) {
+  body {
+    color: white;
+    background-color: black;
+  }
+  
+  a {
+    color: yellow;
+    text-decoration: underline;
+  }
+  
+  .win98-button {
+    border: 2px solid white;
+    color: white;
+    background-color: black;
+  }
+  
+  .win98-window {
+    border: 2px solid white;
+  }
+  
+  .win98-window-header {
+    background-color: black;
+    color: white;
+    border-bottom: 2px solid white;
+  }
+  
+  input, select, textarea {
+    border: 2px solid white;
+    background-color: black;
+    color: white;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .float, .pulse, .magical-hover::before, .page-transition {
+    animation: none !important;
+  }
+  
+  .cursor {
+    animation: none !important;
+    opacity: 1;
+  }
+}
+
+/* Screen reader only elements */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Improved form field accessibility */
+input:focus, 
+select:focus, 
+textarea:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.5);
+}
+
+/* Improved button and link contrast */
+.win98-button, 
+.win98-navbar a, 
+.action-button {
+  color: black;
+  background-color: var(--win98-gray);
+}
+
+/* Ensure text remains visible during webfont load */
+html {
+  font-display: swap;
+}
+
+/* Improved form labels */
+label {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+/* Improved error messages */
+.error-message {
+  color: #ff0000;
+  background-color: #ffeeee;
+  border: 1px solid #ff0000;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border-radius: 3px;
+}
+
+/* Improved focus for interactive elements */
+button:focus,
+[role="button"]:focus,
+input[type="button"]:focus,
+input[type="submit"]:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Improved keyboard navigation for modals */
+.modal:focus {
+  outline: none;
+}
+
+.modal-content:focus {
+  outline: 2px solid var(--gold);
+}
+
+/* Ensure sufficient color contrast */
+.light-text {
+  color: white;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+}
+
+/* Improved link underlines */
+a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+}
+
+/* Improved focus indication for custom components */
+.custom-select:focus-within {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Improved tab focus management */
+[tabindex="-1"]:focus {
+  outline: none !important;
+}
+
+/* Improved ARIA landmarks */
+[role="banner"],
+[role="navigation"],
+[role="main"],
+[role="contentinfo"] {
+  display: block;
+}
