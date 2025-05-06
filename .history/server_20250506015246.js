@@ -132,25 +132,19 @@ app.use('/api', rateLimiter);
 // Add request timeout middleware
 const timeout = require('connect-timeout');
 
-// Use a longer timeout for production
-app.use(timeout(process.env.NODE_ENV === 'production' ? '30s' : '15s'));
-
-// Handle timeouts
+app.use(timeout('15s'));
 app.use((req, res, next) => {
-  if (!req.timedout) {
-    next();
-  }
+  if (!req.timedout) next();
 });
 
 // Clean up any unfinished uploads on timeout
 app.use((err, req, res, next) => {
-  if (err && req.timedout && req.file && req.file.path) {
-    console.log('Request timed out, cleaning up uploaded file:', req.file.path);
-    try {
-      fs.unlinkSync(req.file.path);
-    } catch (unlinkError) {
-      console.error('Failed to cleanup timed out upload:', unlinkError);
-    }
+  if (req.timedout && req.file) {
+    fs.unlink(req.file.path, (unlinkError) => {
+      if (unlinkError) {
+        console.error('Failed to cleanup timed out upload:', unlinkError);
+      }
+    });
   }
   next(err);
 });

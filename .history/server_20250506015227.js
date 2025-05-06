@@ -71,33 +71,16 @@ knex.on('error', (err) => {
   }
 });
 
-// Verify database connection with retry logic
-const verifyDatabaseConnection = async (retries = 5, delay = 5000) => {
-  for (let attempt = 1; attempt <= retries; attempt++) {
-    try {
-      await knex.raw('SELECT 1');
-      console.log('Database connection established successfully');
-      return true;
-    } catch (err) {
-      console.error(`Database connection attempt ${attempt}/${retries} failed:`, err.message);
-
-      if (attempt < retries) {
-        console.log(`Retrying in ${delay/1000} seconds...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
-      } else {
-        console.error('All database connection attempts failed');
-        // Only exit in development to assist with debugging
-        if (process.env.NODE_ENV !== 'production') {
-          process.exit(-1);
-        }
-        return false;
-      }
+// Verify database connection
+knex.raw('SELECT 1')
+  .then(() => console.log('Database connection established successfully'))
+  .catch(err => {
+    console.error('Failed to connect to database:', err);
+    // Only exit in development to assist with debugging
+    if (process.env.NODE_ENV !== 'production') {
+      process.exit(-1);
     }
-  }
-};
-
-// Start the verification process
-verifyDatabaseConnection();
+  });
 
 // Initialize app
 const app = express();
@@ -132,25 +115,19 @@ app.use('/api', rateLimiter);
 // Add request timeout middleware
 const timeout = require('connect-timeout');
 
-// Use a longer timeout for production
-app.use(timeout(process.env.NODE_ENV === 'production' ? '30s' : '15s'));
-
-// Handle timeouts
+app.use(timeout('15s'));
 app.use((req, res, next) => {
-  if (!req.timedout) {
-    next();
-  }
+  if (!req.timedout) next();
 });
 
 // Clean up any unfinished uploads on timeout
 app.use((err, req, res, next) => {
-  if (err && req.timedout && req.file && req.file.path) {
-    console.log('Request timed out, cleaning up uploaded file:', req.file.path);
-    try {
-      fs.unlinkSync(req.file.path);
-    } catch (unlinkError) {
-      console.error('Failed to cleanup timed out upload:', unlinkError);
-    }
+  if (req.timedout && req.file) {
+    fs.unlink(req.file.path, (unlinkError) => {
+      if (unlinkError) {
+        console.error('Failed to cleanup timed out upload:', unlinkError);
+      }
+    });
   }
   next(err);
 });
