@@ -488,10 +488,9 @@ ul {
   background-color: var(--win98-gray);
   border: 2px solid;
   border-color: var(--win98-border-light) var(--win98-border-darker) var(--win98-border-darker) var(--win98-border-light);
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.4);
   position: relative;
-  width: 100%;
 }
 
 /* Add medieval texture overlay to windows */
@@ -565,11 +564,9 @@ ul {
 }
 
 .win98-window-content {
-  padding: 20px;
+  padding: 10px;
   color: black;
   position: relative;
-  overflow: auto;
-  max-height: 80vh;
 }
 
 .win98-input {
@@ -2183,7 +2180,6 @@ button, select, input[type="submit"] {
 
     .container {
         padding: 10px;
-        width: 100%;
     }
 
     .main-header {
@@ -2205,29 +2201,11 @@ button, select, input[type="submit"] {
 
     .win98-window {
         margin-bottom: 15px;
-        width: 100% !important;
-    }
-
-    .win98-window-content {
-        padding: 10px;
     }
 
     .home-content-grid {
         display: flex;
         flex-direction: column;
-    }
-
-    .new-layout {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-
-    .welcome-section, .features-panel, .scrapyard-grid {
-        grid-column: 1;
-    }
-
-    .scrapyard-grid {
-        grid-template-columns: 1fr;
     }
 
     .customize-grid {
@@ -2239,9 +2217,12 @@ button, select, input[type="submit"] {
         margin-bottom: 15px;
     }
 
+    .scrapyard-categories {
+        grid-template-columns: 1fr;
+    }
+
     .category-card {
         margin-bottom: 10px;
-        min-height: 150px;
     }
 
     .users-grid, .items-grid {

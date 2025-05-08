@@ -488,10 +488,9 @@ ul {
   background-color: var(--win98-gray);
   border: 2px solid;
   border-color: var(--win98-border-light) var(--win98-border-darker) var(--win98-border-darker) var(--win98-border-light);
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.4);
   position: relative;
-  width: 100%;
 }
 
 /* Add medieval texture overlay to windows */
