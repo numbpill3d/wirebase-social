@@ -487,32 +487,9 @@ class StreetpassWidget extends HTMLElement {
                 opacity: 1;
             }
             
-            .emote-confirmation.fade-out,
-            .error-notification.fade-out {
+            .emote-confirmation.fade-out {
                 opacity: 0;
                 transition: opacity 0.5s;
-            }
-            
-            .error-notification {
-                position: absolute;
-                bottom: 10px;
-                left: 10px;
-                right: 10px;
-                background-color: #ff5252;
-                color: white;
-                padding: 8px;
-                border-radius: 3px;
-                font-size: 12px;
-                text-align: center;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-                z-index: 100;
-                opacity: 1;
-                animation: fade-in 0.3s ease-in;
-            }
-            
-            @keyframes fade-in {
-                from { opacity: 0; transform: translateY(10px); }
-                to { opacity: 1; transform: translateY(0); }
             }
             
             @keyframes float-up {

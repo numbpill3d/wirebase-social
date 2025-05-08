@@ -739,67 +739,21 @@ function showLoadingScreen() {
     loadingScreen.innerHTML = `
         <div class="loading-window">
             <div class="loading-header">
-                <div class="loading-title">Wirebase Loading...</div>
-                <div class="win98-window-controls">
-                    <span class="win98-window-control disabled">_</span>
-                    <span class="win98-window-control disabled">□</span>
-                    <span class="win98-window-control disabled">×</span>
-                </div>
+                Wirebase Loading...
             </div>
             <div class="loading-content">
-                <div class="loading-icon-container">
-                    <img src="/images/wirebase-logo.svg" alt="" class="loading-logo pixel-image" />
-                </div>
                 <p>Loading medieval dungeon experience...</p>
                 <div class="loading-bar-container">
                     <div class="loading-bar"></div>
                 </div>
                 <p class="loading-status">Please wait...</p>
-                <div class="loading-ambient-container">
-                    <div class="ambient-torch left"></div>
-                    <div class="ambient-torch right"></div>
-                </div>
             </div>
         </div>
     `;
 
     document.body.appendChild(loadingScreen);
 
-    // Add animated torch flicker effect
-    const animateTorches = () => {
-        document.querySelectorAll('.ambient-torch').forEach(torch => {
-            const intensity = 0.8 + (Math.random() * 0.4);
-            const hueRotate = Math.random() * 20 - 10;
-            torch.style.filter = `brightness(${intensity}) hue-rotate(${hueRotate}deg)`;
-        });
-        
-        // Randomize the timing for natural flicker
-        setTimeout(animateTorches, 100 + Math.random() * 200);
-    };
-    
-    animateTorches();
-
-    // Add pulsing effect to logo
-    const loadingLogo = loadingScreen.querySelector('.loading-logo');
-    let pulseDirection = 1;
-    let pulseValue = 1;
-    
-    const animateLogo = () => {
-        pulseValue += 0.01 * pulseDirection;
-        
-        if (pulseValue >= 1.1) pulseDirection = -1;
-        if (pulseValue <= 0.9) pulseDirection = 1;
-        
-        loadingLogo.style.transform = `scale(${pulseValue})`;
-        
-        if (document.body.contains(loadingLogo)) {
-            requestAnimationFrame(animateLogo);
-        }
-    };
-    
-    requestAnimationFrame(animateLogo);
-
-    // Update loading messages with typewriter effect
+    // Update loading messages
     const statusMessages = [
         'Forging medieval components...',
         'Brewing digital potions...',
@@ -813,104 +767,18 @@ function showLoadingScreen() {
 
     const statusElement = loadingScreen.querySelector('.loading-status');
     let messageIndex = 0;
-    let charIndex = 0;
-    let currentMessage = '';
-    
-    const typeWriter = () => {
-        if (charIndex < statusMessages[messageIndex].length) {
-            currentMessage += statusMessages[messageIndex].charAt(charIndex);
-            statusElement.textContent = currentMessage;
-            charIndex++;
-            setTimeout(typeWriter, 50);
-        } else {
-            setTimeout(() => {
-                charIndex = 0;
-                currentMessage = '';
-                messageIndex = (messageIndex + 1) % statusMessages.length;
-                typeWriter();
-            }, 1000);
-        }
-    };
-    
-    typeWriter();
 
-    // Remove loading screen after delay with smooth transition
+    const messageInterval = setInterval(() => {
+        statusElement.textContent = statusMessages[messageIndex];
+        messageIndex = (messageIndex + 1) % statusMessages.length;
+    }, 1500);
+
+    // Remove loading screen after delay
     setTimeout(() => {
-        // Add closing animation class
-        loadingScreen.classList.add('closing');
-        
-        setTimeout(() => {
-            // Fade out after the CRT animation
-            loadingScreen.style.opacity = '0';
-            
-            setTimeout(() => {
-                loadingScreen.remove();
-                
-                // Add initialization complete notification
-                showSystemNotification('System Initialized', 'Welcome to Wirebase!');
-            }, 1000);
-        }, 1000);
+        clearInterval(messageInterval);
+        loadingScreen.style.opacity = '0';
+        setTimeout(() => loadingScreen.remove(), 1000);
     }, 6000);
-}
-
-/**
- * Show a Windows 98 style system notification
- */
-function showSystemNotification(title, message) {
-    const notification = document.createElement('div');
-    notification.className = 'win98-window system-notification';
-    notification.innerHTML = `
-        <div class="win98-window-header">
-            <span class="win98-window-title">${title}</span>
-            <div class="win98-window-controls">
-                <span class="win98-window-control close">×</span>
-            </div>
-        </div>
-        <div class="win98-window-content">
-            <div class="notification-content">
-                <img src="/images/information.png" alt="" class="notification-icon">
-                <p>${message}</p>
-            </div>
-        </div>
-    `;
-    
-    // Style the notification
-    notification.style.position = 'fixed';
-    notification.style.bottom = '20px';
-    notification.style.right = '20px';
-    notification.style.width = '280px';
-    notification.style.zIndex = '9999';
-    notification.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.4)';
-    notification.style.transform = 'translateY(100px)';
-    notification.style.opacity = '0';
-    notification.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
-    
-    document.body.appendChild(notification);
-    
-    // Add click handler to close button
-    notification.querySelector('.close').addEventListener('click', () => {
-        hideNotification();
-    });
-    
-    // Show notification with animation
-    setTimeout(() => {
-        notification.style.transform = 'translateY(0)';
-        notification.style.opacity = '1';
-        playSound('notify');
-    }, 100);
-    
-    // Auto-dismiss after 5 seconds
-    setTimeout(hideNotification, 5000);
-    
-    function hideNotification() {
-        notification.style.transform = 'translateY(100px)';
-        notification.style.opacity = '0';
-        setTimeout(() => {
-            if (document.body.contains(notification)) {
-                notification.remove();
-            }
-        }, 400);
-    }
 }
 
 /**
@@ -966,76 +834,8 @@ function playSound(sound) {
     if (sounds[sound]) {
         const audio = new Audio(sounds[sound]);
         audio.volume = 0.5; // 50% volume
-        audio.play().catch(e => {
-            console.log('Sound playback prevented:', e);
-            // Don't show errors for autoplay restrictions - these are expected
-            if (!e.message.includes('user didn\'t interact')) {
-                showErrorToast('Sound playback issue: ' + e.message);
-            }
-        });
+        audio.play().catch(e => console.log('Sound playback prevented:', e));
     }
-}
-
-/**
- * Show an error toast notification to the user
- */
-function showErrorToast(message) {
-    // Check if a toast container exists
-    let toastContainer = document.querySelector('.toast-container');
-    
-    // Create container if it doesn't exist
-    if (!toastContainer) {
-        toastContainer = document.createElement('div');
-        toastContainer.className = 'toast-container';
-        toastContainer.style.position = 'fixed';
-        toastContainer.style.bottom = '20px';
-        toastContainer.style.right = '20px';
-        toastContainer.style.zIndex = '9999';
-        document.body.appendChild(toastContainer);
-    }
-    
-    // Create toast
-    const toast = document.createElement('div');
-    toast.className = 'error-toast win98-window';
-    toast.innerHTML = `
-        <div class="win98-window-header">
-            <span class="win98-window-title">Error</span>
-            <div class="win98-window-controls">
-                <span class="win98-window-control close-toast">×</span>
-            </div>
-        </div>
-        <div class="win98-window-content">
-            ${message}
-        </div>
-    `;
-    
-    // Style the toast
-    toast.style.marginBottom = '10px';
-    toast.style.minWidth = '250px';
-    toast.style.maxWidth = '350px';
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateY(20px)';
-    toast.style.transition = 'opacity 0.3s, transform 0.3s';
-    
-    toastContainer.appendChild(toast);
-    
-    // Add click handler to close button
-    toast.querySelector('.close-toast').addEventListener('click', () => {
-        fadeOutElement(toast, () => toast.remove());
-    });
-    
-    // Animate in
-    setTimeout(() => {
-        toast.style.opacity = '1';
-        toast.style.transform = 'translateY(0)';
-    }, 10);
-    
-    // Auto-dismiss after 6 seconds
-    setTimeout(() => {
-        if (document.body.contains(toast)) {
-            fadeOutElement(toast, () => toast.remove());
-        }
-    }, 6000);
 }
 
 /**
@@ -1354,28 +1154,13 @@ class EventManager {
       return;
     }
 
-    // Wrap callback to prevent memory leaks from closures
-    const wrappedCallback = (...args) => {
-      callback(...args);
-    };
-
-    element.addEventListener(event, wrappedCallback);
+    element.addEventListener(event, callback);
 
     if (!this.listeners.has(element)) {
       this.listeners.set(element, []);
     }
 
-    this.listeners.get(element).push({ event, callback: wrappedCallback });
-    
-    // Return a removal function for easy cleanup
-    return () => {
-      element.removeEventListener(event, wrappedCallback);
-      const listeners = this.listeners.get(element);
-      const index = listeners.findIndex(l => l.callback === wrappedCallback);
-      if (index !== -1) {
-        listeners.splice(index, 1);
-      }
-    };
+    this.listeners.get(element).push({ event, callback });
   }
 
   removeAllListeners() {
@@ -1396,72 +1181,3 @@ const eventManager = new EventManager();
 function destroyComponent() {
   eventManager.removeAllListeners();
 }
-
-/**
- * Setup accessibility controls
- */
-document.addEventListener('DOMContentLoaded', function() {
-  // Initialize accessibility controls
-  const toggleAnimations = document.getElementById('toggle-animations');
-  const toggleContrast = document.getElementById('toggle-contrast');
-  const increaseFont = document.getElementById('increase-font');
-  
-  if (!toggleAnimations || !toggleContrast || !increaseFont) return;
-  
-  // Get stored preferences
-  const animationsPaused = localStorage.getItem('animations-paused') === 'true';
-  const highContrast = localStorage.getItem('high-contrast') === 'true';
-  const fontSizeLevel = parseInt(localStorage.getItem('font-size-level') || '0');
-  
-  // Apply stored preferences
-  if (animationsPaused) {
-    document.body.classList.add('reduced-motion');
-    toggleAnimations.setAttribute('aria-pressed', 'true');
-  }
-  
-  if (highContrast) {
-    document.body.classList.add('high-contrast');
-    toggleContrast.setAttribute('aria-pressed', 'true');
-  }
-  
-  if (fontSizeLevel > 0) {
-    document.body.classList.add(`font-size-${['large', 'larger', 'largest'][fontSizeLevel - 1]}`);
-  }
-  
-  // Toggle animations
-  toggleAnimations.addEventListener('click', function() {
-    const isPaused = this.getAttribute('aria-pressed') === 'true';
-    const newState = !isPaused;
-    
-    this.setAttribute('aria-pressed', newState.toString());
-    document.body.classList.toggle('reduced-motion', newState);
-    localStorage.setItem('animations-paused', newState.toString());
-  });
-  
-  // Toggle high contrast
-  toggleContrast.addEventListener('click', function() {
-    const isHighContrast = this.getAttribute('aria-pressed') === 'true';
-    const newState = !isHighContrast;
-    
-    this.setAttribute('aria-pressed', newState.toString());
-    document.body.classList.toggle('high-contrast', newState);
-    localStorage.setItem('high-contrast', newState.toString());
-  });
-  
-  // Increase font size (cycles through levels)
-  increaseFont.addEventListener('click', function() {
-    const currentLevel = parseInt(localStorage.getItem('font-size-level') || '0');
-    const newLevel = (currentLevel + 1) % 4; // 0, 1, 2, 3 (0 = default)
-    
-    // Remove all font size classes
-    document.body.classList.remove('font-size-large', 'font-size-larger', 'font-size-largest');
-    
-    // Add new class if not default
-    if (newLevel > 0) {
-      const sizes = ['large', 'larger', 'largest'];
-      document.body.classList.add(`font-size-${sizes[newLevel - 1]}`);
-    }
-    
-    localStorage.setItem('font-size-level', newLevel.toString());
-  });
-});

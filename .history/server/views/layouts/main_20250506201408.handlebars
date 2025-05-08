@@ -135,32 +135,18 @@
     </div>
 
     {{#if user.isAuthenticated}}
-        <div class="user-status-bar" role="status" aria-label="User status">
+        <div class="user-status-bar">
             <div class="user-info">
                 <img src="{{user.avatar}}" alt="{{user.displayName}}" class="user-avatar-small">
                 <span class="user-name">{{user.displayName}}</span>
-                <span class="user-glyph" aria-hidden="true">{{user.customGlyph}}</span>
+                <span class="user-glyph">{{user.customGlyph}}</span>
             </div>
             <div class="loot-tokens">
-                <span class="token-icon" aria-hidden="true">⚜️</span>
-                <span class="token-count">{{user.lootTokens}} tokens</span>
+                <span class="token-icon">⚜️</span>
+                <span class="token-count">{{user.lootTokens}}</span>
             </div>
         </div>
     {{/if}}
-    
-    {{!-- Accessibility features --}}
-    <div id="skiplinks-target" tabindex="-1"></div>
-    <div id="accessibility-controls" class="a11y-controls">
-        <button id="toggle-animations" class="a11y-button" aria-pressed="false">
-            Pause Animations
-        </button>
-        <button id="toggle-contrast" class="a11y-button" aria-pressed="false">
-            High Contrast
-        </button>
-        <button id="increase-font" class="a11y-button">
-            Increase Text Size
-        </button>
-    </div>
 
     <script src="/js/main.js"></script>
     {{#if additionalScripts}}
