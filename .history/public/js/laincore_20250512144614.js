@@ -577,16 +577,8 @@ class LaincoreTheme {
     const buttons = document.querySelectorAll('.win98-button');
     
     buttons.forEach(btn => {
-      // Skip buttons that already have originalText to avoid double-processing
-      if (btn.dataset.originalText) {
-        return;
-      }
-      
-      // Store original text and href
+      // Store original text
       btn.dataset.originalText = btn.textContent;
-      if (btn.getAttribute('href')) {
-        btn.dataset.originalHref = btn.getAttribute('href');
-      }
       
       // Replace with cryptic version
       if (btn.textContent === 'Home') btn.textContent = 'initiate';
@@ -660,49 +652,17 @@ class LaincoreTheme {
     document.querySelectorAll('.laincore-background, .laincore-cursor, .laincore-cursor-trail, .laincore-nav-sidebar, .laincore-nav-toggle, .laincore-theme-toggle, .laincore-audio-toggle, .laincore-message').forEach(el => {
       el.remove();
     });
-    
-    // Remove degradation effects from any elements
-    document.querySelectorAll('[style*="transform"]').forEach(el => {
-      if (el.style.transform.includes('translateX') ||
-          el.style.transform.includes('translateY') ||
-          el.style.transform.includes('skew')) {
-        el.style.transform = '';
-      }
-    });
-    
-    // Reset any opacity changes
-    document.querySelectorAll('[style*="opacity"]').forEach(el => {
-      if (el.style.opacity !== '1' && el.style.opacity !== '') {
-        el.style.opacity = '1';
-      }
-    });
   }
 
   stopIntervals() {
     // Clear all intervals
     if (this.messageInterval) {
       clearInterval(this.messageInterval);
-      this.messageInterval = null;
     }
     
     if (this.degradationInterval) {
       clearInterval(this.degradationInterval);
-      this.degradationInterval = null;
     }
-    
-    // Remove any existing messages
-    if (this.currentMessage && document.body.contains(this.currentMessage)) {
-      this.currentMessage.remove();
-      this.currentMessage = null;
-    }
-    
-    // Clear cursor trails
-    this.cursorTrails.forEach(trail => {
-      if (document.body.contains(trail)) {
-        trail.remove();
-      }
-    });
-    this.cursorTrails = [];
   }
 }
 
