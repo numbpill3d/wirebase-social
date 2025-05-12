@@ -1,0 +1,28 @@
+body {
+    background-color: #111 !important;
+    color: #00ff00 !important;
+    font-family: 'Terminal Grotesque', monospace !important;
+    overflow: hidden !important;
+}
+
+/* Add scanlines effect */
+body::before {
+    content: "" !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: repeating-linear-gradient(0deg, rgba(0, 255, 0, 0.1) 0, rgba(0, 255, 0, 0.1) 1px, transparent 1px, transparent 2px) !important;
+    pointer-events: none !important;
+    z-index: 1000 !important;
+    opacity: 0.7 !important;
+}
+
+/* Add noise effect */
+.noise {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;

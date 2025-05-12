@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laincore Theme Image Assets</title>
+    <style>
+        body {
+            font-family: 'Syne Mono', monospace;
+            background-color: #111;
+            color: #00ff00;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1, h2 {
+            color: #cc6666;
+        }
+        
+        .image-container {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #333;
+            background-color: #0a0a0a;
+        }
+        
+        .image-info {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .image-example {
+            width: 100%;
+            height: auto;
+            max-height: 200px;
+            object-fit: cover;
+            border: 1px solid #333;
+        }
+        
+        code {
+            display: block;
+            background-color: #000;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 3px solid #cc6666;
+            overflow-x: auto;
+        }
+        
+        .resource-link {
+            color: #cc6666;
+            text-decoration: none;
+        }
+        
+        .resource-link:hover {
+            text-decoration: underline;
+            color: #00ff00;
+        }
+    </style>
+</head>
+<body>
+    <h1>Laincore Theme Image Assets</h1>
+    <p>This document outlines the image assets needed for the Serial Experiments Lain-inspired Laincore theme.</p>
+    
+    <h2>Required Images</h2>
+    <p>Place all these images in the <code>/public/images/laincore/</code> directory.</p>
+    
+    <div class="image-container">
+        <h3>1. lain-hallway.jpg</h3>
+        <div class="image-info">
+            <div>
+                <img src="https://i.imgur.com/TMQWs8r.jpg" alt="Lain Hallway Example" class="image-example">
+            </div>
+            <div>
+                <p>A dark, eerie hallway image reminiscent of the ones seen in Serial Experiments Lain.</p>
+                <p>Ideal size: 1280x720px or larger</p>
+                <p>Characteristics: Low-res, dark, slight blur, abstract/surreal</p>
+                <p>Used for: Loading screens</p>
+                <p>Resource options:</p>
+                <ul>
+                    <li><a href="https://www.pinterest.com/search/pins/?q=serial%20experiments%20lain%20hallway" class="resource-link" target="_blank">Pinterest: Lain Hallway Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="image-container">
+        <h3>2. lain-city.jpg</h3>
+        <div class="image-info">
+            <div>
+                <img src="https://i.imgur.com/MxQH6Ww.jpg" alt="Lain City Example" class="image-example">
+            </div>
+            <div>
+                <p>A cityscape with power lines and subdued lighting, similar to the iconic night scenes in Lain.</p>
+                <p>Ideal size: 1920x1080px or larger</p>
+                <p>Characteristics: Urban, night, power lines, slightly desaturated</p>
+                <p>Used for: Background effects</p>
+                <p>Resource options:</p>
+                <ul>
+                    <li><a href="https://www.pinterest.com/search/pins/?q=serial%20experiments%20lain%20city" class="resource-link" target="_blank">Pinterest: Lain City Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="image-container">
+        <h3>3. lain-noise.png</h3>
+        <div class="image-info">
+            <div>
+                <img src="https://i.imgur.com/8b7Jcds.png" alt="Noise Texture Example" class="image-example">
+            </div>
+            <div>
+                <p>A seamless noise texture for visual distortion effects.</p>
+                <p>Ideal size: 256x256px or 512x512px (power of 2 dimensions)</p>
+                <p>Characteristics: High contrast, grainy, seamless tiling</p>
+                <p>Used for: Background noise and distortion effects</p>
+                <p>Resource options:</p>
+                <ul>
+                    <li><a href="https://www.pexels.com/search/noise%20texture/" class="resource-link" target="_blank">Pexels: Noise Texture Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <h2>Audio Assets</h2>
+    <p>Place all these audio files in the <code>/public/sounds/</code> directory.</p>
+    
+    <div class="image-container">
+        <h3>1. laincore-ambient.mp3</h3>
+        <div class="image-info">
+            <div>
+                <audio controls>
+                    <source src="https://example.com/laincore-ambient.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            <div>
+                <p>Low, ambient droning sound with occasional electronic pulses.</p>
+                <p>Ideal length: 1-2 minutes (loopable)</p>
+                <p>Characteristics: Low volume, ambient, subtle electronic elements</p>
+                <p>Used for: Background ambience when theme is active</p>
+                <p>Resource options:</p>
+                <ul>
+                    <li><a href="https://freesound.org/search/?q=cyberpunk+ambient" class="resource-link" target="_blank">Freesound: Cyberpunk Ambient Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="image-container">
+        <h3>2. laincore-glitch.mp3</h3>
+        <div class="image-info">
+            <div>
+                <audio controls>
+                    <source src="https://example.com/laincore-glitch.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            <div>
+                <p>Short electronic glitch/error sound.</p>
+                <p>Ideal length: 0.5-2 seconds</p>
+                <p>Characteristics: Sharp, digital distortion</p>
+                <p>Used for: UI interactions and visual glitches</p>
+                <p>Resource options:</p>
+                <ul>
+                    <li><a href="https://freesound.org/search/?q=digital+glitch" class="resource-link" target="_blank">Freesound: Digital Glitch Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="image-container">
+        <h3>3. laincore-beep.mp3</h3>
+        <div class="image-info">
+            <div>
+                <audio controls>
+                    <source src="https://example.com/laincore-beep.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            <div>
+                <p>Short electronic beep/confirm sound.</p>
+                <p>Ideal length: 0.2-0.5 seconds</p>
+                <p>Characteristics: Clear, digital tone</p>
+                <p>Used for: Button clicks and UI confirmations</p>
+                <p>Resource options:</p>
+                <ul>
+                    <li><a href="https://freesound.org/search/?q=electronic+beep" class="resource-link" target="_blank">Freesound: Electronic Beep Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <h2>Implementation Notes</h2>
+    <p>The Laincore theme uses several other visual effects created entirely with CSS and JavaScript:</p>
+    <ul>
+        <li>Scanlines: Created with CSS gradients</li>
+        <li>Glitching: Implemented with CSS animations and JavaScript</li>
+        <li>Cursor trails: Generated dynamically with JavaScript</li>
+        <li>Random messages: Text generated from a predefined list</li>
+    </ul>
+    
+    <p>If you don't have these specific images, you can substitute them with similar ones that match the Serial Experiments Lain aesthetic of digital alienation, technological anxiety, and surreal cyberpunk.</p>
+
+    <p>For further inspiration, references to Serial Experiments Lain's visual style can be found in:</p>
+    <ul>
+        <li><a href="https://www.google.com/search?q=serial+experiments+lain+aesthetic&tbm=isch" class="resource-link" target="_blank">Google Images: Serial Experiments Lain Aesthetic</a></li>
+        <li><a href="https://www.pinterest.com/search/pins/?q=serial%20experiments%20lain" class="resource-link" target="_blank">Pinterest: Serial Experiments Lain</a></li>
+    </ul>
+</body>
+</html>

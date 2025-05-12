@@ -1076,8 +1076,6 @@ ul {
     100% { width: 100%; }
 }
 
-:start_line:1061
--------
 /* CRT screen effect */
 .crt-effect {
   position: fixed;
@@ -1087,18 +1085,16 @@ ul {
   height: 100%;
   background: repeating-linear-gradient(
     0deg,
-    rgba(0, 255, 0, 0.1),
-    rgba(0, 255, 0, 0.1) 1px,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
     transparent 1px,
     transparent 2px
   );
   pointer-events: none;
   z-index: 998;
-  opacity: 0.2;
+  opacity: 0.3;
 }
 
-:start_line:1080
--------
 .crt-effect::before {
   content: '';
   position: absolute;
@@ -1109,8 +1105,8 @@ ul {
   background: radial-gradient(
     circle at center,
     transparent 0%,
-    rgba(0, 255, 0, 0.05) 70%,
-    rgba(0, 0, 0, 0.2) 100%
+    rgba(0, 0, 0, 0.1) 90%,
+    rgba(0, 0, 0, 0.3) 100%
   );
 }
 

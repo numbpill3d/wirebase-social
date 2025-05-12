@@ -1474,19 +1474,3 @@ document.addEventListener('DOMContentLoaded', function() {
     localStorage.setItem('font-size-level', newLevel.toString());
   });
 });
-
-// Theme toggle functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const themeToggle = document.getElementById('theme-toggle');
-    const laincoreStylesheet = document.querySelector('link[href="css/laincore.css"]');
-
-    if (themeToggle && laincoreStylesheet) {
-        themeToggle.addEventListener('click', function() {
-            if (laincoreStylesheet.disabled) {
-                laincoreStylesheet.disabled = false;
-            } else {
-                laincoreStylesheet.disabled = true;
-            }
-        });
-    }
-});

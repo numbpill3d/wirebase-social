@@ -1,0 +1,849 @@
+/**
+ * LAINCORE THEME - Serial Experiments Lain-inspired UI
+ * A wired, digital void aesthetic with analog distortion
+ */
+
+:root {
+  /* Core palette */
+  --lain-black: #000000;
+  --lain-grey-wash: #333333;
+  --lain-grey-dark: #222222;
+  --lain-grey-light: #555555; 
+  --lain-crt-green: #00ff00;
+  --lain-muted-red: #800000;
+  --lain-muted-pink: #cc6666;
+  --lain-crt-glow: rgba(0, 255, 0, 0.2);
+  --lain-dark-blue: #000022;
+  --lain-overlay-grey: rgba(20, 20, 20, 0.7);
+  --lain-scan-line: rgba(0, 20, 0, 0.1);
+}
+
+/* Import Laincore Fonts */
+@font-face {
+  font-family: 'Syne Mono';
+  src: url('https://fonts.googleapis.com/css2?family=Syne+Mono&display=swap');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Lekton';
+  src: url('https://fonts.googleapis.com/css2?family=Lekton&display=swap');
+  font-display: swap;
+}
+
+/* Base Structure Overrides */
+body.laincore {
+  background-color: var(--lain-black);
+  color: var(--lain-crt-green);
+  font-family: 'Syne Mono', monospace;
+  cursor: none;
+  overflow-x: hidden;
+  letter-spacing: 0.5px;
+  position: relative;
+  text-shadow: 0 0 2px var(--lain-crt-green);
+}
+
+/* Custom Cursor */
+.laincore-cursor {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--lain-crt-green);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  mix-blend-mode: difference;
+  z-index: 10000;
+  transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease;
+}
+
+.laincore-cursor::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px;
+  height: 4px;
+  background-color: var(--lain-crt-green);
+  border-radius: 50%;
+}
+
+.laincore-cursor-trail {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  background: var(--lain-crt-green);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  z-index: 9999;
+}
+
+/* Main Background Effects */
+.laincore-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-color: var(--lain-black);
+  overflow: hidden;
+}
+
+.laincore-city-loop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent 90%, var(--lain-muted-red) 100%),
+              url('/images/lain-city.jpg');
+  background-size: cover;
+  opacity: 0.15;
+  z-index: -3;
+  animation: cityPulse 20s ease-in-out infinite;
+}
+
+.laincore-scan-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 1px,
+    var(--lain-scan-line) 1px,
+    var(--lain-scan-line) 2px
+  );
+  z-index: -1;
+  pointer-events: none;
+  animation: scanMove 8s linear infinite;
+}
+
+.laincore-noise {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAM1BMVEUAAAA7PT04OTk6PDw4Ozs5OTk7PDw5Ozs6Ojo6PDw5Oju5Fx85OTo5OTo6Ojs6OjyzOy9GAAAAEHRSTlMAECAwQFBgcICPn6+/z9/vIxqCigAAAQNJREFUWMPtlluOwyAMRWFsbgGS9N9/t03tqDPIHn5HGs4HsV4OEXF+ONKyP44AyIZi40oAQRBvR3mDqDNMiX4AdV3Mc5pHjblCVnOkGDwfcgD4tB8PgIZaBCAPwB0LpMGzhJwAnpt/b2UPiM4a2ZrRViMDVs0gy3D9WCdBo/9KVgF2LJI6Wv4GPOcCnLVSQdQhygACT9kTHD+NJlJKdRCFgNhjqTJGSVjAB9Y5FLUkXF8UY70kaiDyATXTOcA5gOgE5B6QZl9H4LTE9r0AwP8FsHsfSOoBAPAK2Ck7wClgNi/w7wAHAGIBcgWJC0hcQOICCkxzpjkPmGZPc86ncMjsPaRkP8fPH0fEK+ILgYBfbZ9owZQAAAAASUVORK5CYII=');
+  background-repeat: repeat;
+  opacity: 0.03;
+  z-index: -2;
+  animation: noiseAnimation 0.2s infinite;
+}
+
+.laincore-vignette {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle at center,
+    transparent 40%,
+    rgba(0, 0, 0, 0.4) 80%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Header Styling */
+.laincore .main-header {
+  background-color: var(--lain-grey-dark);
+  border-bottom: 1px solid var(--lain-muted-red);
+  padding: 10px 20px;
+  box-shadow: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.laincore .main-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('data:image/svg+xml;utf8,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="10" height="10" fill="rgba(200, 0, 0, 0.03)"/><rect x="10" y="10" width="10" height="10" fill="rgba(200, 0, 0, 0.03)"/></svg>');
+  opacity: 0.2;
+  z-index: -1;
+}
+
+.laincore .logo h1 {
+  font-family: 'Syne Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  filter: blur(0.5px);
+  animation: textGlitch 5s infinite;
+}
+
+.laincore .logo img {
+  filter: hue-rotate(160deg) brightness(0.7) contrast(1.2);
+  opacity: 0.8;
+  mix-blend-mode: screen;
+}
+
+/* Navigation Sidebar */
+.laincore-nav-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
+  transition: width 0.3s ease;
+  overflow-x: hidden;
+  border-right: 1px solid var(--lain-muted-red);
+}
+
+.laincore-nav-sidebar.active {
+  width: 250px;
+}
+
+.laincore-nav-toggle {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background-color: transparent;
+  border: 1px solid var(--lain-crt-green);
+  color: var(--lain-crt-green);
+  padding: 5px 10px;
+  z-index: 1001;
+  font-family: 'Syne Mono', monospace;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.laincore-nav-toggle:hover {
+  background-color: var(--lain-crt-green);
+  color: var(--lain-black);
+}
+
+.laincore-nav-content {
+  display: flex;
+  flex-direction: column;
+  padding: 60px 20px 20px;
+}
+
+.laincore-nav-content .win98-button {
+  margin-bottom: 10px;
+  width: 100%;
+  text-align: left;
+  text-transform: lowercase;
+}
+
+/* UI Elements */
+.laincore .win98-button {
+  background-color: var(--lain-grey-dark);
+  border: 1px solid var(--lain-muted-red);
+  color: var(--lain-crt-green);
+  font-family: 'Syne Mono', monospace;
+  padding: 5px 10px;
+  position: relative;
+  text-transform: lowercase;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+  box-shadow: none;
+  text-shadow: 0 0 2px var(--lain-crt-green);
+  overflow: hidden;
+  cursor: none;
+}
+
+.laincore .win98-button::before {
+  content: '>';
+  margin-right: 5px;
+  opacity: 0.8;
+}
+
+.laincore .win98-button:hover {
+  border-color: var(--lain-crt-green);
+  transform: scale(1.03);
+  animation: buttonGlitch 1s infinite;
+}
+
+.laincore .win98-button:hover::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(0, 255, 0, 0.1),
+    transparent
+  );
+  animation: buttonScan 1.5s linear infinite;
+}
+
+.laincore .win98-window {
+  background-color: var(--lain-grey-dark);
+  border: 1px solid var(--lain-muted-red);
+  color: var(--lain-crt-green);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  position: relative;
+  backdrop-filter: blur(2px);
+  margin-bottom: 30px;
+}
+
+.laincore .win98-window::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(150, 0, 0, 0.1) 0%, transparent 100%);
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.laincore .win98-window-header {
+  background-color: var(--lain-black);
+  color: var(--lain-muted-red);
+  border-bottom: 1px solid var(--lain-muted-red);
+  padding: 4px;
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+}
+
+.laincore .win98-window-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--lain-muted-red), transparent);
+  opacity: 0.5;
+}
+
+.laincore .win98-window-title {
+  font-family: 'Syne Mono', monospace;
+  text-transform: lowercase;
+  letter-spacing: 1px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.laincore .win98-window-title::before {
+  content: '[';
+  margin-right: 4px;
+  color: var(--lain-crt-green);
+}
+
+.laincore .win98-window-title::after {
+  content: ']';
+  margin-left: 4px;
+  color: var(--lain-crt-green);
+}
+
+.laincore .win98-window-controls {
+  display: flex;
+  gap: 5px;
+}
+
+.laincore .win98-window-control {
+  width: 14px;
+  height: 14px;
+  font-size: 12px;
+  line-height: 12px;
+  background-color: var(--lain-grey-wash);
+  color: var(--lain-crt-green);
+  border: 1px solid var(--lain-muted-red);
+  cursor: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.laincore .win98-window-control:hover {
+  background-color: var(--lain-muted-red);
+  color: var(--lain-crt-green);
+}
+
+.laincore .win98-window-content {
+  padding: 15px;
+  color: var(--lain-crt-green);
+  position: relative;
+  overflow: auto;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.laincore .win98-window-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 100, 0, 0.03) 0px,
+    rgba(0, 100, 0, 0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+}
+
+/* Random Ephemeral Messages */
+.laincore-message {
+  position: fixed;
+  padding: 10px 15px;
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 1px solid var(--lain-muted-red);
+  color: var(--lain-crt-green);
+  font-family: 'Syne Mono', monospace;
+  font-size: 12px;
+  z-index: 9000;
+  opacity: 0;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+  transition: opacity 0.5s ease;
+  text-shadow: 0 0 2px var(--lain-crt-green);
+  animation: messageGlitch 10s infinite;
+}
+
+.laincore-message.show {
+  opacity: 0.9;
+}
+
+.laincore-message-dismiss {
+  display: block;
+  margin-top: 8px;
+  text-align: right;
+  font-size: 10px;
+  opacity: 0.7;
+  cursor: none;
+  text-transform: uppercase;
+}
+
+/* Typography */
+.laincore h1, .laincore h2, .laincore h3, .laincore h4, .laincore h5, .laincore h6 {
+  font-family: 'Syne Mono', monospace;
+  color: var(--lain-muted-red);
+  text-shadow: 0 0 3px rgba(120, 0, 0, 0.5);
+  letter-spacing: 1px;
+  position: relative;
+  display: inline-block;
+  filter: blur(0.5px);
+  overflow: hidden;
+}
+
+.laincore h1::after, .laincore h2::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: var(--lain-muted-red);
+  opacity: 0.5;
+  animation: glitchLine 15s infinite;
+}
+
+.laincore p {
+  font-family: 'Lekton', monospace;
+  line-height: 1.6;
+  color: var(--lain-crt-green);
+  position: relative;
+}
+
+.laincore a {
+  color: var(--lain-muted-pink);
+  text-decoration: none;
+  position: relative;
+  z-index: 1;
+  cursor: none;
+  transition: all 0.2s ease;
+}
+
+.laincore a:hover {
+  color: var(--lain-crt-green);
+  text-shadow: 0 0 5px var(--lain-crt-green);
+  animation: linkFlicker 1s infinite;
+}
+
+.laincore a:hover::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  bottom: 0;
+  left: 0;
+  background-color: var(--lain-crt-green);
+  animation: linkGlitch 2s infinite;
+}
+
+/* Loading Screen */
+.laincore .loading-screen {
+  background-color: var(--lain-black);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10000;
+}
+
+.laincore .loading-screen::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('/images/lain-hallway.jpg');
+  background-size: cover;
+  opacity: 0.1;
+  animation: loadingPulse 4s infinite;
+}
+
+.laincore .loading-text {
+  font-family: 'Syne Mono', monospace;
+  color: var(--lain-crt-green);
+  font-size: 16px;
+  position: relative;
+  text-transform: lowercase;
+  letter-spacing: 2px;
+}
+
+.laincore .loading-text::after {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 14px;
+  background-color: var(--lain-crt-green);
+  margin-left: 5px;
+  animation: cursorBlink 1s infinite;
+}
+
+/* Custom Scrollbar */
+.laincore ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.laincore ::-webkit-scrollbar-track {
+  background: var(--lain-grey-dark);
+}
+
+.laincore ::-webkit-scrollbar-thumb {
+  background: var(--lain-muted-red);
+  border: 1px solid var(--lain-crt-green);
+}
+
+.laincore ::-webkit-scrollbar-thumb:hover {
+  background: var(--lain-muted-pink);
+}
+
+.laincore ::-webkit-scrollbar-corner {
+  background: var(--lain-grey-dark);
+}
+
+/* Footer Styles */
+.laincore .main-footer {
+  background-color: var(--lain-grey-dark);
+  border-top: 1px solid var(--lain-muted-red);
+  padding: 15px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.laincore .main-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('data:image/svg+xml;utf8,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="10" height="10" fill="rgba(200, 0, 0, 0.03)"/><rect x="10" y="10" width="10" height="10" fill="rgba(200, 0, 0, 0.03)"/></svg>');
+  opacity: 0.2;
+  z-index: -1;
+}
+
+.laincore .footer-copyright {
+  color: var(--lain-crt-green);
+  opacity: 0.6;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+/* Theme Toggle */
+.laincore-theme-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--lain-grey-dark);
+  border: 1px solid var(--lain-muted-red);
+  color: var(--lain-crt-green);
+  padding: 5px 10px;
+  font-family: 'Syne Mono', monospace;
+  font-size: 12px;
+  z-index: 1000;
+  cursor: none;
+}
+
+.laincore-theme-toggle:hover {
+  background-color: var(--lain-muted-red);
+  color: var(--lain-crt-green);
+}
+
+/* Audio Controls */
+.laincore-audio-toggle {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background-color: var(--lain-grey-dark);
+  border: 1px solid var(--lain-muted-red);
+  color: var(--lain-crt-green);
+  padding: 5px 10px;
+  font-family: 'Syne Mono', monospace;
+  font-size: 12px;
+  z-index: 1000;
+  cursor: none;
+}
+
+.laincore-audio-toggle:hover {
+  background-color: var(--lain-muted-red);
+  color: var(--lain-crt-green);
+}
+
+/* User Status Bar */
+.laincore .user-status-bar {
+  background-color: var(--lain-grey-dark);
+  border-top: 1px solid var(--lain-muted-red);
+  color: var(--lain-crt-green);
+  font-family: 'Syne Mono', monospace;
+  padding: 5px 10px;
+  display: flex;
+  justify-content: space-between;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  font-size: 12px;
+  z-index: 900;
+}
+
+.laincore .user-info {
+  display: flex;
+  align-items: center;
+}
+
+.laincore .user-avatar-small {
+  border: 1px solid var(--lain-muted-red);
+  filter: grayscale(0.7) brightness(0.8);
+  margin-right: 10px;
+}
+
+.laincore .user-name {
+  position: relative;
+  padding-right: 8px;
+}
+
+.laincore .user-name::after {
+  content: '::';
+  margin-left: 5px;
+  color: var(--lain-muted-red);
+  animation: textFlicker 2s infinite;
+}
+
+.laincore .user-glyph {
+  margin-left: 5px;
+  opacity: 0.7;
+}
+
+.laincore .loot-tokens {
+  opacity: 0.7;
+}
+
+/* Terminal Styles */
+.laincore .terminal-content {
+  background-color: var(--lain-black);
+  border: 1px solid var(--lain-muted-red);
+  color: var(--lain-crt-green);
+  font-family: 'Syne Mono', monospace;
+  padding: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.laincore .terminal-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 100, 0, 0.05) 0px,
+    rgba(0, 100, 0, 0.05) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.laincore .terminal-prompt {
+  color: var(--lain-muted-red);
+}
+
+.laincore .terminal-input {
+  background: transparent;
+  border: none;
+  color: var(--lain-crt-green);
+  font-family: 'Syne Mono', monospace;
+  outline: none;
+  caret-color: var(--lain-crt-green);
+}
+
+/* Mobile Optimizations */
+@media screen and (max-width: 768px) {
+  .laincore-nav-sidebar.active {
+    width: 100%;
+  }
+  
+  .laincore .win98-window {
+    margin-bottom: 15px;
+  }
+  
+  .laincore .main-header {
+    padding: 10px;
+  }
+  
+  .laincore-theme-toggle,
+  .laincore-audio-toggle {
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+  
+  .laincore .user-status-bar {
+    font-size: 10px;
+    padding: 3px 5px;
+  }
+  
+  .laincore-message {
+    width: 90%;
+    left: 5%;
+    font-size: 10px;
+  }
+}
+
+/* Animations */
+@keyframes scanMove {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(20px); }
+}
+
+@keyframes noiseAnimation {
+  0% { transform: translate(0, 0); }
+  10% { transform: translate(-5px, -5px); }
+  20% { transform: translate(10px, 5px); }
+  30% { transform: translate(-5px, 10px); }
+  40% { transform: translate(5px, -10px); }
+  50% { transform: translate(-10px, 5px); }
+  60% { transform: translate(10px, 10px); }
+  70% { transform: translate(-5px, -5px); }
+  80% { transform: translate(5px, 5px); }
+  90% { transform: translate(-10px, -10px); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes textGlitch {
+  0%, 100% { transform: none; opacity: 1; }
+  92% { transform: none; opacity: 1; }
+  92.5% { transform: translate(-2px, 0); opacity: 0.8; }
+  93% { transform: translate(2px, 0); opacity: 1; }
+  93.5% { transform: translate(0, 0); opacity: 0.9; }
+  94% { transform: translate(-2px, 0); opacity: 1; }
+  94.5% { transform: translate(0, 0); opacity: 1; }
+}
+
+@keyframes buttonGlitch {
+  0%, 100% { transform: scale(1.03); }
+  92% { transform: scale(1.03); }
+  92.5% { transform: scale(1.03) translate(-2px, 0); }
+  93% { transform: scale(1.03) translate(2px, 0); }
+  93.5% { transform: scale(1.03) translate(0, 0); }
+  94% { transform: scale(1.03) translate(-2px, 0); }
+  94.5% { transform: scale(1.03) translate(0, 0); }
+}
+
+@keyframes buttonScan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes linkFlicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes textFlicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  92.5% { opacity: 0.2; }
+  93% { opacity: 1; }
+  93.5% { opacity: 0.2; }
+  94% { opacity: 1; }
+}
+
+@keyframes linkGlitch {
+  0%, 100% { transform: none; opacity: 0.5; }
+  25% { transform: scaleX(0.8); opacity: 0.8; }
+  50% { transform: scaleX(1.2); opacity: 0.6; }
+  75% { transform: scaleX(0.9); opacity: 0.7; }
+}
+
+@keyframes cursorBlink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes messageGlitch {
+  0%, 100% { transform: none; }
+  97% { transform: none; }
+  97.5% { transform: translate(-2px, 0); }
+  98% { transform: translate(2px, 0); }
+  98.5% { transform: translate(0, 0); }
+  99% { transform: translate(-2px, 0); }
+  99.5% { transform: translate(0, 0); }
+}
+
+@keyframes loadingPulse {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.15; }
+}
+
+@keyframes glitchLine {
+  0%, 100% { transform: none; opacity: 0.5; }
+  92% { transform: none; opacity: 0.5; }
+  92.5% { transform: translate(-5px, 0); opacity: 0.8; }
+  93% { transform: translate(5px, 0); opacity: 0.2; }
+  93.5% { transform: translate(0, 0); opacity: 0.6; }
+  94% { transform: translate(-5px, 0); opacity: 0.4; }
+  94.5% { transform: translate(0, 0); opacity: 0.5; }
+}
+
+@keyframes cityPulse {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50% { opacity: 0.12; transform: scale(1.05); }
+}

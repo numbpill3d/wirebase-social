@@ -174,15 +174,13 @@ body::after {
 }
 
 /* Enhanced Typography */
-:start_line:182
--------
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Syne Mono', monospace;
-  color: var(--lain-crt-green);
-  text-shadow: 1px 1px 2px var(--lain-black);
-  margin-bottom: 0.8rem;
-  letter-spacing: 0.5px;
-  filter: blur(0.5px);
+  font-family: 'GothicPixels', 'MedievalSharp', cursive;
+  color: var(--gold);
+  text-shadow: 2px 2px 4px var(--dungeon-shadow),
+               0 0 10px rgba(255, 215, 0, 0.3);
+  margin-bottom: 1rem;
+  letter-spacing: 1px;
 }
 
 h1 {
@@ -227,22 +225,18 @@ p {
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-:start_line:233
--------
 a {
-  color: var(--lain-muted-red);
+  color: var(--orange);
   text-decoration: none;
-  transition: all 0.2s;
-  text-shadow: 0 0 2px var(--lain-black);
-  cursor: crosshair;
+  transition: all 0.3s;
+  text-shadow: 0 0 3px rgba(255, 127, 0, 0.3);
+  cursor: pointer;
 }
 
-:start_line:241
--------
 a:hover {
-  color: var(--lain-crt-green);
-  text-decoration: none;
-  text-shadow: 0 0 3px var(--lain-crt-green);
+  color: var(--bright-gold);
+  text-decoration: underline;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
 }
 
 a:active {
@@ -354,23 +348,21 @@ ul {
 }
 
 /* Significantly Enhanced Windows 98 Elements */
-:start_line:356
--------
 .win98-button {
   display: inline-block;
-  background-color: var(--lain-grey-dark);
-  border: 1px solid var(--lain-crt-green);
-  color: var(--lain-crt-green);
-  padding: 4px 8px;
-  font-family: 'Syne Mono', monospace;
-  font-size: 12px;
-  cursor: crosshair;
+  background-color: var(--win98-gray);
+  border: 2px solid;
+  border-color: var(--win98-border-light) var(--win98-border-darker) var(--win98-border-darker) var(--win98-border-light);
+  color: black;
+  padding: 6px 12px;
+  font-family: 'MSSerif', 'MS Sans Serif', 'Tahoma', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
   position: relative;
   text-align: center;
   text-shadow: none;
-  box-shadow: none;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
   transition: all 0.1s;
-  filter: blur(0.5px);
 }
 
 .win98-button::before {
@@ -407,12 +399,10 @@ ul {
   z-index: -1;
 }
 
-:start_line:407
--------
 .win98-button:hover {
-  background-color: var(--lain-grey-light);
-  color: var(--lain-black);
-  border-color: var(--lain-muted-red);
+  background-color: #d0d0d0;
+  transform: translateY(-2px);
+  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.4);
   transition: all 0.2s ease;
 }
 
@@ -420,19 +410,16 @@ ul {
   opacity: 1;
 }
 
-:start_line:418
--------
 .win98-button:active {
-  background-color: var(--lain-black);
-  border-color: var(--lain-crt-green);
-  color: var(--lain-crt-green);
-  transform: translateY(1px);
+  border-color: var(--win98-border-darker) var(--win98-border-light) var(--win98-border-light) var(--win98-border-darker);
+  padding: 7px 11px 5px 13px;
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.2);
+  transform: translateY(0);
 }
 
-:start_line:425
--------
 .win98-button:focus {
-  outline: none;
+  outline: 1px dotted black;
+  outline-offset: -5px;
 }
 
 /* Medieval style button with enhanced effects */
@@ -492,13 +479,12 @@ ul {
   100% { opacity: 1; }
 }
 
-:start_line:487
--------
 .win98-window {
-  background-color: var(--lain-grey-dark);
-  border: 1px solid var(--lain-crt-green);
-  margin-bottom: 20px;
-  box-shadow: none;
+  background-color: var(--win98-gray);
+  border: 2px solid;
+  border-color: var(--win98-border-light) var(--win98-border-darker) var(--win98-border-darker) var(--win98-border-light);
+  margin-bottom: 30px;
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.4);
   position: relative;
   width: 100%;
 }
@@ -516,19 +502,16 @@ ul {
   pointer-events: none;
 }
 
-:start_line:511
--------
 .win98-window-header {
-  background-color: var(--lain-black);
-  color: var(--lain-crt-green);
-  padding: 2px 4px;
-  font-weight: normal;
+  background-color: var(--win98-blue);
+  color: white;
+  padding: 3px 5px;
+  font-weight: bold;
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: relative;
   overflow: hidden;
-  border-bottom: 1px solid var(--lain-crt-green);
 }
 
 /* Add subtle gradient to window headers */
@@ -545,13 +528,9 @@ ul {
   pointer-events: none;
 }
 
-:start_line:537
--------
 .win98-window-title {
-  font-family: 'Syne Mono', monospace;
-  text-shadow: none;
-  font-size: 12px;
-  filter: blur(0.5px);
+  font-family: 'MSSerif', 'MS Sans Serif', 'Tahoma', sans-serif;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
 }
 
 .win98-window-controls {
@@ -580,11 +559,9 @@ ul {
   box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.2);
 }
 
-:start_line:567
--------
 .win98-window-content {
-  padding: 10px;
-  color: var(--lain-crt-green);
+  padding: 20px;
+  color: black;
   position: relative;
   overflow: auto;
   max-height: 80vh;
@@ -1076,8 +1053,6 @@ ul {
     100% { width: 100%; }
 }
 
-:start_line:1061
--------
 /* CRT screen effect */
 .crt-effect {
   position: fixed;
@@ -1087,18 +1062,16 @@ ul {
   height: 100%;
   background: repeating-linear-gradient(
     0deg,
-    rgba(0, 255, 0, 0.1),
-    rgba(0, 255, 0, 0.1) 1px,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
     transparent 1px,
     transparent 2px
   );
   pointer-events: none;
   z-index: 998;
-  opacity: 0.2;
+  opacity: 0.3;
 }
 
-:start_line:1080
--------
 .crt-effect::before {
   content: '';
   position: absolute;
@@ -1109,8 +1082,8 @@ ul {
   background: radial-gradient(
     circle at center,
     transparent 0%,
-    rgba(0, 255, 0, 0.05) 70%,
-    rgba(0, 0, 0, 0.2) 100%
+    rgba(0, 0, 0, 0.1) 90%,
+    rgba(0, 0, 0, 0.3) 100%
   );
 }
 

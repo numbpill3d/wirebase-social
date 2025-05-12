@@ -123,20 +123,22 @@ function setupWindows98Elements() {
 
 :start_line:124
 -------
-:start_line:124
--------
     win98Buttons.forEach(button => {
         button.addEventListener('mousedown', function() {
             this.classList.add('active');
             playSound('click');
+            this.classList.add('glitch');
+            setTimeout(() => this.classList.remove('glitch'), 100);
         });
 
         button.addEventListener('mouseup', function() {
             this.classList.remove('active');
+            this.classList.remove('glitch');
         });
 
         button.addEventListener('mouseleave', function() {
             this.classList.remove('active');
+            this.classList.remove('glitch');
         });
 
         button.addEventListener('mouseover', function() {
@@ -1473,20 +1475,4 @@ document.addEventListener('DOMContentLoaded', function() {
     
     localStorage.setItem('font-size-level', newLevel.toString());
   });
-});
-
-// Theme toggle functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const themeToggle = document.getElementById('theme-toggle');
-    const laincoreStylesheet = document.querySelector('link[href="css/laincore.css"]');
-
-    if (themeToggle && laincoreStylesheet) {
-        themeToggle.addEventListener('click', function() {
-            if (laincoreStylesheet.disabled) {
-                laincoreStylesheet.disabled = false;
-            } else {
-                laincoreStylesheet.disabled = true;
-            }
-        });
-    }
 });
