@@ -1,0 +1,139 @@
+const express = require('express');
+const router = express.Router();
+
+// Authentication middleware
+const ensureAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  req.flash('error_msg', 'Please log in to view this resource');
+  res.redirect('/users/login');
+};
+
+// Forum home page
+router.get('/', (req, res) => {
+  try {
+    res.render('forum/index', {
+      title: 'Assembly - Wirebase',
+      pageDescription: 'Join the discussion in the Wirebase Assembly forum',
+      pageTheme: 'dark-dungeon'
+    });
+  } catch (err) {
+    console.error('Forum error:', err);
+    res.status(500).render('error', {
+      title: 'Server Error',
+      errorCode: 500,
+      message: 'There was an error loading the forum',
+      theme: 'broken-window'
+    });
+  }
+});
+
+// Forum categories
+router.get('/category/:category', (req, res) => {
+  try {
+    const { category } = req.params;
+    
+    // Validate category
+    const validCategories = ['general', 'tech', 'creative', 'meta'];
+    if (!validCategories.includes(category)) {
+      return res.status(404).render('error', {
+        title: '404 - Category Not Found',
+        errorCode: 404,
+        message: 'The category you are looking for does not exist.',
+        theme: 'dark-dungeon'
+      });
+    }
+    
+    res.render('forum/category', {
+      title: `${category.charAt(0).toUpperCase() + category.slice(1)} - Assembly - Wirebase`,
+      category,
+      pageDescription: `Discussions in the ${category} category`,
+      pageTheme: 'dark-dungeon'
+    });
+  } catch (err) {
+    console.error('Forum category error:', err);
+    res.status(500).render('error', {
+      title: 'Server Error',
+      errorCode: 500,
+      message: 'There was an error loading this category',
+      theme: 'broken-window'
+    });
+  }
+});
+
+// View thread
+router.get('/thread/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // In a real app, we would fetch the thread from the database
+    // For now, we'll just render a placeholder
+    
+    res.render('forum/thread', {
+      title: 'Thread - Assembly - Wirebase',
+      threadId: id,
+      pageDescription: 'Forum thread discussion',
+      pageTheme: 'dark-dungeon'
+    });
+  } catch (err) {
+    console.error('Forum thread error:', err);
+    res.status(500).render('error', {
+      title: 'Server Error',
+      errorCode: 500,
+      message: 'There was an error loading this thread',
+      theme: 'broken-window'
+    });
+  }
+});
+
+// Create new thread (requires authentication)
+router.get('/new', ensureAuthenticated, (req, res) => {
+  res.render('forum/new-thread', {
+    title: 'New Thread - Assembly - Wirebase',
+    pageDescription: 'Create a new discussion thread',
+    pageTheme: 'dark-dungeon'
+  });
+});
+
+// Post new thread (requires authentication)
+router.post('/new', ensureAuthenticated, (req, res) => {
+  try {
+    const { title, category, content } = req.body;
+    const errors = [];
+    
+    // Validate input
+    if (!title || !category || !content) {
+      errors.push({ msg: 'Please fill in all fields' });
+    }
+    
+    if (title && title.length > 100) {
+      errors.push({ msg: 'Title cannot exceed 100 characters' });
+    }
+    
+    if (errors.length > 0) {
+      return res.render('forum/new-thread', {
+        title: 'New Thread - Assembly - Wirebase',
+        errors,
+        formData: { title, category, content },
+        pageTheme: 'dark-dungeon'
+      });
+    }
+    
+    // In a real app, we would save the thread to the database
+    // For now, we'll just redirect to the forum home
+    
+    req.flash('success_msg', 'Thread created successfully');
+    res.redirect('/forum');
+  } catch (err) {
+    console.error('New thread error:', err);
+    res.status(500).render('error', {
+      title: 'Server Error',
+      errorCode: 500,
+      message: 'There was an error creating your thread',
+      theme: 'broken-window'
+    });
+  }
+});
+
+module.exports = router;

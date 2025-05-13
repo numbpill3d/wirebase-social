@@ -1,0 +1,220 @@
+<div class="forum-container">
+  <div class="forum-header">
+    <h1 class="cyber-header">Create New Thread</h1>
+    <div class="breadcrumbs">
+      <a href="/forum">Assembly</a> &gt; <span>New Thread</span>
+    </div>
+  </div>
+
+  <div class="new-thread-form cyber-window">
+    <div class="cyber-window-header">
+      <span class="cyber-window-title">New Thread</span>
+    </div>
+    <div class="cyber-window-content">
+      {{#if errors}}
+        <div class="error-container">
+          <ul class="error-list">
+            {{#each errors}}
+              <li>{{this.msg}}</li>
+            {{/each}}
+          </ul>
+        </div>
+      {{/if}}
+      
+      <form action="/forum/new" method="POST">
+        <div class="form-group">
+          <label for="title">Thread Title</label>
+          <input type="text" id="title" name="title" class="cyber-input" value="{{formData.title}}" required maxlength="100">
+          <div class="input-help">Maximum 100 characters</div>
+        </div>
+        
+        <div class="form-group">
+          <label for="category">Category</label>
+          <select id="category" name="category" class="cyber-select" required>
+            <option value="" disabled {{#unless formData.category}}selected{{/unless}}>Select a category</option>
+            <option value="general" {{#if (eq formData.category "general")}}selected{{/if}}>General</option>
+            <option value="tech" {{#if (eq formData.category "tech")}}selected{{/if}}>Tech</option>
+            <option value="creative" {{#if (eq formData.category "creative")}}selected{{/if}}>Creative</option>
+            <option value="meta" {{#if (eq formData.category "meta")}}selected{{/if}}>Meta</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="content">Content</label>
+          <textarea id="content" name="content" rows="10" class="cyber-input" required>{{formData.content}}</textarea>
+          <div class="input-help">
+            <span class="formatting-help-toggle">Formatting Help</span>
+            <div class="formatting-help">
+              <p>You can use basic formatting:</p>
+              <ul>
+                <li><code>**bold**</code> for <strong>bold text</strong></li>
+                <li><code>*italic*</code> for <em>italic text</em></li>
+                <li><code>[link text](url)</code> for <a href="#">links</a></li>
+                <li><code>- item</code> for bullet lists</li>
+                <li><code>1. item</code> for numbered lists</li>
+                <li><code>```code```</code> for code blocks</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="tags">Tags (optional)</label>
+          <input type="text" id="tags" name="tags" class="cyber-input" value="{{formData.tags}}">
+          <div class="input-help">Separate tags with commas</div>
+        </div>
+        
+        <div class="form-actions">
+          <a href="/forum" class="cyber-button secondary">Cancel</a>
+          <button type="submit" class="cyber-button">Create Thread</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  .forum-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .forum-header {
+    margin-bottom: 30px;
+  }
+  
+  .breadcrumbs {
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    opacity: 0.7;
+  }
+  
+  .breadcrumbs a {
+    color: var(--cyber-primary);
+    text-decoration: none;
+  }
+  
+  .breadcrumbs a:hover {
+    text-decoration: underline;
+  }
+  
+  .error-container {
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    border-radius: 3px;
+  }
+  
+  .error-list {
+    margin: 0;
+    padding-left: 20px;
+    color: #ff6b6b;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  .cyber-input, .cyber-select {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--cyber-primary);
+    color: var(--cyber-text);
+    padding: 10px;
+    font-family: inherit;
+  }
+  
+  .cyber-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2300ff00' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px;
+  }
+  
+  textarea.cyber-input {
+    resize: vertical;
+  }
+  
+  .input-help {
+    font-size: 0.8rem;
+    margin-top: 5px;
+    opacity: 0.7;
+  }
+  
+  .formatting-help-toggle {
+    cursor: pointer;
+    color: var(--cyber-primary);
+    text-decoration: underline;
+  }
+  
+  .formatting-help {
+    display: none;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    margin-top: 10px;
+    border-left: 3px solid var(--cyber-primary);
+  }
+  
+  .formatting-help-toggle:hover + .formatting-help,
+  .formatting-help:hover {
+    display: block;
+  }
+  
+  .formatting-help p {
+    margin-top: 0;
+  }
+  
+  .formatting-help code {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 2px 4px;
+    border-radius: 3px;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 30px;
+  }
+  
+  .cyber-button.secondary {
+    background: transparent;
+    border: 1px solid var(--cyber-primary);
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Show/hide formatting help
+    const formattingToggle = document.querySelector('.formatting-help-toggle');
+    const formattingHelp = document.querySelector('.formatting-help');
+    
+    if (formattingToggle && formattingHelp) {
+      formattingToggle.addEventListener('click', function() {
+        formattingHelp.style.display = formattingHelp.style.display === 'block' ? 'none' : 'block';
+      });
+    }
+    
+    // Pre-select category from query parameter if available
+    const urlParams = new URLSearchParams(window.location.search);
+    const categoryParam = urlParams.get('category');
+    
+    if (categoryParam) {
+      const categorySelect = document.getElementById('category');
+      const option = Array.from(categorySelect.options).find(opt => opt.value === categoryParam);
+      
+      if (option) {
+        option.selected = true;
+      }
+    }
+  });
+</script>

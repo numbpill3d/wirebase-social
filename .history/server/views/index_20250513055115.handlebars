@@ -1,4 +1,4 @@
-<div class="home-container">
+
     <section class="hero">
         <div class="cyber-window">
             <div class="cyber-window-header">
@@ -32,74 +32,6 @@
     </section>
 
     <div class="home-content-grid" role="main">
-        <section class="site-stats-widget">
-            <div class="cyber-window">
-                <div class="cyber-window-header">
-                    <span class="cyber-window-title">system.statistics</span>
-                    <div class="cyber-window-controls">
-                        <span class="cyber-window-control minimize">_</span>
-                        <span class="cyber-window-control maximize">□</span>
-                        <span class="cyber-window-control close">×</span>
-                    </div>
-                </div>
-                <div class="cyber-window-content" data-loading>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <div class="stat-value">{{stats.userCount}}</div>
-                            <div class="stat-label">nodes</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">{{stats.itemCount}}</div>
-                            <div class="stat-label">artifacts</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">{{stats.threadCount}}</div>
-                            <div class="stat-label">threads</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">{{stats.commentCount}}</div>
-                            <div class="stat-label">signals</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="traffic-widget">
-            <div class="cyber-window">
-                <div class="cyber-window-header">
-                    <span class="cyber-window-title">system.traffic</span>
-                    <div class="cyber-window-controls">
-                        <span class="cyber-window-control minimize">_</span>
-                        <span class="cyber-window-control maximize">□</span>
-                        <span class="cyber-window-control close">×</span>
-                    </div>
-                </div>
-                <div class="cyber-window-content" data-loading>
-                    <div class="traffic-visualization">
-                        <div class="traffic-bars">
-                            {{#each traffic.hourlyData}}
-                                <div class="traffic-bar" style="height: {{this.value}}0%;" title="Hour {{this.hour}}: {{this.value}} visitors">
-                                    <div class="traffic-bar-glow"></div>
-                                </div>
-                            {{/each}}
-                        </div>
-                        <div class="traffic-labels">
-                            <span>00</span>
-                            <span>06</span>
-                            <span>12</span>
-                            <span>18</span>
-                            <span>23</span>
-                        </div>
-                    </div>
-                    <div class="traffic-info">
-                        <p>Peak activity: <span class="highlight">{{traffic.peakHour}}:00</span></p>
-                        <p>Network pulse: <span class="highlight">{{mood.current}}</span></p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <section class="features-section">
             <div class="cyber-window">
                 <div class="cyber-window-header">
@@ -205,82 +137,6 @@
             </div>
         </section>
     </div>
-
-    <section class="user-activity-widget">
-        <div class="cyber-window">
-            <div class="cyber-window-header">
-                <span class="cyber-window-title">system.activity</span>
-                <div class="cyber-window-controls">
-                    <span class="cyber-window-control minimize">_</span>
-                    <span class="cyber-window-control maximize">□</span>
-                    <span class="cyber-window-control close">×</span>
-                </div>
-            </div>
-            <div class="cyber-window-content" data-loading>
-                <div class="activity-status">
-                    <div class="activity-metric">
-                        <span class="activity-value">{{activity.onlineUsers}}</span>
-                        <span class="activity-label">online nodes</span>
-                    </div>
-                    <div class="activity-metric">
-                        <span class="activity-value">{{activity.activeUsers}}</span>
-                        <span class="activity-label">active today</span>
-                    </div>
-                </div>
-                <div class="recent-activity">
-                    <h3>Recent Activity</h3>
-                    <ul class="activity-list">
-                        {{#each activity.recentUsers}}
-                            <li class="activity-item">
-                                <img src="{{avatar}}" alt="{{displayName}}" class="activity-avatar">
-                                <div class="activity-details">
-                                    <span class="activity-name">{{displayName}}</span>
-                                    <span class="activity-time">{{timeAgo lastActive}}</span>
-                                </div>
-                            </li>
-                        {{/each}}
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="mood-widget">
-        <div class="cyber-window">
-            <div class="cyber-window-header">
-                <span class="cyber-window-title">system.mood</span>
-                <div class="cyber-window-controls">
-                    <span class="cyber-window-control minimize">_</span>
-                    <span class="cyber-window-control maximize">□</span>
-                    <span class="cyber-window-control close">×</span>
-                </div>
-            </div>
-            <div class="cyber-window-content" data-loading>
-                <div class="mood-indicator">
-                    <div class="mood-visual mood-{{mood.current}}">
-                        <div class="mood-pulse" style="animation-duration: {{#if (eq mood.current 'energetic')}}0.5s{{else if (eq mood.current 'active')}}1s{{else if (eq mood.current 'calm')}}2s{{else}}3s{{/if}}"></div>
-                        <div class="mood-scanlines"></div>
-                    </div>
-                    <div class="mood-details">
-                        <div class="mood-status">
-                            <span class="mood-label">Network Mood:</span>
-                            <span class="mood-value">{{mood.current}}</span>
-                        </div>
-                        <div class="mood-intensity">
-                            <div class="intensity-bar">
-                                <div class="intensity-fill" style="width: {{mood.intensity}}%"></div>
-                            </div>
-                            <span class="intensity-value">{{mood.intensity}}%</span>
-                        </div>
-                        <div class="mood-trend">
-                            <span class="trend-label">Trend:</span>
-                            <span class="trend-value trend-{{mood.trend}}">{{mood.trend}}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <section class="discovery-feed">
         <div class="cyber-window">
@@ -396,3 +252,4 @@ HTML saved successfully.
         </div>
     </section>
 </div>
+

@@ -1,0 +1,238 @@
+<div class="forum-container">
+  <div class="forum-header">
+    <h1 class="cyber-header">Thread Title</h1>
+    <div class="breadcrumbs">
+      <a href="/forum">Assembly</a> &gt; <a href="/forum/category/general">General</a> &gt; <span>Thread</span>
+    </div>
+  </div>
+
+  <div class="thread-container">
+    <div class="thread-original-post cyber-window">
+      <div class="cyber-window-header">
+        <span class="cyber-window-title">Original Post</span>
+      </div>
+      <div class="cyber-window-content">
+        <div class="post-header">
+          <div class="post-author">
+            <img src="/images/laincore/default-avatar.svg" alt="Avatar" class="author-avatar">
+            <div class="author-info">
+              <div class="author-name">system_admin</div>
+              <div class="author-title">Administrator</div>
+            </div>
+          </div>
+          <div class="post-meta">
+            <span class="post-date">Posted 2 days ago</span>
+          </div>
+        </div>
+        <div class="post-content">
+          <p>Welcome to the Wirebase Assembly forum! This is a place for community discussion about all things Wirebase.</p>
+          <p>Please follow these guidelines:</p>
+          <ul>
+            <li>Be respectful to other users</li>
+            <li>Stay on topic in each category</li>
+            <li>Use code blocks for sharing code</li>
+            <li>Report any issues to the moderators</li>
+          </ul>
+          <p>Happy posting!</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="thread-replies">
+      <h3 class="replies-header">Replies</h3>
+      
+      <div class="reply cyber-window">
+        <div class="cyber-window-header">
+          <span class="cyber-window-title">Reply #1</span>
+        </div>
+        <div class="cyber-window-content">
+          <div class="post-header">
+            <div class="post-author">
+              <img src="/images/laincore/default-avatar.svg" alt="Avatar" class="author-avatar">
+              <div class="author-info">
+                <div class="author-name">tech_support</div>
+                <div class="author-title">Moderator</div>
+              </div>
+            </div>
+            <div class="post-meta">
+              <span class="post-date">Posted 1 day ago</span>
+            </div>
+          </div>
+          <div class="post-content">
+            <p>Thanks for setting this up! I'm looking forward to the technical discussions we'll have here.</p>
+            <p>For anyone new to the forum, don't hesitate to ask questions in the appropriate category.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="reply cyber-window">
+        <div class="cyber-window-header">
+          <span class="cyber-window-title">Reply #2</span>
+        </div>
+        <div class="cyber-window-content">
+          <div class="post-header">
+            <div class="post-author">
+              <img src="/images/laincore/default-avatar.svg" alt="Avatar" class="author-avatar">
+              <div class="author-info">
+                <div class="author-name">wirebase_fan</div>
+                <div class="author-title">Member</div>
+              </div>
+            </div>
+            <div class="post-meta">
+              <span class="post-date">Posted 12 hours ago</span>
+            </div>
+          </div>
+          <div class="post-content">
+            <p>Hello everyone! New member here. I'm excited to join the community.</p>
+            <p>I've been exploring Wirebase for a few days now and I'm really impressed with the cyberschizo aesthetic.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {{#if isAuthenticated}}
+      <div class="reply-form cyber-window">
+        <div class="cyber-window-header">
+          <span class="cyber-window-title">Post Reply</span>
+        </div>
+        <div class="cyber-window-content">
+          <form action="/forum/thread/{{threadId}}/reply" method="POST">
+            <div class="form-group">
+              <textarea name="content" rows="5" class="cyber-input" placeholder="Type your reply here..."></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="cyber-button">Post Reply</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    {{else}}
+      <div class="login-prompt">
+        <a href="/users/login" class="cyber-button">Login to Reply</a>
+      </div>
+    {{/if}}
+  </div>
+</div>
+
+<style>
+  .forum-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .forum-header {
+    margin-bottom: 30px;
+  }
+  
+  .breadcrumbs {
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    opacity: 0.7;
+  }
+  
+  .breadcrumbs a {
+    color: var(--cyber-primary);
+    text-decoration: none;
+  }
+  
+  .breadcrumbs a:hover {
+    text-decoration: underline;
+  }
+  
+  .thread-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .thread-original-post {
+    margin-bottom: 20px;
+  }
+  
+  .post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+  }
+  
+  .post-author {
+    display: flex;
+    align-items: center;
+  }
+  
+  .author-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  
+  .author-name {
+    font-weight: bold;
+  }
+  
+  .author-title {
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+  
+  .post-meta {
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+  
+  .post-content {
+    line-height: 1.6;
+  }
+  
+  .post-content p {
+    margin-bottom: 15px;
+  }
+  
+  .post-content ul {
+    margin-bottom: 15px;
+    padding-left: 20px;
+  }
+  
+  .replies-header {
+    margin: 20px 0 15px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+  }
+  
+  .reply {
+    margin-bottom: 15px;
+  }
+  
+  .reply-form {
+    margin-top: 30px;
+  }
+  
+  .cyber-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--cyber-primary);
+    color: var(--cyber-text);
+    padding: 10px;
+    font-family: inherit;
+    resize: vertical;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+  }
+  
+  .login-prompt {
+    margin-top: 30px;
+    text-align: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px dashed var(--cyber-primary);
+  }
+</style>

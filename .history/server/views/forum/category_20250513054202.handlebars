@@ -1,0 +1,190 @@
+<div class="forum-container">
+  <div class="forum-header">
+    <h1 class="cyber-header">{{category}}</h1>
+    <p class="forum-description">Discussions in the {{category}} category</p>
+    <div class="breadcrumbs">
+      <a href="/forum">Assembly</a> &gt; <span>{{category}}</span>
+    </div>
+  </div>
+
+  <div class="forum-actions">
+    {{#if isAuthenticated}}
+      <a href="/forum/new?category={{category}}" class="cyber-button">Create New Thread</a>
+    {{else}}
+      <a href="/users/login" class="cyber-button">Login to Post</a>
+    {{/if}}
+  </div>
+
+  <div class="threads-container cyber-window">
+    <div class="cyber-window-header">
+      <span class="cyber-window-title">Threads</span>
+    </div>
+    <div class="cyber-window-content">
+      <div class="thread-list">
+        <!-- In a real app, this would be populated with actual threads -->
+        {{#if (eq category "general")}}
+          <div class="thread-item">
+            <div class="thread-title">
+              <a href="/forum/thread/1">Welcome to the Wirebase Assembly</a>
+            </div>
+            <div class="thread-meta">
+              <span class="thread-author">system_admin</span>
+              <span class="thread-date">2 days ago</span>
+              <span class="thread-replies">5 replies</span>
+            </div>
+          </div>
+        {{/if}}
+        
+        {{#if (eq category "tech")}}
+          <div class="thread-item">
+            <div class="thread-title">
+              <a href="/forum/thread/2">Technical FAQ and Resources</a>
+            </div>
+            <div class="thread-meta">
+              <span class="thread-author">tech_support</span>
+              <span class="thread-date">1 day ago</span>
+              <span class="thread-replies">3 replies</span>
+            </div>
+          </div>
+        {{/if}}
+        
+        {{#if (eq category "creative")}}
+          <div class="thread-item">
+            <div class="thread-title">
+              <a href="/forum/thread/3">Share Your Wirebase Profile Designs</a>
+            </div>
+            <div class="thread-meta">
+              <span class="thread-author">design_guru</span>
+              <span class="thread-date">12 hours ago</span>
+              <span class="thread-replies">7 replies</span>
+            </div>
+          </div>
+        {{/if}}
+        
+        {{#if (eq category "meta")}}
+          <div class="thread-item">
+            <div class="thread-title">
+              <a href="/forum/thread/4">Feature Request: Enhanced Terminal Mode</a>
+            </div>
+            <div class="thread-meta">
+              <span class="thread-author">power_user</span>
+              <span class="thread-date">5 hours ago</span>
+              <span class="thread-replies">2 replies</span>
+            </div>
+          </div>
+        {{/if}}
+        
+        <!-- Add some placeholder threads for all categories -->
+        <div class="thread-item">
+          <div class="thread-title">
+            <a href="/forum/thread/5">Example Thread in {{category}}</a>
+          </div>
+          <div class="thread-meta">
+            <span class="thread-author">user123</span>
+            <span class="thread-date">3 hours ago</span>
+            <span class="thread-replies">0 replies</span>
+          </div>
+        </div>
+        
+        <div class="thread-item">
+          <div class="thread-title">
+            <a href="/forum/thread/6">Another Example Thread in {{category}}</a>
+          </div>
+          <div class="thread-meta">
+            <span class="thread-author">wirebase_fan</span>
+            <span class="thread-date">1 hour ago</span>
+            <span class="thread-replies">1 reply</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .forum-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .forum-header {
+    margin-bottom: 30px;
+  }
+  
+  .forum-description {
+    font-size: 1.2rem;
+    opacity: 0.8;
+    margin-bottom: 10px;
+  }
+  
+  .breadcrumbs {
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    opacity: 0.7;
+  }
+  
+  .breadcrumbs a {
+    color: var(--cyber-primary);
+    text-decoration: none;
+  }
+  
+  .breadcrumbs a:hover {
+    text-decoration: underline;
+  }
+  
+  .forum-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+  }
+  
+  .thread-list {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .thread-item {
+    padding: 15px;
+    border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+  }
+  
+  .thread-item:last-child {
+    border-bottom: none;
+  }
+  
+  .thread-title {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+  }
+  
+  .thread-title a {
+    text-decoration: none;
+    color: var(--cyber-primary);
+  }
+  
+  .thread-title a:hover {
+    text-decoration: underline;
+  }
+  
+  .thread-meta {
+    display: flex;
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+  
+  .thread-meta > * {
+    margin-right: 15px;
+  }
+  
+  .thread-meta > *:before {
+    content: '•';
+    margin-right: 5px;
+    opacity: 0.5;
+  }
+  
+  .thread-meta > *:first-child:before {
+    content: '';
+    margin-right: 0;
+  }
+</style>

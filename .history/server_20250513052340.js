@@ -294,7 +294,6 @@ app.use('/profile', require('./server/routes/profile'));
 app.use('/scrapyard', require('./server/routes/scrapyard'));
 app.use('/feed', require('./server/routes/feed'));
 app.use('/api', require('./server/routes/api'));
-app.use('/forum', require('./server/routes/forum'));
 
 // 404 handler
 app.use((req, res, next) => {
@@ -312,11 +311,7 @@ app.use((req, res, next) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error('Server Error:', err.name, err.message);
-  console.error('Error Stack:', err.stack);
-  console.error('Request URL:', req.method, req.url);
-  console.error('Request Headers:', JSON.stringify(req.headers, null, 2));
-  
+  console.error(err.stack);
   res.status(500).render('error', {
     title: '500 - Server Error',
     errorCode: 500,

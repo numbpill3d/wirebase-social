@@ -1,0 +1,43 @@
+<div class="forum-container">
+  <div class="forum-header">
+    <h1 class="cyber-header">Create New Thread</h1>
+    <div class="breadcrumbs">
+      <a href="/forum">Assembly</a> &gt; <span>New Thread</span>
+    </div>
+  </div>
+
+  <div class="new-thread-form cyber-window">
+    <div class="cyber-window-header">
+      <span class="cyber-window-title">New Thread</span>
+    </div>
+    <div class="cyber-window-content">
+      {{#if errors}}
+        <div class="error-container">
+          <ul class="error-list">
+            {{#each errors}}
+              <li>{{this.msg}}</li>
+            {{/each}}
+          </ul>
+        </div>
+      {{/if}}
+      
+      <form action="/forum/new" method="POST">
+        <div class="form-group">
+          <label for="title">Thread Title</label>
+          <input type="text" id="title" name="title" class="cyber-input" value="{{formData.title}}" required maxlength="100">
+          <div class="input-help">Maximum 100 characters</div>
+        </div>
+        
+        <div class="form-group">
+          <label for="category">Category</label>
+          <select id="category" name="category" class="cyber-select" required>
+            <option value="" disabled {{#unless formData.category}}selected{{/unless}}>Select a category</option>
+            <option value="general" {{#if (eq formData.category "general")}}selected{{/if}}>General</option>
+            <option value="tech" {{#if (eq formData.category "tech")}}selected{{/if}}>Tech</option>
+            <option value="creative" {{#if (eq formData.category "creative")}}selected{{/if}}>Creative</option>
+            <option value="meta" {{#if (eq formData.category "meta")}}selected{{/if}}>Meta</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="content">Content</label>

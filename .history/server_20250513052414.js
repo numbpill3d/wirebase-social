@@ -294,7 +294,6 @@ app.use('/profile', require('./server/routes/profile'));
 app.use('/scrapyard', require('./server/routes/scrapyard'));
 app.use('/feed', require('./server/routes/feed'));
 app.use('/api', require('./server/routes/api'));
-app.use('/forum', require('./server/routes/forum'));
 
 // 404 handler
 app.use((req, res, next) => {

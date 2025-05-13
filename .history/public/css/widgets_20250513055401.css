@@ -1,0 +1,346 @@
+/* 
+ * widgets.css - Modular widget styles for wirebase.city
+ * Cyberpunk/laincore aesthetic widgets for the main page
+ */
+
+/* Common widget styles */
+.site-stats-widget,
+.traffic-widget,
+.user-activity-widget,
+.mood-widget {
+  margin-bottom: 20px;
+}
+
+/* Stats widget */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  padding: 10px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  background-color: rgba(70, 0, 102, 0.2);
+  border: 1px solid var(--cyber-purple);
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--cyber-green);
+  text-shadow: 0 0 5px var(--cyber-glow);
+  font-family: 'PixelOperator', 'VT323', monospace;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: var(--cyber-light);
+  text-transform: lowercase;
+  margin-top: 5px;
+}
+
+/* Traffic visualization widget */
+.traffic-visualization {
+  height: 150px;
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.traffic-bars {
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+  gap: 2px;
+  padding: 0 10px;
+}
+
+.traffic-bar {
+  flex: 1;
+  background-color: var(--cyber-purple);
+  position: relative;
+  min-height: 1px;
+  transition: height 0.5s ease;
+}
+
+.traffic-bar-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to top, transparent, var(--cyber-green));
+  opacity: 0.3;
+  animation: pulse 2s infinite alternate;
+}
+
+.traffic-labels {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 10px;
+  color: var(--cyber-light);
+  font-size: 0.8rem;
+}
+
+.traffic-info {
+  padding: 10px;
+  border-top: 1px solid var(--cyber-purple);
+  font-size: 0.9rem;
+}
+
+.traffic-info .highlight {
+  color: var(--cyber-green);
+  font-weight: bold;
+}
+
+/* User activity widget */
+.activity-status {
+  display: flex;
+  justify-content: space-around;
+  padding: 15px 10px;
+  border-bottom: 1px solid var(--cyber-purple);
+}
+
+.activity-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.activity-value {
+  font-size: 1.8rem;
+  color: var(--cyber-green);
+  font-weight: bold;
+  text-shadow: 0 0 5px var(--cyber-glow);
+}
+
+.activity-label {
+  font-size: 0.8rem;
+  color: var(--cyber-light);
+  text-transform: lowercase;
+}
+
+.recent-activity h3 {
+  padding: 10px;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.activity-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  border-top: 1px solid rgba(70, 0, 102, 0.3);
+}
+
+.activity-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 2px;
+  margin-right: 10px;
+  border: 1px solid var(--cyber-purple);
+}
+
+.activity-details {
+  flex: 1;
+}
+
+.activity-name {
+  display: block;
+  font-weight: bold;
+  color: var(--cyber-light);
+}
+
+.activity-time {
+  font-size: 0.8rem;
+  color: rgba(217, 217, 217, 0.7);
+}
+
+/* Mood indicator widget */
+.mood-indicator {
+  display: flex;
+  padding: 15px;
+  gap: 20px;
+}
+
+.mood-visual {
+  width: 100px;
+  height: 100px;
+  border: 1px solid var(--cyber-purple);
+  position: relative;
+  overflow: hidden;
+}
+
+.mood-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  height: 50%;
+  border-radius: 50%;
+  background-color: var(--cyber-green);
+  animation: pulse 2s infinite alternate;
+}
+
+.mood-scanlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0, 0, 0, 0.1) 51%
+  );
+  background-size: 100% 4px;
+  animation: scanline 10s linear infinite;
+  pointer-events: none;
+}
+
+.mood-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.mood-status {
+  margin-bottom: 10px;
+}
+
+.mood-label, .trend-label {
+  font-size: 0.9rem;
+  color: var(--cyber-light);
+  margin-right: 5px;
+}
+
+.mood-value {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--cyber-green);
+}
+
+.mood-intensity {
+  margin-bottom: 10px;
+}
+
+.intensity-bar {
+  height: 10px;
+  background-color: rgba(70, 0, 102, 0.3);
+  margin-bottom: 5px;
+  position: relative;
+}
+
+.intensity-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: var(--cyber-green);
+}
+
+.intensity-value {
+  font-size: 0.8rem;
+  color: var(--cyber-light);
+}
+
+.trend-value {
+  font-weight: bold;
+}
+
+.trend-rising {
+  color: var(--cyber-green);
+}
+
+.trend-falling {
+  color: var(--cyber-red);
+}
+
+/* Mood variations */
+.mood-energetic .mood-pulse {
+  background-color: #ff00ff;
+  box-shadow: 0 0 15px #ff00ff;
+  animation: pulse 0.5s infinite alternate;
+}
+
+.mood-active .mood-pulse {
+  background-color: var(--cyber-green);
+  box-shadow: 0 0 10px var(--cyber-green);
+  animation: pulse 1s infinite alternate;
+}
+
+.mood-calm .mood-pulse {
+  background-color: #00aaff;
+  box-shadow: 0 0 8px #00aaff;
+  animation: pulse 2s infinite alternate;
+}
+
+.mood-quiet .mood-pulse {
+  background-color: #6600cc;
+  box-shadow: 0 0 5px #6600cc;
+  animation: pulse 3s infinite alternate;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(100px); }
+}
+
+/* Loading states */
+[data-loading] .loading-spinner {
+  margin: 20px auto;
+}
+
+/* Responsive layout */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .mood-indicator {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .mood-visual {
+    margin-bottom: 15px;
+  }
+  
+  .mood-details {
+    width: 100%;
+  }
+}
+
+/* Grid layout for home page */
+@media (min-width: 992px) {
+  .home-content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+}

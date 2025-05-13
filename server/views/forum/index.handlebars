@@ -1,0 +1,244 @@
+<div class="forum-container">
+  <div class="forum-header">
+    <h1 class="cyber-header">Assembly</h1>
+    <p class="forum-description">Join the discussion in the Wirebase community</p>
+  </div>
+
+  <div class="forum-categories">
+    <div class="category-grid">
+      <div class="category-card cyber-window">
+        <div class="cyber-window-header">
+          <span class="cyber-window-title">General Discussion</span>
+        </div>
+        <div class="cyber-window-content">
+          <a href="/forum/category/general" class="category-link">
+            <div class="category-icon">💬</div>
+            <div class="category-info">
+              <h3>General</h3>
+              <p>Discuss anything related to Wirebase and the community</p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="category-card cyber-window">
+        <div class="cyber-window-header">
+          <span class="cyber-window-title">Technical</span>
+        </div>
+        <div class="cyber-window-content">
+          <a href="/forum/category/tech" class="category-link">
+            <div class="category-icon">🔌</div>
+            <div class="category-info">
+              <h3>Tech</h3>
+              <p>Technical discussions, code sharing, and troubleshooting</p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="category-card cyber-window">
+        <div class="cyber-window-header">
+          <span class="cyber-window-title">Creative</span>
+        </div>
+        <div class="cyber-window-content">
+          <a href="/forum/category/creative" class="category-link">
+            <div class="category-icon">🎨</div>
+            <div class="category-info">
+              <h3>Creative</h3>
+              <p>Share your art, music, writing, and other creative works</p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="category-card cyber-window">
+        <div class="cyber-window-header">
+          <span class="cyber-window-title">Meta</span>
+        </div>
+        <div class="cyber-window-content">
+          <a href="/forum/category/meta" class="category-link">
+            <div class="category-icon">🔍</div>
+            <div class="category-info">
+              <h3>Meta</h3>
+              <p>Discussions about Wirebase itself, suggestions, and feedback</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="forum-actions">
+    {{#if isAuthenticated}}
+      <a href="/forum/new" class="cyber-button">Create New Thread</a>
+    {{else}}
+      <a href="/users/login" class="cyber-button">Login to Post</a>
+    {{/if}}
+  </div>
+
+  <div class="recent-threads cyber-window">
+    <div class="cyber-window-header">
+      <span class="cyber-window-title">Recent Threads</span>
+    </div>
+    <div class="cyber-window-content">
+      <div class="thread-list">
+        <!-- In a real app, this would be populated with actual threads -->
+        <div class="thread-item">
+          <div class="thread-title">
+            <a href="/forum/thread/1">Welcome to the Wirebase Assembly</a>
+          </div>
+          <div class="thread-meta">
+            <span class="thread-author">system_admin</span>
+            <span class="thread-date">2 days ago</span>
+            <span class="thread-category">General</span>
+          </div>
+        </div>
+        
+        <div class="thread-item">
+          <div class="thread-title">
+            <a href="/forum/thread/2">Technical FAQ and Resources</a>
+          </div>
+          <div class="thread-meta">
+            <span class="thread-author">tech_support</span>
+            <span class="thread-date">1 day ago</span>
+            <span class="thread-category">Tech</span>
+          </div>
+        </div>
+        
+        <div class="thread-item">
+          <div class="thread-title">
+            <a href="/forum/thread/3">Share Your Wirebase Profile Designs</a>
+          </div>
+          <div class="thread-meta">
+            <span class="thread-author">design_guru</span>
+            <span class="thread-date">12 hours ago</span>
+            <span class="thread-category">Creative</span>
+          </div>
+        </div>
+        
+        <div class="thread-item">
+          <div class="thread-title">
+            <a href="/forum/thread/4">Feature Request: Enhanced Terminal Mode</a>
+          </div>
+          <div class="thread-meta">
+            <span class="thread-author">power_user</span>
+            <span class="thread-date">5 hours ago</span>
+            <span class="thread-category">Meta</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .forum-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .forum-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .forum-description {
+    font-size: 1.2rem;
+    opacity: 0.8;
+    margin-bottom: 20px;
+  }
+  
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .category-card {
+    transition: transform 0.2s ease;
+  }
+  
+  .category-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .category-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    padding: 10px;
+  }
+  
+  .category-icon {
+    font-size: 2rem;
+    margin-right: 15px;
+  }
+  
+  .category-info h3 {
+    margin: 0 0 5px 0;
+  }
+  
+  .category-info p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+  
+  .forum-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 30px;
+  }
+  
+  .thread-list {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .thread-item {
+    padding: 15px;
+    border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+  }
+  
+  .thread-item:last-child {
+    border-bottom: none;
+  }
+  
+  .thread-title {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+  }
+  
+  .thread-title a {
+    text-decoration: none;
+    color: var(--cyber-primary);
+  }
+  
+  .thread-title a:hover {
+    text-decoration: underline;
+  }
+  
+  .thread-meta {
+    display: flex;
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+  
+  .thread-meta > * {
+    margin-right: 15px;
+  }
+  
+  .thread-meta > *:before {
+    content: '•';
+    margin-right: 5px;
+    opacity: 0.5;
+  }
+  
+  .thread-meta > *:first-child:before {
+    content: '';
+    margin-right: 0;
+  }
+</style>
