@@ -335,9 +335,7 @@ class User {
 
       const { data, error } = await supabaseQuery;
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       return data.map(user => User.formatUser(user));
     } catch (error) {
@@ -364,9 +362,7 @@ class User {
 
       const { count, error } = await supabaseQuery;
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       return count || 0;
     } catch (error) {
@@ -381,9 +377,7 @@ class User {
    * @returns {Object} - Formatted user
    */
   static formatUser(dbUser) {
-    if (!dbUser) {
-      return null;
-    }
+    if (!dbUser) return null;
 
     return {
       id: dbUser.id,

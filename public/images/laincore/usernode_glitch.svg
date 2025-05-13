@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <defs>
+    <filter id="glitchFilter">
+      <feTurbulence type="fractalNoise" baseFrequency="0.08" numOctaves="3" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="10" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    <linearGradient id="cyberGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#460066" />
+      <stop offset="50%" stop-color="#330044" />
+      <stop offset="100%" stop-color="#220033" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="200" height="200" fill="#0f0f0f" />
+  
+  <!-- Digital noise background with more intense glitch -->
+  <rect width="200" height="200" fill="#131313" opacity="0.4" filter="url(#glitchFilter)" />
+  
+  <!-- Glitched node shape -->
+  <circle cx="100" cy="100" r="60" fill="url(#cyberGradient)" opacity="0.8" />
+  
+  <!-- Glitch effects - more pronounced -->
+  <rect x="60" y="70" width="80" height="15" fill="#00ff00" opacity="0.3" filter="url(#glow)" />
+  <rect x="70" y="100" width="60" height="10" fill="#ff0000" opacity="0.2" />
+  <rect x="80" y="130" width="40" height="8" fill="#00ff00" opacity="0.4" filter="url(#glow)" />
+  
+  <!-- Digital circuit elements -->
+  <path d="M20,100 L80,100" stroke="#00ff00" stroke-width="2" opacity="0.6" />
+  <path d="M120,100 L180,100" stroke="#00ff00" stroke-width="2" opacity="0.6" />
+  <path d="M100,20 L100,80" stroke="#00ff00" stroke-width="2" opacity="0.6" />
+  <path d="M100,120 L100,180" stroke="#00ff00" stroke-width="2" opacity="0.6" />
+  
+  <!-- Node center with glitch effect -->
+  <circle cx="100" cy="100" r="20" fill="#000000" />
+  <circle cx="100" cy="100" r="15" fill="#460066" filter="url(#glitchFilter)" />
+  <circle cx="100" cy="100" r="10" fill="#00ff00" opacity="0.7" filter="url(#glow)" />
+  
+  <!-- Additional glitch elements -->
+  <rect x="40" y="40" width="120" height="2" fill="#00ff00" opacity="0.2" transform="rotate(45, 100, 100)" />
+  <rect x="40" y="40" width="120" height="2" fill="#00ff00" opacity="0.2" transform="rotate(135, 100, 100)" />
+  
+  <!-- Random digital artifacts -->
+  <rect x="30" y="30" width="5" height="5" fill="#00ff00" opacity="0.5" />
+  <rect x="165" y="165" width="5" height="5" fill="#00ff00" opacity="0.5" />
+  <rect x="30" y="165" width="5" height="5" fill="#00ff00" opacity="0.5" />
+  <rect x="165" y="30" width="5" height="5" fill="#00ff00" opacity="0.5" />
+</svg>

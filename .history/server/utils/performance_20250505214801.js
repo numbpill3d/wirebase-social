@@ -1,17 +1,7 @@
 /**
  * Performance optimization utilities for Wirebase
  */
-// Try to load compression module, fallback to a simple middleware if not available
-let compression;
-try {
-  compression = require('compression');
-} catch (err) {
-  console.warn('Compression module not found, using fallback implementation');
-  // Simple fallback implementation
-  compression = () => (req, res, next) => next();
-  compression.filter = () => true;
-}
-
+const compression = require('compression');
 const NodeCache = require('node-cache');
 
 // Create a cache instance
@@ -29,11 +19,11 @@ const compressionMiddleware = compression({
   threshold: 1024, // Only compress responses larger than 1KB
   filter: (req, res) => {
     // Don't compress responses for older browsers without proper support
-    if (req.headers['user-agent'] &&
+    if (req.headers['user-agent'] && 
         req.headers['user-agent'].includes('MSIE 6')) {
       return false;
     }
-
+    
     // Use compression for all other requests
     return compression.filter(req, res);
   }
@@ -49,30 +39,30 @@ const apiCache = (duration = 60) => {
     if (req.method !== 'GET' || req.isAuthenticated()) {
       return next();
     }
-
+    
     const key = `api:${req.originalUrl}`;
     const cachedResponse = cache.get(key);
-
+    
     if (cachedResponse) {
       res.set('X-Cache', 'HIT');
       return res.json(cachedResponse);
     }
-
+    
     // Store the original json method
     const originalJson = res.json;
-
+    
     // Override the json method
     res.json = function(data) {
       // Store in cache
       cache.set(key, data, duration);
-
+      
       // Set cache header
       res.set('X-Cache', 'MISS');
-
+      
       // Call the original method
       return originalJson.call(this, data);
     };
-
+    
     next();
   };
 };
@@ -84,7 +74,7 @@ const apiCache = (duration = 60) => {
 const clearCache = (pattern) => {
   const keys = cache.keys();
   const regex = pattern instanceof RegExp ? pattern : new RegExp(pattern);
-
+  
   keys.forEach(key => {
     if (regex.test(key)) {
       cache.del(key);
@@ -103,7 +93,7 @@ const resourceHints = (req, res, next) => {
     { url: '/js/main.js', as: 'script' },
     { url: '/fonts/gothic-pixels.woff2', as: 'font', crossorigin: 'anonymous' }
   ];
-
+  
   // Add Link headers for resource hints
   const linkHeaders = criticalAssets.map(asset => {
     let header = `<${asset.url}>; rel=preload; as=${asset.as}`;
@@ -112,11 +102,11 @@ const resourceHints = (req, res, next) => {
     }
     return header;
   });
-
+  
   if (linkHeaders.length > 0) {
     res.setHeader('Link', linkHeaders.join(', '));
   }
-
+  
   next();
 };
 
@@ -132,7 +122,7 @@ const cacheControl = (req, res, next) => {
     // HTML responses should revalidate
     res.setHeader('Cache-Control', 'no-cache, must-revalidate');
   }
-
+  
   next();
 };
 

@@ -506,9 +506,7 @@ class ScrapyardItem {
    * @returns {Object} - Formatted item
    */
   static formatItem(dbItem) {
-    if (!dbItem) {
-      return null;
-    }
+    if (!dbItem) return null;
 
     // Extract creator data
     let creator = dbItem.creator;

@@ -439,9 +439,7 @@ class ScrapyardItem {
 
       // Execute query
       const { data, error } = await query;
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       let result = data.map(item => ScrapyardItem.formatItem(item));
 
@@ -506,9 +504,7 @@ class ScrapyardItem {
    * @returns {Object} - Formatted item
    */
   static formatItem(dbItem) {
-    if (!dbItem) {
-      return null;
-    }
+    if (!dbItem) return null;
 
     // Extract creator data
     let creator = dbItem.creator;

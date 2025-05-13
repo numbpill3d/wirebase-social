@@ -156,9 +156,7 @@ class ScrapyardItem {
         `)
         .single();
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       return ScrapyardItem.formatItem(data);
     } catch (error) {
@@ -179,9 +177,7 @@ class ScrapyardItem {
       if (error) {
         // If RPC doesn't exist, update directly
         const item = await ScrapyardItem.findById(id);
-        if (!item) {
-          throw new Error('Item not found');
-        }
+        if (!item) throw new Error('Item not found');
 
         const { data: updateData, error: updateError } = await supabaseAdmin
           .from('scrapyard_items')
@@ -190,9 +186,7 @@ class ScrapyardItem {
           .select()
           .single();
 
-        if (updateError) {
-          throw updateError;
-        }
+        if (updateError) throw updateError;
 
         return ScrapyardItem.formatItem(updateData);
       }
@@ -242,9 +236,7 @@ class ScrapyardItem {
         `)
         .single();
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       // Update this instance with the returned data
       Object.assign(this, ScrapyardItem.formatItem(data));
@@ -268,9 +260,7 @@ class ScrapyardItem {
         .delete()
         .eq('id', id);
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       return true;
     } catch (error) {
@@ -329,9 +319,7 @@ class ScrapyardItem {
 
       const { data, error } = await supabaseQuery;
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       let formattedItems = data.map(item => ScrapyardItem.formatItem(item));
 
@@ -370,9 +358,7 @@ class ScrapyardItem {
 
       const { count, error } = await supabaseQuery;
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       return count || 0;
     } catch (error) {
@@ -439,9 +425,7 @@ class ScrapyardItem {
 
       // Execute query
       const { data, error } = await query;
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       let result = data.map(item => ScrapyardItem.formatItem(item));
 
@@ -506,9 +490,7 @@ class ScrapyardItem {
    * @returns {Object} - Formatted item
    */
   static formatItem(dbItem) {
-    if (!dbItem) {
-      return null;
-    }
+    if (!dbItem) return null;
 
     // Extract creator data
     let creator = dbItem.creator;

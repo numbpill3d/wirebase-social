@@ -268,9 +268,7 @@ class ScrapyardItem {
         .delete()
         .eq('id', id);
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       return true;
     } catch (error) {
@@ -329,9 +327,7 @@ class ScrapyardItem {
 
       const { data, error } = await supabaseQuery;
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       let formattedItems = data.map(item => ScrapyardItem.formatItem(item));
 
@@ -370,9 +366,7 @@ class ScrapyardItem {
 
       const { count, error } = await supabaseQuery;
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       return count || 0;
     } catch (error) {
@@ -439,9 +433,7 @@ class ScrapyardItem {
 
       // Execute query
       const { data, error } = await query;
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       let result = data.map(item => ScrapyardItem.formatItem(item));
 
@@ -506,9 +498,7 @@ class ScrapyardItem {
    * @returns {Object} - Formatted item
    */
   static formatItem(dbItem) {
-    if (!dbItem) {
-      return null;
-    }
+    if (!dbItem) return null;
 
     // Extract creator data
     let creator = dbItem.creator;
