@@ -1,0 +1,243 @@
+/* wirebase.city - Serial Experiments Lain / Cyberschizo Theme */
+
+:root {
+  /* Core cyberschizo palette */
+  --cyber-light: #d9d9d9;
+  --cyber-dark: #0f0f0f;
+  --cyber-purple: #460066;
+  --cyber-silver: #c0c0c0;
+  --cyber-red: #ff0000;
+  --cyber-green: #00ff00;
+  --cyber-glitch: rgba(255, 0, 0, 0.2);
+  --cyber-shadow: rgba(0, 0, 0, 0.8);
+  --cyber-glow: rgba(70, 0, 102, 0.5);
+}
+
+/* Import Pixel Fonts */
+@font-face {
+  font-family: 'PixelOperator';
+  src: url('/fonts/PixelOperator.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'VT323';
+  src: url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+  font-display: swap;
+}
+
+/* Base Structure */
+body {
+  background-color: var(--cyber-dark);
+  color: var(--cyber-light);
+  font-family: 'PixelOperator', 'VT323', monospace;
+  cursor: crosshair;
+  overflow-x: hidden;
+  letter-spacing: 0.5px;
+  position: relative;
+  text-shadow: 0 0 2px var(--cyber-green);
+  margin: 0;
+  padding: 0;
+}
+
+/* CRT Scanlines Effect */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15) 0px,
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.7;
+  animation: scanlines 10s linear infinite;
+}
+
+/* Digital Noise Overlay */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAM1BMVEUAAAA7PT04OTk6PDw4Ozs5OTk7PDw5Ozs6Ojo6PDw5Oju5Fx85OTo5OTo6Ojs6OjyzOy9GAAAAEHRSTlMAECAwQFBgcICPn6+/z9/vIxqCigAAAQNJREFUWMPtlluOwyAMRWFsbgGS9N9/t03tqDPIHn5HGs4HsV4OEXF+ONKyP44AyIZi40oAQRBvR3mDqDNMiX4AdV3Mc5pHjblCVnOkGDwfcgD4tB8PgIZaBCAPwB0LpMGzhJwAnpt/b2UPiM4a2ZrRViMDVs0gy3D9WCdBo/9KVgF2LJI6Wv4GPOcCnLVSQdQhygACT9kTHD+NJlJKdRCFgNhjqTJGSVjAB9Y5FLUkXF8UY70kaiDyATXTOcA5gOgE5B6QZl9H4LTE9r0AwP8FsHsfSOoBAPAK2Ck7wClgNi/w7wAHAGIBcgWJC0hcQOICCkxzpjkPmGZPc86ncMjsPaRkP8fPH0fEK+ILgYBfbZ9owZQAAAAASUVORK5CYII=');
+  background-repeat: repeat;
+  opacity: 0.03;
+  z-index: -2;
+  animation: noise 0.2s infinite;
+  pointer-events: none;
+}
+
+/* Vignette Effect */
+.vignette {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle at center,
+    transparent 40%,
+    rgba(0, 0, 0, 0.4) 80%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'PixelOperator', 'VT323', monospace;
+  color: var(--cyber-silver);
+  text-shadow: 0 0 3px var(--cyber-purple);
+  letter-spacing: 1px;
+  position: relative;
+  display: inline-block;
+  filter: blur(0.5px);
+  overflow: hidden;
+}
+
+h1::after, h2::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: var(--cyber-red);
+  opacity: 0.5;
+  animation: glitchLine 15s infinite;
+}
+
+p {
+  font-family: 'PixelOperator', 'VT323', monospace;
+  line-height: 1.6;
+  color: var(--cyber-light);
+  position: relative;
+}
+
+a {
+  color: var(--cyber-purple);
+  text-decoration: none;
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+a:hover {
+  color: var(--cyber-green);
+  text-shadow: 0 0 5px var(--cyber-green);
+  animation: linkFlicker 1s infinite;
+}
+
+a:hover::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  bottom: 0;
+  left: 0;
+  background-color: var(--cyber-green);
+  animation: linkGlitch 2s infinite;
+}
+
+/* Header Styling */
+.main-header {
+  background-color: var(--cyber-dark);
+  border-bottom: 1px solid var(--cyber-purple);
+  padding: 10px 20px;
+  box-shadow: 0 0 10px var(--cyber-shadow);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.main-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('data:image/svg+xml;utf8,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="10" height="10" fill="rgba(70, 0, 102, 0.03)"/><rect x="10" y="10" width="10" height="10" fill="rgba(70, 0, 102, 0.03)"/></svg>');
+  opacity: 0.2;
+  z-index: -1;
+}
+
+.logo h1 {
+  font-family: 'PixelOperator', 'VT323', monospace;
+  text-transform: lowercase;
+  letter-spacing: 3px;
+  filter: blur(0.5px);
+  animation: textGlitch 5s infinite;
+  color: var(--cyber-silver);
+}
+
+.logo img {
+  filter: hue-rotate(280deg) brightness(0.7) contrast(1.2);
+  opacity: 0.8;
+  mix-blend-mode: screen;
+}
+
+/* Navigation */
+.cyber-nav {
+  display: flex;
+  gap: 10px;
+}
+
+.cyber-button {
+  background-color: var(--cyber-dark);
+  border: 1px solid var(--cyber-purple);
+  color: var(--cyber-light);
+  font-family: 'PixelOperator', 'VT323', monospace;
+  padding: 5px 10px;
+  position: relative;
+  text-transform: lowercase;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+  box-shadow: none;
+  text-shadow: 0 0 2px var(--cyber-green);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.cyber-button::before {
+  content: '>';
+  margin-right: 5px;
+  opacity: 0.8;
+}
+
+.cyber-button:hover {
+  border-color: var(--cyber-green);
+  transform: scale(1.03);
+  animation: buttonGlitch 1s infinite;
+  color: var(--cyber-green);
+}
+
+.cyber-button:hover::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(0, 255, 0, 0.1),
+    transparent
+  );
