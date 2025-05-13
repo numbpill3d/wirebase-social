@@ -1,0 +1,82 @@
+<div class="discover-container">
+    <div class="cyber-window">
+        <div class="cyber-window-header">
+            <span class="cyber-window-title">Stream // Global Feed</span>
+            <div class="cyber-window-controls">
+                <span class="cyber-window-control minimize">_</span>
+                <span class="cyber-window-control maximize">□</span>
+            </div>
+        </div>
+        <div class="cyber-window-content">
+            <div class="discover-header">
+                <h1>Discover the Wired</h1>
+                <p>Recent activity from across the network</p>
+            </div>
+
+            <div class="discover-feed">
+                {{#if updates.length}}
+                    {{#each updates}}
+                        <div class="feed-item {{this.type}}-item">
+                            <div class="feed-item-header">
+                                {{#if (eq this.type "profile")}}
+                                    <img src="{{this.item.avatar}}" alt="{{this.item.displayName}}" class="feed-avatar">
+                                    <div class="feed-user-info">
+                                        <span class="feed-username">{{this.item.displayName}}</span>
+                                        <span class="feed-glyph">{{this.item.customGlyph}}</span>
+                                    </div>
+                                    <span class="feed-time">{{formatDate this.date}}</span>
+                                {{else}}
+                                    <img src="{{this.item.creator.avatar}}" alt="{{this.item.creator.displayName}}" class="feed-avatar">
+                                    <div class="feed-user-info">
+                                        <span class="feed-username">{{this.item.creator.displayName}}</span>
+                                        <span class="feed-glyph">{{this.item.creator.customGlyph}}</span>
+                                    </div>
+                                    <span class="feed-time">{{formatDate this.date}}</span>
+                                {{/if}}
+                            </div>
+                            <div class="feed-item-content">
+                                {{#if (eq this.type "profile")}}
+                                    <div class="feed-status">
+                                        <p>{{this.item.statusMessage}}</p>
+                                        <a href="/profile/{{this.item.username}}" class="cyber-button small">View Profile</a>
+                                    </div>
+                                {{else}}
+                                    <div class="feed-scrapyard-item">
+                                        <h3>{{this.item.title}}</h3>
+                                        <span class="category-tag">{{this.item.category}}</span>
+                                        {{#if this.item.previewImage}}
+                                            <img src="{{this.item.previewImage}}" alt="{{this.item.title}}" class="feed-preview-image">
+                                        {{/if}}
+                                        <a href="/scrapyard/item/{{this.item._id}}" class="cyber-button small">View Item</a>
+                                    </div>
+                                {{/if}}
+                            </div>
+                        </div>
+                    {{/each}}
+                {{else}}
+                    <div class="empty-feed">
+                        <p>No recent activity found. The network seems quiet...</p>
+                    </div>
+                {{/if}}
+            </div>
+
+            {{#if pagination}}
+                <div class="pagination">
+                    {{#if pagination.hasPrev}}
+                        <a href="/discover?page={{subtract pagination.page 1}}" class="cyber-button small">Previous</a>
+                    {{else}}
+                        <span class="cyber-button small disabled">Previous</span>
+                    {{/if}}
+                    
+                    <span class="page-info">Page {{pagination.page}} of {{pagination.totalPages}}</span>
+                    
+                    {{#if pagination.hasNext}}
+                        <a href="/discover?page={{add pagination.page 1}}" class="cyber-button small">Next</a>
+                    {{else}}
+                        <span class="cyber-button small disabled">Next</span>
+                    {{/if}}
+                </div>
+            {{/if}}
+        </div>
+    </div>
+</div>

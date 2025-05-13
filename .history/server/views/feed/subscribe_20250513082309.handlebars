@@ -1,0 +1,124 @@
+<div class="feed-subscribe-container">
+    <div class="cyber-window">
+        <div class="cyber-window-header">
+            <span class="cyber-window-title">Subscribe to Feeds</span>
+            <div class="cyber-window-controls">
+                <span class="cyber-window-control minimize">_</span>
+                <span class="cyber-window-control maximize">□</span>
+            </div>
+        </div>
+        <div class="cyber-window-content">
+            <div class="feed-header">
+                <h1>Subscribe to Wirebase Feeds</h1>
+                <p>Stay updated with the latest content from Wirebase through RSS, Atom, or JSON feeds.</p>
+            </div>
+
+            <div class="feed-content">
+                <section class="feed-section">
+                    <h2>Main Feeds</h2>
+                    <div class="feed-list">
+                        <div class="feed-item">
+                            <h3>Global Feed</h3>
+                            <p>All recent activity from across Wirebase</p>
+                            <div class="feed-links">
+                                <a href="/feed?format=rss" class="cyber-button small">RSS</a>
+                                <a href="/feed?format=atom" class="cyber-button small">Atom</a>
+                                <a href="/feed?format=json" class="cyber-button small">JSON</a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="feed-section">
+                    <h2>Scrapyard Category Feeds</h2>
+                    <div class="feed-list">
+                        <div class="feed-item">
+                            <h3>All Categories</h3>
+                            <div class="feed-links">
+                                <a href="/feed/scrapyard/all?format=rss" class="cyber-button small">RSS</a>
+                                <a href="/feed/scrapyard/all?format=atom" class="cyber-button small">Atom</a>
+                                <a href="/feed/scrapyard/all?format=json" class="cyber-button small">JSON</a>
+                            </div>
+                        </div>
+                        
+                        <div class="feed-item">
+                            <h3>Widgets</h3>
+                            <div class="feed-links">
+                                <a href="/feed/scrapyard/widget?format=rss" class="cyber-button small">RSS</a>
+                                <a href="/feed/scrapyard/widget?format=atom" class="cyber-button small">Atom</a>
+                                <a href="/feed/scrapyard/widget?format=json" class="cyber-button small">JSON</a>
+                            </div>
+                        </div>
+                        
+                        <div class="feed-item">
+                            <h3>Templates</h3>
+                            <div class="feed-links">
+                                <a href="/feed/scrapyard/template?format=rss" class="cyber-button small">RSS</a>
+                                <a href="/feed/scrapyard/template?format=atom" class="cyber-button small">Atom</a>
+                                <a href="/feed/scrapyard/template?format=json" class="cyber-button small">JSON</a>
+                            </div>
+                        </div>
+                        
+                        <div class="feed-item">
+                            <h3>Icons</h3>
+                            <div class="feed-links">
+                                <a href="/feed/scrapyard/icon?format=rss" class="cyber-button small">RSS</a>
+                                <a href="/feed/scrapyard/icon?format=atom" class="cyber-button small">Atom</a>
+                                <a href="/feed/scrapyard/icon?format=json" class="cyber-button small">JSON</a>
+                            </div>
+                        </div>
+                        
+                        <div class="feed-item">
+                            <h3>Banners</h3>
+                            <div class="feed-links">
+                                <a href="/feed/scrapyard/banner?format=rss" class="cyber-button small">RSS</a>
+                                <a href="/feed/scrapyard/banner?format=atom" class="cyber-button small">Atom</a>
+                                <a href="/feed/scrapyard/banner?format=json" class="cyber-button small">JSON</a>
+                            </div>
+                        </div>
+                        
+                        <div class="feed-item">
+                            <h3>GIFs</h3>
+                            <div class="feed-links">
+                                <a href="/feed/scrapyard/gif?format=rss" class="cyber-button small">RSS</a>
+                                <a href="/feed/scrapyard/gif?format=atom" class="cyber-button small">Atom</a>
+                                <a href="/feed/scrapyard/gif?format=json" class="cyber-button small">JSON</a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="feed-section">
+                    <h2>User Feeds</h2>
+                    <p>Each user has their own feed. Replace 'username' with the actual username.</p>
+                    <div class="feed-example">
+                        <code>/feed/user/username?format=rss</code>
+                    </div>
+                    
+                    {{#if isAuthenticated}}
+                        <div class="your-feed">
+                            <h3>Your Feed</h3>
+                            <div class="feed-links">
+                                <a href="/feed/user/{{user.username}}?format=rss" class="cyber-button small">RSS</a>
+                                <a href="/feed/user/{{user.username}}?format=atom" class="cyber-button small">Atom</a>
+                                <a href="/feed/user/{{user.username}}?format=json" class="cyber-button small">JSON</a>
+                            </div>
+                        </div>
+                    {{/if}}
+                </section>
+
+                <section class="feed-section">
+                    <h2>How to Use These Feeds</h2>
+                    <p>You can subscribe to these feeds using any RSS reader or feed aggregator. Here's how:</p>
+                    <ol>
+                        <li>Copy the URL of the feed format you prefer (RSS, Atom, or JSON)</li>
+                        <li>Open your feed reader application</li>
+                        <li>Add a new subscription and paste the URL</li>
+                        <li>Save the subscription to start receiving updates</li>
+                    </ol>
+                    <p>Popular feed readers include Feedly, Inoreader, and NewsBlur.</p>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
