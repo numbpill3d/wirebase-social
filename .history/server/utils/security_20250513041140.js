@@ -16,25 +16,8 @@ try {
     next();
   };
 }
-// Try to load rate-limit module, fallback to a simple middleware if not available
-let rateLimit;
-try {
-  rateLimit = require('express-rate-limit');
-} catch (err) {
-  console.warn('Express-rate-limit module not found, using fallback implementation');
-  // Simple fallback implementation
-  rateLimit = (config) => (req, res, next) => next();
-}
-
-// Try to load xss-clean module, fallback to a simple middleware if not available
-let xss;
-try {
-  xss = require('xss-clean');
-} catch (err) {
-  console.warn('XSS-clean module not found, using fallback implementation');
-  // Simple fallback implementation
-  xss = () => (req, res, next) => next();
-}
+const rateLimit = require('express-rate-limit');
+const xss = require('xss-clean');
 const crypto = require('crypto');
 
 /**

@@ -1,40 +1,9 @@
 /**
  * Enhanced security utilities for Wirebase
  */
-// Try to load helmet module, fallback to a simple middleware if not available
-let helmet;
-try {
-  helmet = require('helmet');
-} catch (err) {
-  console.warn('Helmet module not found, using fallback implementation');
-  // Simple fallback implementation
-  helmet = (config) => (req, res, next) => {
-    // Set some basic security headers
-    res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('X-XSS-Protection', '1; mode=block');
-    res.setHeader('X-Frame-Options', 'DENY');
-    next();
-  };
-}
-// Try to load rate-limit module, fallback to a simple middleware if not available
-let rateLimit;
-try {
-  rateLimit = require('express-rate-limit');
-} catch (err) {
-  console.warn('Express-rate-limit module not found, using fallback implementation');
-  // Simple fallback implementation
-  rateLimit = (config) => (req, res, next) => next();
-}
-
-// Try to load xss-clean module, fallback to a simple middleware if not available
-let xss;
-try {
-  xss = require('xss-clean');
-} catch (err) {
-  console.warn('XSS-clean module not found, using fallback implementation');
-  // Simple fallback implementation
-  xss = () => (req, res, next) => next();
-}
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const xss = require('xss-clean');
 const crypto = require('crypto');
 
 /**
@@ -72,8 +41,8 @@ const helmetConfig = {
  * Rate limiting configuration
  */
 const rateLimiterConfig = {
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, // Limit each IP to 100 requests per windowMs
+  windowMs: process.env.RATE_LIMIT_WINDOW || 15 * 60 * 1000, // 15 minutes
+  max: process.env.RATE_LIMIT_MAX_REQUESTS || 100, // Limit each IP to 100 requests per windowMs
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   message: {
@@ -153,7 +122,7 @@ const validateRequest = (schema) => {
     req.body = value.body;
     req.query = value.query;
     req.params = value.params;
-
+    
     next();
   };
 };
@@ -165,7 +134,7 @@ const ensureAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) {
     return next();
   }
-
+  
   req.session.returnTo = req.originalUrl;
   res.redirect('/users/login');
 };
@@ -180,14 +149,14 @@ const ensureRole = (roles) => {
       req.session.returnTo = req.originalUrl;
       return res.redirect('/users/login');
     }
-
+    
     const userRole = req.user.role || 'user';
     const requiredRoles = Array.isArray(roles) ? roles : [roles];
-
+    
     if (requiredRoles.includes(userRole) || userRole === 'admin') {
       return next();
     }
-
+    
     res.status(403).render('error', {
       title: 'Access Denied',
       errorCode: 403,

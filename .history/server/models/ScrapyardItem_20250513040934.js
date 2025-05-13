@@ -174,7 +174,7 @@ class ScrapyardItem {
    */
   static async recordUsage(id) {
     try {
-      const { error } = await supabaseAdmin.rpc('increment_usage_count', { item_id: id });
+      const { data, error } = await supabaseAdmin.rpc('increment_usage_count', { item_id: id });
 
       if (error) {
         // If RPC doesn't exist, update directly

@@ -34,9 +34,7 @@ try {
 
     get(key) {
       const item = this.cache.get(key);
-      if (!item) {
-        return undefined;
-      }
+      if (!item) return undefined;
 
       if (item.expires && Date.now() > item.expires) {
         this.cache.delete(key);

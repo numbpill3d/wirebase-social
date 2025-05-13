@@ -1,40 +1,9 @@
 /**
  * Enhanced security utilities for Wirebase
  */
-// Try to load helmet module, fallback to a simple middleware if not available
-let helmet;
-try {
-  helmet = require('helmet');
-} catch (err) {
-  console.warn('Helmet module not found, using fallback implementation');
-  // Simple fallback implementation
-  helmet = (config) => (req, res, next) => {
-    // Set some basic security headers
-    res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('X-XSS-Protection', '1; mode=block');
-    res.setHeader('X-Frame-Options', 'DENY');
-    next();
-  };
-}
-// Try to load rate-limit module, fallback to a simple middleware if not available
-let rateLimit;
-try {
-  rateLimit = require('express-rate-limit');
-} catch (err) {
-  console.warn('Express-rate-limit module not found, using fallback implementation');
-  // Simple fallback implementation
-  rateLimit = (config) => (req, res, next) => next();
-}
-
-// Try to load xss-clean module, fallback to a simple middleware if not available
-let xss;
-try {
-  xss = require('xss-clean');
-} catch (err) {
-  console.warn('XSS-clean module not found, using fallback implementation');
-  // Simple fallback implementation
-  xss = () => (req, res, next) => next();
-}
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const xss = require('xss-clean');
 const crypto = require('crypto');
 
 /**
