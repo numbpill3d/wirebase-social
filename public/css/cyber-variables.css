@@ -1,0 +1,73 @@
+/* 
+ * cyber-variables.css - Cyberschizo theme variables for wirebase.city
+ */
+
+:root {
+  /* Main color palette */
+  --cyber-light: #d9d9d9;
+  --cyber-dark: #0f0f0f;
+  --cyber-purple: #460066;
+  --cyber-gray: #c0c0c0;
+  --cyber-red: #ff0000;
+  --cyber-green: #00ff00;
+  
+  /* Secondary colors */
+  --cyber-dark-purple: #2a0033;
+  --cyber-light-purple: #6b238e;
+  --cyber-terminal-bg: #000000;
+  --cyber-terminal-text: #00ff00;
+  
+  /* Effect colors */
+  --cyber-glow: rgba(0, 255, 0, 0.3);
+  --cyber-shadow: rgba(70, 0, 102, 0.5);
+  --cyber-glitch-red: rgba(255, 0, 0, 0.5);
+  --cyber-glitch-blue: rgba(0, 0, 255, 0.5);
+  
+  /* Typography */
+  --cyber-font-mono: 'PixelOperator', 'VT323', 'Courier New', monospace;
+  --cyber-font-display: 'VT323', 'Courier New', monospace;
+  
+  /* Spacing */
+  --cyber-space-xs: 4px;
+  --cyber-space-sm: 8px;
+  --cyber-space-md: 16px;
+  --cyber-space-lg: 24px;
+  --cyber-space-xl: 32px;
+  
+  /* Border radius */
+  --cyber-radius-none: 0;
+  --cyber-radius-sm: 2px;
+  --cyber-radius-md: 4px;
+  
+  /* Transitions */
+  --cyber-transition-fast: 0.1s;
+  --cyber-transition-normal: 0.2s;
+  --cyber-transition-slow: 0.4s;
+  
+  /* Z-index layers */
+  --cyber-z-base: 1;
+  --cyber-z-above: 10;
+  --cyber-z-modal: 100;
+  --cyber-z-overlay: 1000;
+  --cyber-z-tooltip: 2000;
+}
+
+/* Dark theme overrides */
+.dark-theme {
+  --cyber-light: #1a1a1a;
+  --cyber-dark: #000000;
+  --cyber-purple: #330044;
+  --cyber-gray: #333333;
+  --cyber-green: #00cc00;
+}
+
+/* High contrast theme overrides */
+.high-contrast {
+  --cyber-light: #ffffff;
+  --cyber-dark: #000000;
+  --cyber-purple: #9900cc;
+  --cyber-gray: #dddddd;
+  --cyber-red: #ff3333;
+  --cyber-green: #33ff33;
+  --cyber-glow: rgba(51, 255, 51, 0.5);
+}

@@ -1,0 +1,10 @@
+This is a placeholder for the default avatar image.
+
+For the cyberschizo theme, the default avatar should be a Lain-inspired image with the following characteristics:
+- Dark background (#0f0f0f)
+- Minimalist face or silhouette
+- Glitch effects or digital distortion
+- Purple (#460066) and green (#00ff00) accents
+- Low-res or pixelated style
+
+Replace this text file with an actual image file (PNG or SVG) with the same name.

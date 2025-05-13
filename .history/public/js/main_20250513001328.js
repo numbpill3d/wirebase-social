@@ -121,6 +121,10 @@ function setupCyberElements() {
     // Setup Cyber buttons
     const cyberButtons = document.querySelectorAll('.cyber-button');
 
+:start_line:124
+-------
+:start_line:124
+-------
     cyberButtons.forEach(button => {
         button.addEventListener('mousedown', function() {
             this.classList.add('active');
