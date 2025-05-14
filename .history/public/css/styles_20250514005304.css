@@ -278,18 +278,20 @@ ul {
 
 /* Enhanced Header */
 .main-header {
-  background-color: var(--cyber-dark);
+  background-color: var(--dark-purple);
   background-image:
-    linear-gradient(to bottom, rgba(70, 0, 102, 0.5), rgba(26, 12, 46, 0.8)),
+    linear-gradient(to bottom, rgba(75, 40, 131, 0.5), rgba(26, 12, 46, 0.8)),
     url('/images/castle-banner.png');
   background-position: center;
   background-size: cover;
-  border-bottom: 2px solid var(--cyber-purple);
-  padding: 10px 15px;
+  border-bottom: 3px solid var(--gold);
+  padding: 15px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(255, 215, 0, 0.2);
   position: relative;
   z-index: 100;
 }
@@ -311,17 +313,19 @@ ul {
 }
 
 .logo img {
-  width: 40px;
-  height: 40px;
-  margin-right: 8px;
-  filter: drop-shadow(0 0 5px rgba(0, 255, 0, 0.3));
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+  filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5));
 }
 
 .logo h1 {
   margin: 0;
-  font-size: 1.8rem;
+  font-size: 2rem;
   border: none;
-  text-shadow: 0 0 8px var(--cyber-glow);
+  text-shadow:
+    2px 2px 4px var(--dungeon-shadow),
+    0 0 10px rgba(255, 215, 0, 0.3);
 }
 
 .logo h1::after {
@@ -334,7 +338,7 @@ ul {
 
 .win98-navbar {
   display: flex;
-  gap: 4px;
+  gap: 5px;
 }
 
 @media (max-width: 768px) {
