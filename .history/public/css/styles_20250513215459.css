@@ -1537,19 +1537,19 @@ button, select, input[type="submit"] {
 /* Two-column scrollable profile box */
 .profile-example-columns {
   display: grid;
-  grid-template-columns: 45% 55%;
-  gap: 12px;
-  max-height: 380px;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  max-height: 400px;
   overflow-y: auto;
 }
 
 .profile-tutorial {
-  border-right: 1px solid var(--cyber-purple);
-  padding-right: 10px;
+  border-right: 1px solid var(--gold);
+  padding-right: 15px;
 }
 
 .profile-dynamic-content {
-  padding-left: 10px;
+  padding-left: 15px;
 }
 
 /* OSRS-inspired elements */

@@ -1544,12 +1544,12 @@ button, select, input[type="submit"] {
 }
 
 .profile-tutorial {
-  border-right: 1px solid var(--cyber-purple);
-  padding-right: 10px;
+  border-right: 1px solid var(--gold);
+  padding-right: 15px;
 }
 
 .profile-dynamic-content {
-  padding-left: 10px;
+  padding-left: 15px;
 }
 
 /* OSRS-inspired elements */
