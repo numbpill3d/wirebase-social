@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stream - wirebase.city</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/laincore.css">
+    <link rel="stylesheet" href="../css/interface.css">
+    <link rel="stylesheet" href="../css/scanlines.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <script src="../js/laincore-loader.js"></script>
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo">
+            <img src="../images/wirebase-logo.svg" alt="wirebase.city" class="glitch-image">
+            <h1 class="glitch-text" data-text="wirebase.city">wirebase.city</h1>
+        </div>
+        <nav class="cyber-navbar">
+            <a href="/" class="cyber-button">Core</a>
+            <a href="/profile" class="cyber-button">Shell</a>
+            <a href="/scrapyard" class="cyber-button">Nullspace</a>
+            <a href="/feed" class="cyber-button active">Stream</a>
+            <a href="/forum" class="cyber-button">Assembly</a>
+            <a href="/users/login" class="cyber-button">Connect</a>
+            <button id="theme-toggle" class="cyber-button" type="button">Disconnect</button>
+        </nav>
+    </header>
+
+    <!-- Add CRT scanlines and glitch effects -->
+    <div class="crt-scanlines"></div>
+    <div class="crt-flicker"></div>
+    <div class="digital-noise"></div>
+
+    <div class="container">
+        <div class="cyber-window">
+            <div class="cyber-window-header">
+                <span class="cyber-window-title">system.stream</span>
+                <div class="cyber-window-controls">
+                    <span class="cyber-window-control">_</span>
+                    <span class="cyber-window-control">□</span>
+                    <span class="cyber-window-control">×</span>
+                </div>
+            </div>
+            <div class="cyber-window-content">
+                <h2>Global Data Stream</h2>
+                <p>Monitor the flow of information across the network.</p>
+                
+                <div class="feed-options">
+                    <div class="cyber-tabs">
+                        <button class="cyber-tab active" type="button">All Activity</button>
+                        <button class="cyber-tab" type="button">Nullspace Updates</button>
+                        <button class="cyber-tab" type="button">Shell Changes</button>
+                        <button class="cyber-tab" type="button">System Alerts</button>
+                    </div>
+                    
+                    <div class="feed-format">
+                        <span>Feed Format:</span>
+                        <a href="/feed?format=rss" class="cyber-button small">RSS</a>
+                        <a href="/feed?format=atom" class="cyber-button small">ATOM</a>
+                        <a href="/feed?format=json" class="cyber-button small">JSON</a>
+                    </div>
+                </div>
+                
+                <div class="stream-feed">
+                    <div class="feed-item">
+                        <div class="feed-timestamp">2025-05-14 14:32:18</div>
+                        <div class="feed-content">
+                            <span class="feed-user">SystemAdmin</span> uploaded a new artifact to the Nullspace: <a href="#">Corrupted Memory Block</a>
+                        </div>
+                    </div>
+                    
+                    <div class="feed-item">
+                        <div class="feed-timestamp">2025-05-14 13:45:01</div>
+                        <div class="feed-content">
+                            <span class="feed-user">Node_4231</span> updated their digital shell with new HTML/CSS
+                        </div>
+                    </div>
+                    
+                    <div class="feed-item">
+                        <div class="feed-timestamp">2025-05-14 12:17:33</div>
+                        <div class="feed-content">
+                            <span class="feed-user">DataNode</span> established connection with <span class="feed-user">CyberEntity</span>
+                        </div>
+                    </div>
+                    
+                    <div class="feed-item">
+                        <div class="feed-timestamp">2025-05-14 11:05:22</div>
+                        <div class="feed-content">
+                            <span class="feed-system">SYSTEM</span>: Network maintenance scheduled for 2025-05-15
+                        </div>
+                    </div>
+                    
+                    <div class="feed-item">
+                        <div class="feed-timestamp">2025-05-14 10:42:15</div>
+                        <div class="feed-content">
+                            <span class="feed-user">PixelArtist</span> uploaded a new artifact to the Nullspace: <a href="#">Pixel Symbols Pack</a>
+                        </div>
+                    </div>
+                    
+                    <div class="feed-item">
+                        <div class="feed-timestamp">2025-05-14 09:30:07</div>
+                        <div class="feed-content">
+                            <span class="feed-user">GlitchHunter</span> updated their digital shell with new HTML/CSS
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stream-controls">
+                    <button class="cyber-button" type="button">Load More Data</button>
+                    <button class="cyber-button" type="button">Auto-Refresh</button>
+                    <button class="cyber-button" type="button">Filter Options</button>
+                </div>
+                
+                <div class="feed-subscribe">
+                    <h3>Subscribe to Data Streams</h3>
+                    <p>Add these feeds to your RSS reader to monitor network activity:</p>
+                    <ul class="feed-list">
+                        <li><a href="/feed?format=rss">Global Activity Feed</a></li>
+                        <li><a href="/feed/nullspace?format=rss">Nullspace Updates</a></li>
+                        <li><a href="/feed/shells?format=rss">Shell Modifications</a></li>
+                        <li><a href="/feed/system?format=rss">System Alerts</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="../images/wirebase-logo.svg" alt="wirebase.city" class="pixel-image small">
+                <span>wirebase.city</span>
+            </div>
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Terms</a>
+                <a href="#">Privacy</a>
+                <a href="#">Contact</a>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            © 2025 wirebase.city - You don't exist until you're online
+        </div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/laincore.js"></script>
+</body>
+</html>

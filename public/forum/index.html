@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assembly - wirebase.city</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/laincore.css">
+    <link rel="stylesheet" href="../css/interface.css">
+    <link rel="stylesheet" href="../css/scanlines.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <script src="../js/laincore-loader.js"></script>
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo">
+            <img src="../images/wirebase-logo.svg" alt="wirebase.city" class="glitch-image">
+            <h1 class="glitch-text" data-text="wirebase.city">wirebase.city</h1>
+        </div>
+        <nav class="cyber-navbar">
+            <a href="/" class="cyber-button">Core</a>
+            <a href="/profile" class="cyber-button">Shell</a>
+            <a href="/scrapyard" class="cyber-button">Nullspace</a>
+            <a href="/feed" class="cyber-button">Stream</a>
+            <a href="/forum" class="cyber-button active">Assembly</a>
+            <a href="/users/login" class="cyber-button">Connect</a>
+            <button id="theme-toggle" class="cyber-button" type="button">Disconnect</button>
+        </nav>
+    </header>
+
+    <!-- Add CRT scanlines and glitch effects -->
+    <div class="crt-scanlines"></div>
+    <div class="crt-flicker"></div>
+    <div class="digital-noise"></div>
+
+    <div class="container">
+        <div class="cyber-window">
+            <div class="cyber-window-header">
+                <span class="cyber-window-title">system.assembly</span>
+                <div class="cyber-window-controls">
+                    <span class="cyber-window-control">_</span>
+                    <span class="cyber-window-control">□</span>
+                    <span class="cyber-window-control">×</span>
+                </div>
+            </div>
+            <div class="cyber-window-content">
+                <h2>Network Assembly</h2>
+                <p>Connect with other nodes and exchange information packets.</p>
+                
+                <div class="forum-controls">
+                    <div class="cyber-input-group">
+                        <input type="text" class="cyber-input" placeholder="Search discussions...">
+                        <button type="button" class="cyber-button">Search</button>
+                    </div>
+                    <button type="button" class="cyber-button primary">New Thread</button>
+                </div>
+                
+                <div class="forum-categories">
+                    <div class="forum-category">
+                        <div class="category-header">
+                            <h3>System Announcements</h3>
+                            <span class="thread-count">3 threads</span>
+                        </div>
+                        <div class="category-threads">
+                            <div class="thread">
+                                <div class="thread-icon">📢</div>
+                                <div class="thread-info">
+                                    <a href="#" class="thread-title">Welcome to wirebase.city</a>
+                                    <div class="thread-meta">
+                                        <span class="thread-author">SystemAdmin</span>
+                                        <span class="thread-date">2025-05-01</span>
+                                    </div>
+                                </div>
+                                <div class="thread-stats">
+                                    <span class="reply-count">24 replies</span>
+                                    <span class="view-count">1,245 views</span>
+                                </div>
+                            </div>
+                            <div class="thread">
+                                <div class="thread-icon">📢</div>
+                                <div class="thread-info">
+                                    <a href="#" class="thread-title">Network Maintenance Schedule</a>
+                                    <div class="thread-meta">
+                                        <span class="thread-author">SystemAdmin</span>
+                                        <span class="thread-date">2025-05-10</span>
+                                    </div>
+                                </div>
+                                <div class="thread-stats">
+                                    <span class="reply-count">8 replies</span>
+                                    <span class="view-count">532 views</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="forum-category">
+                        <div class="category-header">
+                            <h3>Shell Customization</h3>
+                            <span class="thread-count">12 threads</span>
+                        </div>
+                        <div class="category-threads">
+                            <div class="thread">
+                                <div class="thread-icon">💻</div>
+                                <div class="thread-info">
+                                    <a href="#" class="thread-title">HTML/CSS Tips for Digital Shells</a>
+                                    <div class="thread-meta">
+                                        <span class="thread-author">Node_4231</span>
+                                        <span class="thread-date">2025-05-12</span>
+                                    </div>
+                                </div>
+                                <div class="thread-stats">
+                                    <span class="reply-count">42 replies</span>
+                                    <span class="view-count">876 views</span>
+                                </div>
+                            </div>
+                            <div class="thread">
+                                <div class="thread-icon">💻</div>
+                                <div class="thread-info">
+                                    <a href="#" class="thread-title">Glitch Effect Tutorial</a>
+                                    <div class="thread-meta">
+                                        <span class="thread-author">GlitchHunter</span>
+                                        <span class="thread-date">2025-05-08</span>
+                                    </div>
+                                </div>
+                                <div class="thread-stats">
+                                    <span class="reply-count">17 replies</span>
+                                    <span class="view-count">423 views</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="forum-category">
+                        <div class="category-header">
+                            <h3>Nullspace Resources</h3>
+                            <span class="thread-count">8 threads</span>
+                        </div>
+                        <div class="category-threads">
+                            <div class="thread">
+                                <div class="thread-icon">🔌</div>
+                                <div class="thread-info">
+                                    <a href="#" class="thread-title">Best Widgets for Your Shell</a>
+                                    <div class="thread-meta">
+                                        <span class="thread-author">DataNode</span>
+                                        <span class="thread-date">2025-05-14</span>
+                                    </div>
+                                </div>
+                                <div class="thread-stats">
+                                    <span class="reply-count">11 replies</span>
+                                    <span class="view-count">342 views</span>
+                                </div>
+                            </div>
+                            <div class="thread">
+                                <div class="thread-icon">🔌</div>
+                                <div class="thread-info">
+                                    <a href="#" class="thread-title">Resource Request Thread</a>
+                                    <div class="thread-meta">
+                                        <span class="thread-author">PixelArtist</span>
+                                        <span class="thread-date">2025-05-05</span>
+                                    </div>
+                                </div>
+                                <div class="thread-stats">
+                                    <span class="reply-count">32 replies</span>
+                                    <span class="view-count">687 views</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="forum-stats">
+                    <div class="stat-box">
+                        <div class="stat-title">Total Threads</div>
+                        <div class="stat-value">127</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-title">Total Posts</div>
+                        <div class="stat-value">1,543</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-title">Active Users</div>
+                        <div class="stat-value">42</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-title">Newest Member</div>
+                        <div class="stat-value">CyberEntity</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="../images/wirebase-logo.svg" alt="wirebase.city" class="pixel-image small">
+                <span>wirebase.city</span>
+            </div>
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Terms</a>
+                <a href="#">Privacy</a>
+                <a href="#">Contact</a>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            © 2025 wirebase.city - You don't exist until you're online
+        </div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/laincore.js"></script>
+</body>
+</html>

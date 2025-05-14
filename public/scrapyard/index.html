@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nullspace - wirebase.city</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/laincore.css">
+    <link rel="stylesheet" href="../css/interface.css">
+    <link rel="stylesheet" href="../css/scanlines.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <script src="../js/laincore-loader.js"></script>
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo">
+            <img src="../images/wirebase-logo.svg" alt="wirebase.city" class="glitch-image">
+            <h1 class="glitch-text" data-text="wirebase.city">wirebase.city</h1>
+        </div>
+        <nav class="cyber-navbar">
+            <a href="/" class="cyber-button">Core</a>
+            <a href="/profile" class="cyber-button">Shell</a>
+            <a href="/scrapyard" class="cyber-button active">Nullspace</a>
+            <a href="/feed" class="cyber-button">Stream</a>
+            <a href="/forum" class="cyber-button">Assembly</a>
+            <a href="/users/login" class="cyber-button">Connect</a>
+            <button id="theme-toggle" class="cyber-button" type="button">Disconnect</button>
+        </nav>
+    </header>
+
+    <!-- Add CRT scanlines and glitch effects -->
+    <div class="crt-scanlines"></div>
+    <div class="crt-flicker"></div>
+    <div class="digital-noise"></div>
+
+    <div class="container">
+        <div class="cyber-window">
+            <div class="cyber-window-header">
+                <span class="cyber-window-title">system.nullspace</span>
+                <div class="cyber-window-controls">
+                    <span class="cyber-window-control">_</span>
+                    <span class="cyber-window-control">□</span>
+                    <span class="cyber-window-control">×</span>
+                </div>
+            </div>
+            <div class="cyber-window-content">
+                <h2>Nullspace Repository</h2>
+                <p>Browse abandoned processes, dead shells, and data fragments to enhance your digital identity.</p>
+                
+                <div class="search-panel">
+                    <div class="cyber-input-group">
+                        <input type="text" class="cyber-input" placeholder="Search the nullspace...">
+                        <button type="button" class="cyber-button">Scan</button>
+                    </div>
+                </div>
+                
+                <div class="nullspace-categories">
+                    <div class="category">
+                        <h3>Abandoned Processes</h3>
+                        <div class="category-item">Connection Counter</div>
+                        <div class="category-item">Network Widget</div>
+                        <div class="category-item">System Monitor</div>
+                        <div class="category-item">Protocol Scanner</div>
+                    </div>
+                    <div class="category">
+                        <h3>Dead Shells</h3>
+                        <div class="category-item">Digital Interface</div>
+                        <div class="category-item">Retro Terminal</div>
+                        <div class="category-item">Glitch Frame</div>
+                        <div class="category-item">Neural Link</div>
+                    </div>
+                    <div class="category">
+                        <h3>Data Fragments</h3>
+                        <div class="category-item">Digital Icons</div>
+                        <div class="category-item">Pixel Symbols</div>
+                        <div class="category-item">Cyber Glyphs</div>
+                        <div class="category-item">Memory Blocks</div>
+                    </div>
+                    <div class="category">
+                        <h3>Signal Echoes</h3>
+                        <div class="category-item">Static Patterns</div>
+                        <div class="category-item">Glitch Headers</div>
+                        <div class="category-item">Noise Filters</div>
+                        <div class="category-item">Wave Distortions</div>
+                    </div>
+                    <div class="category">
+                        <h3>Visual Artifacts</h3>
+                        <div class="category-item">Digital Noise</div>
+                        <div class="category-item">Scrolling Code</div>
+                        <div class="category-item">Pixel Corruption</div>
+                        <div class="category-item">Scan Interference</div>
+                    </div>
+                </div>
+                
+                <div class="featured-items">
+                    <h3>Featured Artifacts</h3>
+                    <div class="items-grid">
+                        <div class="item-card">
+                            <div class="item-preview">
+                                <div class="item-image cyber-glitch"></div>
+                                <div class="item-category">Visual Artifact</div>
+                            </div>
+                            <div class="item-info">
+                                <span class="item-title">Corrupted Memory Block</span>
+                                <span class="item-creator">By: System_Admin</span>
+                            </div>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-preview">
+                                <div class="item-image cyber-terminal"></div>
+                                <div class="item-category">Dead Shell</div>
+                            </div>
+                            <div class="item-info">
+                                <span class="item-title">Legacy Terminal v2.1</span>
+                                <span class="item-creator">By: Node_4231</span>
+                            </div>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-preview">
+                                <div class="item-image cyber-counter"></div>
+                                <div class="item-category">Abandoned Process</div>
+                            </div>
+                            <div class="item-info">
+                                <span class="item-title">Network Traffic Counter</span>
+                                <span class="item-creator">By: DataNode</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="../images/wirebase-logo.svg" alt="wirebase.city" class="pixel-image small">
+                <span>wirebase.city</span>
+            </div>
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Terms</a>
+                <a href="#">Privacy</a>
+                <a href="#">Contact</a>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            © 2025 wirebase.city - You don't exist until you're online
+        </div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/laincore.js"></script>
+</body>
+</html>

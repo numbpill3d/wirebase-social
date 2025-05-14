@@ -1216,49 +1216,6 @@ if (!sessionStorage.getItem('startupSoundPlayed')) {
     }, 1000);
 }
 
-/**
- * Setup theme toggle functionality
- */
-function setupThemeToggle() {
-    const themeToggle = document.getElementById('theme-toggle');
-    if (themeToggle) {
-        // Check if theme preference is stored
-        const isDarkTheme = localStorage.getItem('theme') !== 'light';
-
-        // Apply stored theme preference
-        if (!isDarkTheme) {
-            document.body.classList.add('light-theme');
-            themeToggle.textContent = 'Disconnect';
-        } else {
-            themeToggle.textContent = 'Reconnect';
-        }
-
-        // Add click event listener
-        themeToggle.addEventListener('click', function() {
-            // Toggle between dark and light theme
-            document.body.classList.toggle('light-theme');
-
-            // Update button text
-            if (document.body.classList.contains('light-theme')) {
-                localStorage.setItem('theme', 'light');
-                this.textContent = 'Disconnect';
-            } else {
-                localStorage.setItem('theme', 'dark');
-                this.textContent = 'Reconnect';
-            }
-
-            // Toggle CRT effects
-            const crtElements = document.querySelectorAll('.crt-scanlines, .crt-flicker, .digital-noise');
-            crtElements.forEach(el => {
-                el.style.opacity = document.body.classList.contains('light-theme') ? '0.3' : '1';
-            });
-
-            // Play sound effect
-            playSound('click');
-        });
-    }
-}
-
 // Add scroll-triggered animations
 const observerOptions = {
   threshold: 0.2,

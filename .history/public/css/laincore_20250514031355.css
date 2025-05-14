@@ -14,48 +14,6 @@
   --cyber-glow: rgba(0, 255, 0, 0.3);
 }
 
-/* Light theme variables */
-.light-theme {
-  --cyber-light: #0f0f0f;
-  --cyber-dark: #f0f0ff;
-  --cyber-purple: #9900cc;
-  --cyber-gray: #555577;
-  --cyber-red: #cc0000;
-  --cyber-green: #006600;
-  --cyber-glow: rgba(0, 102, 0, 0.3);
-}
-
-/* Light theme specific overrides */
-.light-theme {
-  background-color: #f0f0ff;
-  color: #0f0f0f;
-}
-
-.light-theme .cyber-window {
-  box-shadow: 0 0 10px rgba(153, 0, 204, 0.3);
-}
-
-.light-theme .cyber-button {
-  border: 1px solid var(--cyber-purple);
-}
-
-.light-theme .cyber-button:hover {
-  background-color: var(--cyber-purple);
-  color: #ffffff;
-}
-
-.light-theme .main-header,
-.light-theme .main-footer {
-  background-color: var(--cyber-purple);
-  color: white;
-}
-
-.light-theme .crt-scanlines,
-.light-theme .crt-flicker,
-.light-theme .digital-noise {
-  opacity: 0.3;
-}
-
 /* Base styles */
 body {
   background-color: var(--cyber-dark);
