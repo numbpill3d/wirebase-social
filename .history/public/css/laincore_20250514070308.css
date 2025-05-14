@@ -507,33 +507,22 @@ a:hover {
 .stats-panel {
   background-color: var(--cyber-dark);
   border: 1px solid var(--cyber-purple);
-  padding: 12px;
-  margin: 15px 0;
-  border-radius: 3px;
-  box-shadow: 0 0 10px rgba(70, 0, 102, 0.3);
+  padding: 8px;
+  margin: 10px 0;
 }
 
 .stats-header {
   text-align: center;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   color: var(--cyber-green);
-  font-size: 1rem;
-  letter-spacing: 0.5px;
-  border-bottom: 1px solid rgba(70, 0, 102, 0.3);
-  padding-bottom: 5px;
+  font-size: 0.9rem;
 }
 
 .stat {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
-  padding: 3px 0;
-  transition: background-color 0.2s;
-}
-
-.stat:hover {
-  background-color: rgba(70, 0, 102, 0.1);
+  margin-bottom: 4px;
 }
 
 .stat-name {
@@ -542,19 +531,14 @@ a:hover {
 
 .stat-value {
   color: var(--cyber-green);
-  font-weight: bold;
 }
 
 .connection-counter, .system-status {
-  font-size: 0.9rem;
-  margin-top: 12px;
+  font-size: 0.85rem;
+  margin-top: 8px;
   color: var(--cyber-light);
   display: inline-block;
   margin-right: 15px;
-  padding: 4px 8px;
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
-  border-left: 2px solid var(--cyber-purple);
 }
 
 /* Active navigation styling */

@@ -1114,28 +1114,20 @@ function setupCRTBootEffect() {
  * Add digital noise for ambient effect
  */
 function addDigitalNoise() {
-    // Check if effects are already present
-    if (!document.querySelector('.digital-noise')) {
-        // Create ambient digital noise effect with reduced opacity
-        const noise = document.createElement('div');
-        noise.className = 'digital-noise';
-        noise.style.opacity = '0.03'; // Reduce opacity for less distraction
-        document.body.appendChild(noise);
-    }
+    // Create ambient digital noise effect
+    const noise = document.createElement('div');
+    noise.className = 'digital-noise';
+    document.body.appendChild(noise);
 
-    // Add scanlines if not already present
-    if (!document.querySelector('.crt-scanlines')) {
-        const scanlines = document.createElement('div');
-        scanlines.className = 'crt-scanlines';
-        document.body.appendChild(scanlines);
-    }
+    // Add scanlines
+    const scanlines = document.createElement('div');
+    scanlines.className = 'crt-scanlines';
+    document.body.appendChild(scanlines);
 
-    // Add flicker effect if not already present
-    if (!document.querySelector('.crt-flicker')) {
-        const flicker = document.createElement('div');
-        flicker.className = 'crt-flicker';
-        document.body.appendChild(flicker);
-    }
+    // Add flicker effect
+    const flicker = document.createElement('div');
+    flicker.className = 'crt-flicker';
+    document.body.appendChild(flicker);
 }
 
 /**
