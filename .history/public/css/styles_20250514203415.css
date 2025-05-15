@@ -586,9 +586,6 @@ ul {
   position: relative;
   overflow: auto;
   max-height: 80vh;
-  width: 100%;
-  box-sizing: border-box;
-  overflow-x: hidden;
 }
 
 .win98-input {

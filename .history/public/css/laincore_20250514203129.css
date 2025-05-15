@@ -91,8 +91,6 @@ a:hover {
   box-shadow: 0 0 15px rgba(70, 0, 102, 0.5);
   border-radius: 2px;
   overflow: hidden;
-  width: 100%;
-  box-sizing: border-box;
 }
 
 .cyber-window-header {
@@ -885,11 +883,9 @@ a:hover {
 
 .items-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 15px;
   margin-top: 15px;
-  width: 100%;
-  max-width: 100%;
 }
 
 .item-card {

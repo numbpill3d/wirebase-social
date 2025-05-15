@@ -91,8 +91,6 @@ a:hover {
   box-shadow: 0 0 15px rgba(70, 0, 102, 0.5);
   border-radius: 2px;
   overflow: hidden;
-  width: 100%;
-  box-sizing: border-box;
 }
 
 .cyber-window-header {
@@ -138,9 +136,6 @@ a:hover {
 .cyber-window-content {
   padding: 12px;
   line-height: 1.5;
-  width: 100%;
-  box-sizing: border-box;
-  overflow-x: hidden;
 }
 
 /* Buttons */
@@ -450,9 +445,6 @@ a:hover {
   border: 1px solid var(--cyber-purple);
   padding: 8px;
   transition: all 0.2s;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
 }
 
 .category:hover {
@@ -472,11 +464,6 @@ a:hover {
   font-size: 0.85rem;
   cursor: pointer;
   transition: background-color 0.2s;
-  width: 100%;
-  box-sizing: border-box;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .category-item:hover {
@@ -885,11 +872,9 @@ a:hover {
 
 .items-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 15px;
   margin-top: 15px;
-  width: 100%;
-  max-width: 100%;
 }
 
 .item-card {
