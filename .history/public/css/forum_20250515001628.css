@@ -627,15 +627,6 @@
   color: var(--cyber-gray);
 }
 
-.search-highlight {
-  animation: highlight-pulse 2s infinite;
-}
-
-@keyframes highlight-pulse {
-  0%, 100% { background-color: rgba(70, 0, 102, 0.1); }
-  50% { background-color: rgba(70, 0, 102, 0.3); }
-}
-
 /* New Thread Form */
 .new-thread-form {
   margin-bottom: 30px;

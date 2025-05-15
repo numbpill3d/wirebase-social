@@ -120,14 +120,6 @@
   </div>
 
   <div class="forum-actions">
-    <div class="search-container">
-      <form id="thread-search-form" class="search-form">
-        <input type="text" id="thread-search" class="cyber-input search-input" placeholder="Search threads...">
-        <button type="submit" class="cyber-button search-button">
-          <i class="fas fa-search"></i>
-        </button>
-      </form>
-    </div>
     {{#if isAuthenticated}}
       <a href="/forum/new" class="cyber-button">Create New Thread</a>
     {{else}}
@@ -229,72 +221,6 @@
         });
       });
     });
-
-    // Thread search functionality
-    const searchForm = document.getElementById('thread-search-form');
-    const searchInput = document.getElementById('thread-search');
-
-    if (searchForm && searchInput) {
-      // Create search results container
-      const searchResults = document.createElement('div');
-      searchResults.className = 'search-results';
-      searchResults.style.display = 'none';
-      searchForm.parentNode.appendChild(searchResults);
-
-      searchForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const searchTerm = searchInput.value.trim().toLowerCase();
-
-        if (searchTerm.length < 2) {
-          searchResults.textContent = 'Search term must be at least 2 characters';
-          searchResults.style.display = 'block';
-          return;
-        }
-
-        // Search through thread titles
-        let matches = 0;
-        threadItems.forEach(item => {
-          const title = item.querySelector('.thread-title a').textContent.toLowerCase();
-          const author = item.querySelector('.thread-author').textContent.toLowerCase();
-
-          if (title.includes(searchTerm) || author.includes(searchTerm)) {
-            item.style.display = 'flex';
-            item.classList.add('search-highlight');
-            matches++;
-          } else {
-            item.style.display = 'none';
-            item.classList.remove('search-highlight');
-          }
-        });
-
-        // Show search results
-        searchResults.textContent = matches > 0 ?
-          `Found ${matches} thread${matches !== 1 ? 's' : ''} matching "${searchTerm}"` :
-          `No threads found matching "${searchTerm}"`;
-        searchResults.style.display = 'block';
-
-        // Reset category filter buttons
-        filterButtons.forEach(btn => btn.classList.remove('active'));
-        filterButtons[0].classList.add('active'); // Select "All Categories"
-      });
-
-      // Clear search when input is cleared
-      searchInput.addEventListener('input', function() {
-        if (this.value.trim() === '') {
-          threadItems.forEach(item => {
-            item.style.display = 'flex';
-            item.classList.remove('search-highlight');
-          });
-          searchResults.style.display = 'none';
-
-          // Reset category filter
-          const activeCategory = document.querySelector('.category-filter-button.active');
-          if (activeCategory) {
-            activeCategory.click();
-          }
-        }
-      });
-    }
   });
 </script>
 

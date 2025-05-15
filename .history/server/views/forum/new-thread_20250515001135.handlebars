@@ -233,50 +233,40 @@
         button.addEventListener('click', function() {
           const command = this.getAttribute('data-command');
 
-          try {
-            switch(command) {
-              case 'bold':
-                document.execCommand('bold', false, null);
-                break;
-              case 'italic':
-                document.execCommand('italic', false, null);
-                break;
-              case 'link':
-                const url = prompt('Enter the URL:');
-                if (url) {
-                  document.execCommand('createLink', false, url);
-                }
-                break;
-              case 'code':
-                const selection = window.getSelection();
-                if (selection && selection.toString().length > 0) {
-                  try {
-                    const range = selection.getRangeAt(0);
-                    const codeElement = document.createElement('code');
-                    codeElement.textContent = selection.toString();
-                    range.deleteContents();
-                    range.insertNode(codeElement);
-                  } catch (selectionError) {
-                    console.error('Selection error:', selectionError);
-                    document.execCommand('insertHTML', false, '<code>code here</code>');
-                  }
-                } else {
-                  document.execCommand('insertHTML', false, '<code>code here</code>');
-                }
-                break;
-              case 'quote':
-                document.execCommand('insertHTML', false, '<blockquote>quote here</blockquote>');
-                break;
-              case 'list-ul':
-                document.execCommand('insertUnorderedList', false, null);
-                break;
-              case 'list-ol':
-                document.execCommand('insertOrderedList', false, null);
-                break;
-            }
-          } catch (editorError) {
-            console.error('WYSIWYG editor error:', editorError);
-            alert('An error occurred while formatting. Please try again.');
+          switch(command) {
+            case 'bold':
+              document.execCommand('bold', false, null);
+              break;
+            case 'italic':
+              document.execCommand('italic', false, null);
+              break;
+            case 'link':
+              const url = prompt('Enter the URL:');
+              if (url) {
+                document.execCommand('createLink', false, url);
+              }
+              break;
+            case 'code':
+              const selection = window.getSelection();
+              if (selection.toString().length > 0) {
+                const range = selection.getRangeAt(0);
+                const codeElement = document.createElement('code');
+                codeElement.textContent = selection.toString();
+                range.deleteContents();
+                range.insertNode(codeElement);
+              } else {
+                document.execCommand('insertHTML', false, '<code>code here</code>');
+              }
+              break;
+            case 'quote':
+              document.execCommand('insertHTML', false, '<blockquote>quote here</blockquote>');
+              break;
+            case 'list-ul':
+              document.execCommand('insertUnorderedList', false, null);
+              break;
+            case 'list-ol':
+              document.execCommand('insertOrderedList', false, null);
+              break;
           }
 
           // Update content and counter
