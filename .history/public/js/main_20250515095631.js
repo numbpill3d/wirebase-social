@@ -46,7 +46,7 @@ function setupCyberElements() {
     const windowControls = document.querySelectorAll('.cyber-window-control');
 
     windowControls.forEach(control => {
-        control.addEventListener('mousedown', function() {
+        control.addEventListener('mousedown', function(e) {
             playSound('click');
 
             const windowElement = this.closest('.cyber-window');
@@ -88,6 +88,9 @@ function setupCyberElements() {
             } else if (controlText === '□' || this.classList.contains('maximize')) {
                 // Toggle maximize class
                 windowElement.classList.toggle('maximized');
+
+                // Get the parent container to maximize within
+                const container = windowElement.closest('.container') || document.body;
 
                 if (windowElement.classList.contains('maximized')) {
                     // Save original dimensions
@@ -183,7 +186,8 @@ function makeDraggable(element, handle) {
 
     handle.onmousedown = dragMouseDown;
 
-    const dragMouseDown = (e) => {
+    function dragMouseDown(e) {
+        e = e || window.event;
         e.preventDefault();
         // Get the mouse cursor position at startup
         pos3 = e.clientX;
@@ -199,9 +203,10 @@ function makeDraggable(element, handle) {
         document.onmouseup = closeDragElement;
         // Call function on mouse move
         document.onmousemove = elementDrag;
-    };
+    }
 
-    const elementDrag = (e) => {
+    function elementDrag(e) {
+        e = e || window.event;
         e.preventDefault();
 
         // Calculate the new cursor position
@@ -213,16 +218,16 @@ function makeDraggable(element, handle) {
         // Set the element's new position
         element.style.top = (element.offsetTop - pos2) + "px";
         element.style.left = (element.offsetLeft - pos1) + "px";
-    };
+    }
 
-    const closeDragElement = () => {
+    function closeDragElement() {
         // Remove active state
         element.classList.remove('dragging');
 
         // Stop moving when mouse button is released
         document.onmouseup = null;
         document.onmousemove = null;
-    };
+    }
 }
 
 /**
@@ -284,7 +289,7 @@ function setupCyberEffects() {
     document.querySelectorAll('a:not([data-no-transition])').forEach(link => {
         if (link.href && link.href.indexOf(window.location.hostname) !== -1) {
             console.log('Adding standard navigation to link:', link.href);
-            link.addEventListener('click', function() {
+            link.addEventListener('click', function(e) {
                 // Don't prevent default - let the browser handle navigation normally
                 console.log('Navigation link clicked, using default browser navigation:', this.href);
                 try {
@@ -381,20 +386,14 @@ function createDigitalParticle(container) {
 function setupTerminalInterface() {
     // Check if terminal container exists
     const terminal = document.querySelector('.terminal-content');
-    if (!terminal) {
-        return;
-    }
+    if (!terminal) return;
 
     const input = document.querySelector('.terminal-input');
-    if (!input) {
-        return;
-    }
+    if (!input) return;
 
     // Focus the input field
     setTimeout(() => {
-        if (input) {
-            input.focus();
-        }
+        if (input) input.focus();
     }, 500);
 
     // Blinking cursor effect
@@ -437,7 +436,7 @@ function setupTerminalInterface() {
         let currentLine = '';
         let typing = false;
 
-        const typeNextCharacter = () => {
+        function typeNextCharacter() {
             if (lineIndex >= typewriterLines.length) {
                 return;
             }
@@ -462,7 +461,7 @@ function setupTerminalInterface() {
                     setTimeout(typeNextCharacter, Math.random() * 300 + 800);
                 }
             }
-        };
+        }
 
         // Start typing effect after a delay
         setTimeout(typeNextCharacter, 2000);
@@ -554,9 +553,7 @@ function setupConnectionTracking() {
     // Find Streetpass widgets
     const widgets = document.querySelectorAll('streetpass-widget, .streetpass-widget');
 
-    if (widgets.length === 0) {
-        return;
-    }
+    if (widgets.length === 0) return;
 
     // In a real app, we'd record the visit to the profile via API call
     // For demo purposes, we'll show a notification after a delay
@@ -573,9 +570,7 @@ function setupConnectionTracking() {
 function showConnectionNotification() {
     // Check if we're on a profile page
     const profilePage = document.querySelector('.profile-container, .profile-view, .profile-preview');
-    if (!profilePage) {
-        return;
-    }
+    if (!profilePage) return;
 
     // Create notification
     const notification = document.createElement('div');
@@ -722,9 +717,7 @@ function setupCRTEffect() {
  * Add CRT screen effect to the page
  */
 function addCRTEffect() {
-    if (document.querySelector('.crt-effect')) {
-        return;
-    }
+    if (document.querySelector('.crt-effect')) return;
 
     const crtEffect = document.createElement('div');
     crtEffect.className = 'crt-effect';
@@ -799,12 +792,8 @@ function showLoadingScreen() {
     const animateLogo = () => {
         pulseValue += 0.01 * pulseDirection;
 
-        if (pulseValue >= 1.1) {
-            pulseDirection = -1;
-        }
-        if (pulseValue <= 0.9) {
-            pulseDirection = 1;
-        }
+        if (pulseValue >= 1.1) pulseDirection = -1;
+        if (pulseValue <= 0.9) pulseDirection = 1;
 
         loadingLogo.style.transform = `scale(${pulseValue})`;
 
@@ -916,7 +905,9 @@ function showSystemNotification(title, message) {
     }, 100);
 
     // Auto-dismiss after 5 seconds
-    const hideNotification = () => {
+    setTimeout(hideNotification, 5000);
+
+    function hideNotification() {
         notification.style.transform = 'translateY(100px)';
         notification.style.opacity = '0';
         setTimeout(() => {
@@ -924,9 +915,7 @@ function showSystemNotification(title, message) {
                 notification.remove();
             }
         }, 400);
-    };
-
-    setTimeout(hideNotification, 5000);
+    }
 }
 
 /**
@@ -1077,9 +1066,7 @@ function fadeOutElement(element, callback) {
     element.style.opacity = '0';
 
     setTimeout(() => {
-        if (callback) {
-            callback();
-        }
+        if (callback) callback();
     }, 300);
 }
 
@@ -1421,7 +1408,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Defer non-critical features
         requestIdleCallback(() => {
             setupTerminalMode();
-            setupConnectionTracking(); // Use connection tracking instead of streetpass
+            setupStreetpass();
         });
 
         // Load CRT effect only if enabled
@@ -1496,9 +1483,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const toggleContrast = document.getElementById('toggle-contrast');
   const increaseFont = document.getElementById('increase-font');
 
-  if (!toggleAnimations || !toggleContrast || !increaseFont) {
-    return;
-  }
+  if (!toggleAnimations || !toggleContrast || !increaseFont) return;
 
   // Get stored preferences
   const animationsPaused = localStorage.getItem('animations-paused') === 'true';

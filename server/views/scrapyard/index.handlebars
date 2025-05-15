@@ -1,0 +1,398 @@
+<div class="scrapyard-container">
+    <div class="cyber-header">
+        <h1 class="cyber-heading glitch-text">Nullspace</h1>
+        <p class="cyber-subheading">Digital artifacts from the network</p>
+    </div>
+
+    <div class="scrapyard-controls">
+        <div class="search-bar">
+            <input type="text" id="search-input" class="cyber-input" placeholder="Search artifacts...">
+            <button id="search-button" class="cyber-button">Search</button>
+        </div>
+        
+        <div class="filter-controls">
+            <select id="category-filter" class="cyber-select">
+                <option value="">All Categories</option>
+                <option value="widget">Widgets</option>
+                <option value="template">Templates</option>
+                <option value="icon">Icons</option>
+                <option value="banner">Banners</option>
+                <option value="gif">GIFs</option>
+            </select>
+            
+            <select id="sort-filter" class="cyber-select">
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="popular">Most Popular</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+            </select>
+        </div>
+        
+        {{#if isAuthenticated}}
+        <a href="/scrapyard/submit" class="cyber-button primary">Submit New Artifact</a>
+        {{/if}}
+    </div>
+
+    <div class="scrapyard-grid" id="artifacts-container">
+        {{#if items}}
+            {{#each items}}
+                <div class="artifact-card" data-category="{{category}}" data-tags="{{tags}}">
+                    <div class="artifact-preview">
+                        {{#if previewImage}}
+                            <img src="{{previewImage}}" alt="{{title}}" class="artifact-image">
+                        {{else}}
+                            <div class="artifact-placeholder">
+                                <span class="artifact-icon">{{categoryIcon category}}</span>
+                            </div>
+                        {{/if}}
+                    </div>
+                    
+                    <div class="artifact-info">
+                        <h3 class="artifact-title">{{title}}</h3>
+                        <div class="artifact-meta">
+                            <span class="artifact-category">{{categoryName category}}</span>
+                            <span class="artifact-date">{{formatDate createdAt}}</span>
+                        </div>
+                        <p class="artifact-description">{{truncate description 100}}</p>
+                        
+                        {{#if tags}}
+                            <div class="artifact-tags">
+                                {{#each (splitTags tags)}}
+                                    <span class="tag">{{this}}</span>
+                                {{/each}}
+                            </div>
+                        {{/if}}
+                        
+                        <div class="artifact-footer">
+                            <div class="artifact-price">
+                                {{#if price}}
+                                    <span class="price-amount">{{price}}</span>
+                                    <span class="price-currency">credits</span>
+                                {{else}}
+                                    <span class="price-free">Free</span>
+                                {{/if}}
+                            </div>
+                            
+                            <a href="/scrapyard/view/{{_id}}" class="cyber-button small">View</a>
+                        </div>
+                    </div>
+                </div>
+            {{/each}}
+        {{else}}
+            <div class="no-artifacts">
+                <div class="empty-state">
+                    <div class="empty-icon">🔍</div>
+                    <h3>No artifacts found</h3>
+                    <p>Be the first to contribute to the Nullspace.</p>
+                    {{#if isAuthenticated}}
+                        <a href="/scrapyard/submit" class="cyber-button">Submit New Artifact</a>
+                    {{else}}
+                        <a href="/users/login" class="cyber-button">Login to Submit</a>
+                    {{/if}}
+                </div>
+            </div>
+        {{/if}}
+    </div>
+
+    {{#if pagination}}
+        <div class="pagination">
+            {{#if pagination.hasPrevPage}}
+                <a href="/scrapyard?page={{pagination.prevPage}}" class="cyber-button pagination-button">Previous</a>
+            {{else}}
+                <span class="cyber-button pagination-button disabled">Previous</span>
+            {{/if}}
+            
+            <span class="pagination-info">Page {{pagination.currentPage}} of {{pagination.totalPages}}</span>
+            
+            {{#if pagination.hasNextPage}}
+                <a href="/scrapyard?page={{pagination.nextPage}}" class="cyber-button pagination-button">Next</a>
+            {{else}}
+                <span class="cyber-button pagination-button disabled">Next</span>
+            {{/if}}
+        </div>
+    {{/if}}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search functionality
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const artifactsContainer = document.getElementById('artifacts-container');
+        const artifactCards = document.querySelectorAll('.artifact-card');
+        
+        // Category filter
+        const categoryFilter = document.getElementById('category-filter');
+        
+        // Sort filter
+        const sortFilter = document.getElementById('sort-filter');
+        
+        // Combined filter and search function
+        function filterArtifacts() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const categoryValue = categoryFilter.value;
+            
+            artifactCards.forEach(card => {
+                const title = card.querySelector('.artifact-title').textContent.toLowerCase();
+                const description = card.querySelector('.artifact-description').textContent.toLowerCase();
+                const category = card.dataset.category;
+                const tags = card.dataset.tags ? card.dataset.tags.toLowerCase() : '';
+                
+                const matchesSearch = title.includes(searchTerm) || 
+                                     description.includes(searchTerm) || 
+                                     tags.includes(searchTerm);
+                                     
+                const matchesCategory = categoryValue === '' || category === categoryValue;
+                
+                if (matchesSearch && matchesCategory) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Check if no results
+            checkNoResults();
+        }
+        
+        // Check if no results and show message
+        function checkNoResults() {
+            const visibleCards = Array.from(artifactCards).filter(card => 
+                card.style.display !== 'none'
+            );
+            
+            if (visibleCards.length === 0 && artifactCards.length > 0) {
+                // If no existing "no results" message, create one
+                if (!document.querySelector('.no-results')) {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'no-artifacts no-results';
+                    noResults.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">🔍</div>
+                            <h3>No matching artifacts</h3>
+                            <p>Try adjusting your search or filters.</p>
+                            <button id="reset-filters" class="cyber-button">Reset Filters</button>
+                        </div>
+                    `;
+                    artifactsContainer.appendChild(noResults);
+                    
+                    // Add event listener to reset button
+                    document.getElementById('reset-filters').addEventListener('click', resetFilters);
+                }
+            } else {
+                // Remove "no results" message if it exists
+                const noResults = document.querySelector('.no-results');
+                if (noResults) {
+                    noResults.remove();
+                }
+            }
+        }
+        
+        // Reset all filters
+        function resetFilters() {
+            searchInput.value = '';
+            categoryFilter.value = '';
+            sortFilter.value = 'newest';
+            filterArtifacts();
+        }
+        
+        // Event listeners
+        searchButton.addEventListener('click', filterArtifacts);
+        searchInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                filterArtifacts();
+            }
+        });
+        
+        categoryFilter.addEventListener('change', filterArtifacts);
+        
+        // Initialize
+        if (artifactCards.length > 0) {
+            filterArtifacts();
+        }
+    });
+</script>
+
+<style>
+    .scrapyard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    .cyber-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .scrapyard-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .search-bar {
+        display: flex;
+        flex: 1;
+        min-width: 250px;
+    }
+    
+    .search-bar .cyber-input {
+        flex: 1;
+        margin-right: 0.5rem;
+    }
+    
+    .filter-controls {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .scrapyard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .artifact-card {
+        border: 1px solid var(--cyber-gray);
+        background: rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s, box-shadow 0.2s;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .artifact-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 255, 0, 0.1);
+    }
+    
+    .artifact-preview {
+        height: 160px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.3);
+    }
+    
+    .artifact-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .artifact-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .artifact-icon {
+        font-size: 3rem;
+        opacity: 0.7;
+    }
+    
+    .artifact-info {
+        padding: 1rem;
+    }
+    
+    .artifact-title {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.2rem;
+    }
+    
+    .artifact-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        color: var(--cyber-gray);
+        margin-bottom: 0.5rem;
+    }
+    
+    .artifact-description {
+        margin: 0.5rem 0;
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    
+    .artifact-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 0.5rem 0;
+    }
+    
+    .tag {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.5rem;
+        background: rgba(70, 0, 102, 0.3);
+        border-radius: 2px;
+    }
+    
+    .artifact-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+    }
+    
+    .artifact-price {
+        font-size: 0.9rem;
+    }
+    
+    .price-free {
+        color: var(--cyber-green);
+    }
+    
+    .no-artifacts {
+        grid-column: 1 / -1;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px dashed var(--cyber-gray);
+    }
+    
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.7;
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .pagination-info {
+        font-size: 0.9rem;
+    }
+    
+    .pagination-button.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    @media (max-width: 768px) {
+        .scrapyard-controls {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .search-bar, .filter-controls {
+            width: 100%;
+        }
+    }
+</style>

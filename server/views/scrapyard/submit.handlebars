@@ -1,0 +1,231 @@
+<div class="scrapyard-container">
+    <div class="cyber-panel">
+        <h1 class="cyber-heading">Submit to Nullspace</h1>
+        <p class="cyber-text">Share your digital artifacts with the network.</p>
+
+        <form action="/scrapyard/submit" method="POST" enctype="multipart/form-data" class="cyber-form">
+            <div class="form-group">
+                <label for="title" class="cyber-label">Title *</label>
+                <input type="text" id="title" name="title" class="cyber-input" required maxlength="100">
+                <div class="char-counter"><span id="title-counter">0</span>/100</div>
+            </div>
+
+            <div class="form-group">
+                <label for="description" class="cyber-label">Description *</label>
+                <textarea id="description" name="description" class="cyber-textarea" required maxlength="500"></textarea>
+                <div class="char-counter"><span id="desc-counter">0</span>/500</div>
+            </div>
+
+            <div class="form-group">
+                <label for="category" class="cyber-label">Category *</label>
+                <select id="category" name="category" class="cyber-select" required>
+                    <option value="">Select a category</option>
+                    <option value="widget">Widget</option>
+                    <option value="template">Template</option>
+                    <option value="icon">Icon</option>
+                    <option value="banner">Banner</option>
+                    <option value="gif">GIF</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="tags" class="cyber-label">Tags (comma separated)</label>
+                <input type="text" id="tags" name="tags" class="cyber-input" placeholder="cyberpunk, retro, glitch">
+            </div>
+
+            <div class="form-group">
+                <label for="price" class="cyber-label">Price (bandwidth credits)</label>
+                <input type="number" id="price" name="price" class="cyber-input" min="0" value="0">
+            </div>
+
+            <div class="form-group upload-section">
+                <label class="cyber-label">Upload Method</label>
+                <div class="upload-toggle">
+                    <button type="button" class="cyber-button active" id="file-toggle">File Upload</button>
+                    <button type="button" class="cyber-button" id="code-toggle">Direct Code</button>
+                </div>
+            </div>
+
+            <div class="form-group" id="file-upload">
+                <label for="file" class="cyber-label">Upload File</label>
+                <div class="file-upload-wrapper">
+                    <input type="file" id="file" name="file" class="cyber-file-input">
+                    <div class="file-upload-info">
+                        <span class="file-name">No file selected</span>
+                        <button type="button" class="cyber-button small">Browse</button>
+                    </div>
+                </div>
+                <div class="file-types-info" id="file-types-info">
+                    Allowed file types will be shown based on selected category
+                </div>
+            </div>
+
+            <div class="form-group hidden" id="code-input">
+                <label for="content" class="cyber-label">Direct Code Input</label>
+                <textarea id="content" name="content" class="cyber-textarea code-editor" rows="10"></textarea>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="cyber-button primary">Submit to Nullspace</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Character counters
+        const titleInput = document.getElementById('title');
+        const titleCounter = document.getElementById('title-counter');
+        const descInput = document.getElementById('description');
+        const descCounter = document.getElementById('desc-counter');
+        
+        titleInput.addEventListener('input', function() {
+            titleCounter.textContent = this.value.length;
+        });
+        
+        descInput.addEventListener('input', function() {
+            descCounter.textContent = this.value.length;
+        });
+        
+        // Toggle between file upload and code input
+        const fileToggle = document.getElementById('file-toggle');
+        const codeToggle = document.getElementById('code-toggle');
+        const fileUpload = document.getElementById('file-upload');
+        const codeInput = document.getElementById('code-input');
+        
+        fileToggle.addEventListener('click', function() {
+            fileToggle.classList.add('active');
+            codeToggle.classList.remove('active');
+            fileUpload.classList.remove('hidden');
+            codeInput.classList.add('hidden');
+        });
+        
+        codeToggle.addEventListener('click', function() {
+            codeToggle.classList.add('active');
+            fileToggle.classList.remove('active');
+            codeInput.classList.remove('hidden');
+            fileUpload.classList.add('hidden');
+        });
+        
+        // Update allowed file types based on category
+        const categorySelect = document.getElementById('category');
+        const fileTypesInfo = document.getElementById('file-types-info');
+        
+        const allowedTypes = {
+            widget: ['.js', '.html'],
+            template: ['.html', '.css'],
+            icon: ['.png', '.svg', '.ico', '.jpg', '.jpeg', '.gif'],
+            banner: ['.png', '.jpg', '.jpeg', '.gif', '.svg'],
+            gif: ['.gif']
+        };
+        
+        categorySelect.addEventListener('change', function() {
+            const category = this.value;
+            if (category && allowedTypes[category]) {
+                fileTypesInfo.textContent = `Allowed file types: ${allowedTypes[category].join(', ')}`;
+            } else {
+                fileTypesInfo.textContent = 'Allowed file types will be shown based on selected category';
+            }
+        });
+        
+        // File upload UI enhancement
+        const fileInput = document.getElementById('file');
+        const fileName = document.querySelector('.file-name');
+        const browseButton = document.querySelector('.file-upload-info .cyber-button');
+        
+        browseButton.addEventListener('click', function() {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                fileName.textContent = this.files[0].name;
+            } else {
+                fileName.textContent = 'No file selected';
+            }
+        });
+    });
+</script>
+
+<style>
+    .scrapyard-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    .cyber-form .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .char-counter {
+        text-align: right;
+        font-size: 0.8rem;
+        color: var(--cyber-gray);
+        margin-top: 0.25rem;
+    }
+    
+    .upload-toggle {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .upload-toggle .cyber-button {
+        flex: 1;
+        opacity: 0.7;
+    }
+    
+    .upload-toggle .cyber-button.active {
+        opacity: 1;
+        border-color: var(--cyber-green);
+    }
+    
+    .file-upload-wrapper {
+        display: flex;
+        align-items: center;
+    }
+    
+    .cyber-file-input {
+        position: absolute;
+        width: 0.1px;
+        height: 0.1px;
+        opacity: 0;
+        overflow: hidden;
+        z-index: -1;
+    }
+    
+    .file-upload-info {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid var(--cyber-gray);
+        background: rgba(0, 0, 0, 0.2);
+    }
+    
+    .file-name {
+        flex: 1;
+        margin-right: 1rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .file-types-info {
+        font-size: 0.8rem;
+        color: var(--cyber-gray);
+        margin-top: 0.5rem;
+    }
+    
+    .code-editor {
+        font-family: monospace;
+        background: var(--cyber-terminal-bg);
+        color: var(--cyber-terminal-text);
+    }
+    
+    .hidden {
+        display: none;
+    }
+</style>

@@ -1077,9 +1077,7 @@ function fadeOutElement(element, callback) {
     element.style.opacity = '0';
 
     setTimeout(() => {
-        if (callback) {
-            callback();
-        }
+        if (callback) callback();
     }, 300);
 }
 
@@ -1496,9 +1494,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const toggleContrast = document.getElementById('toggle-contrast');
   const increaseFont = document.getElementById('increase-font');
 
-  if (!toggleAnimations || !toggleContrast || !increaseFont) {
-    return;
-  }
+  if (!toggleAnimations || !toggleContrast || !increaseFont) return;
 
   // Get stored preferences
   const animationsPaused = localStorage.getItem('animations-paused') === 'true';

@@ -573,9 +573,7 @@ function setupConnectionTracking() {
 function showConnectionNotification() {
     // Check if we're on a profile page
     const profilePage = document.querySelector('.profile-container, .profile-view, .profile-preview');
-    if (!profilePage) {
-        return;
-    }
+    if (!profilePage) return;
 
     // Create notification
     const notification = document.createElement('div');
@@ -722,9 +720,7 @@ function setupCRTEffect() {
  * Add CRT screen effect to the page
  */
 function addCRTEffect() {
-    if (document.querySelector('.crt-effect')) {
-        return;
-    }
+    if (document.querySelector('.crt-effect')) return;
 
     const crtEffect = document.createElement('div');
     crtEffect.className = 'crt-effect';
@@ -799,12 +795,8 @@ function showLoadingScreen() {
     const animateLogo = () => {
         pulseValue += 0.01 * pulseDirection;
 
-        if (pulseValue >= 1.1) {
-            pulseDirection = -1;
-        }
-        if (pulseValue <= 0.9) {
-            pulseDirection = 1;
-        }
+        if (pulseValue >= 1.1) pulseDirection = -1;
+        if (pulseValue <= 0.9) pulseDirection = 1;
 
         loadingLogo.style.transform = `scale(${pulseValue})`;
 
@@ -1077,9 +1069,7 @@ function fadeOutElement(element, callback) {
     element.style.opacity = '0';
 
     setTimeout(() => {
-        if (callback) {
-            callback();
-        }
+        if (callback) callback();
     }, 300);
 }
 
@@ -1496,9 +1486,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const toggleContrast = document.getElementById('toggle-contrast');
   const increaseFont = document.getElementById('increase-font');
 
-  if (!toggleAnimations || !toggleContrast || !increaseFont) {
-    return;
-  }
+  if (!toggleAnimations || !toggleContrast || !increaseFont) return;
 
   // Get stored preferences
   const animationsPaused = localStorage.getItem('animations-paused') === 'true';

@@ -198,20 +198,19 @@ const store = new KnexSessionStore({
 
 app.use(session({
   store: store,
-  secret: process.env.SESSION_SECRET || 'wirebase-dev-secret',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false, // Only save sessions when necessary
   rolling: false, // Disable rolling to reduce database writes
   name: 'wirebase.sid', // Custom cookie name for better security
   cookie: {
-    maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days (reduced from 7)
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days (reduced from 30)
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    httpOnly: true, // Prevent client-side JS from accessing cookie
-    path: '/'
+    httpOnly: true // Prevent client-side JS from accessing cookie
   },
   // Add touch option to reduce database writes
-  touchAfter: 48 * 3600 // Only update session once every 2 days
+  touchAfter: 24 * 3600 // Only update session once per day instead of on every request
 }));
 
 // Initialize passport for authentication
@@ -220,7 +219,7 @@ app.use(passport.session());
 
 // Setup file storage for user uploads
 const storage = multer.diskStorage({
-  destination: function (req, _file, cb) {
+  destination: function (req, file, cb) {
     const userId = req.user ? req.user.id : 'anonymous';
     // Use tmp directory for Render compatibility
     const baseDir = process.env.NODE_ENV === 'production' ? '/tmp' : __dirname;
@@ -247,7 +246,7 @@ const storage = multer.diskStorage({
       }
     }
   },
-  filename: function (_req, file, cb) {
+  filename: function (req, file, cb) {
     // Add file type validation
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
     if (!allowedTypes.includes(file.mimetype)) {
@@ -298,7 +297,7 @@ app.use('/api', require('./server/routes/api'));
 app.use('/forum', require('./server/routes/forum'));
 
 // 404 handler
-app.use((req, res) => {
+app.use((req, res, next) => {
   console.log('404 Not Found:', req.method, req.url);
   console.log('Referrer:', req.get('Referrer') || 'None');
   console.log('User Agent:', req.get('User-Agent'));
@@ -312,7 +311,7 @@ app.use((req, res) => {
 });
 
 // Error handler
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   console.error('Server Error:', err.name, err.message);
   console.error('Error Stack:', err.stack);
   console.error('Request URL:', req.method, req.url);

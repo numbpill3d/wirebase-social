@@ -220,7 +220,7 @@ app.use(passport.session());
 
 // Setup file storage for user uploads
 const storage = multer.diskStorage({
-  destination: function (req, _file, cb) {
+  destination: function (req, file, cb) {
     const userId = req.user ? req.user.id : 'anonymous';
     // Use tmp directory for Render compatibility
     const baseDir = process.env.NODE_ENV === 'production' ? '/tmp' : __dirname;
@@ -247,7 +247,7 @@ const storage = multer.diskStorage({
       }
     }
   },
-  filename: function (_req, file, cb) {
+  filename: function (req, file, cb) {
     // Add file type validation
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
     if (!allowedTypes.includes(file.mimetype)) {
