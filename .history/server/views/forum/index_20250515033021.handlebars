@@ -47,30 +47,12 @@
   </div>
 
   <!-- Category Filter -->
-  <div class="filter-controls">
-    <div class="category-filter">
-      <h3 class="filter-heading">Categories</h3>
-      <button class="category-filter-button active" data-category="all">All Categories</button>
-      <button class="category-filter-button" data-category="general">General</button>
-      <button class="category-filter-button" data-category="tech">Tech</button>
-      <button class="category-filter-button" data-category="creative">Creative</button>
-      <button class="category-filter-button" data-category="meta">Meta</button>
-    </div>
-
-    <div class="tag-filter">
-      <h3 class="filter-heading">Popular Tags</h3>
-      <div class="tag-filter-buttons">
-        <button class="tag-filter-button" data-tag="welcome">welcome</button>
-        <button class="tag-filter-button" data-tag="announcement">announcement</button>
-        <button class="tag-filter-button" data-tag="faq">faq</button>
-        <button class="tag-filter-button" data-tag="resources">resources</button>
-        <button class="tag-filter-button" data-tag="design">design</button>
-        <button class="tag-filter-button" data-tag="feature">feature</button>
-        <button class="tag-filter-button" data-tag="terminal">terminal</button>
-        <button class="tag-filter-button" data-tag="profiles">profiles</button>
-      </div>
-      <button class="tag-filter-clear" style="display: none;">Clear Tag Filter</button>
-    </div>
+  <div class="category-filter">
+    <button class="category-filter-button active" data-category="all">All Categories</button>
+    <button class="category-filter-button" data-category="general">General</button>
+    <button class="category-filter-button" data-category="tech">Tech</button>
+    <button class="category-filter-button" data-category="creative">Creative</button>
+    <button class="category-filter-button" data-category="meta">Meta</button>
   </div>
 
   <div class="forum-categories">
@@ -187,11 +169,6 @@
             <span class="thread-category">Tech</span>
             <span class="thread-replies">3 replies</span>
           </div>
-          <div class="thread-tags">
-            <span class="thread-tag">faq</span>
-            <span class="thread-tag">resources</span>
-            <span class="thread-tag">help</span>
-          </div>
         </div>
 
         <div class="thread-item">
@@ -204,11 +181,6 @@
             <span class="thread-category">Creative</span>
             <span class="thread-replies">7 replies</span>
           </div>
-          <div class="thread-tags">
-            <span class="thread-tag">design</span>
-            <span class="thread-tag">profiles</span>
-            <span class="thread-tag">showcase</span>
-          </div>
         </div>
 
         <div class="thread-item">
@@ -220,11 +192,6 @@
             <span class="thread-date">5 hours ago</span>
             <span class="thread-category">Meta</span>
             <span class="thread-replies">2 replies</span>
-          </div>
-          <div class="thread-tags">
-            <span class="thread-tag">feature</span>
-            <span class="thread-tag">terminal</span>
-            <span class="thread-tag">request</span>
           </div>
         </div>
       </div>
@@ -267,84 +234,6 @@
         });
       });
     });
-
-    // Tag filter functionality
-    const tagFilterButtons = document.querySelectorAll('.tag-filter-button');
-    const tagFilterClear = document.querySelector('.tag-filter-clear');
-    let activeTag = null;
-
-    tagFilterButtons.forEach(button => {
-      button.addEventListener('click', function() {
-        const tag = this.getAttribute('data-tag');
-
-        // If the same tag is clicked again, deactivate it
-        if (activeTag === tag) {
-          clearTagFilter();
-          return;
-        }
-
-        // Remove active class from all buttons
-        tagFilterButtons.forEach(btn => btn.classList.remove('active'));
-
-        // Add active class to clicked button
-        this.classList.add('active');
-
-        // Show clear button
-        tagFilterClear.style.display = 'block';
-
-        // Set active tag
-        activeTag = tag;
-
-        // Filter threads by tag
-        threadItems.forEach(item => {
-          const threadTags = item.querySelectorAll('.thread-tag');
-          let hasTag = false;
-
-          threadTags.forEach(threadTag => {
-            if (threadTag.textContent.toLowerCase() === tag.toLowerCase()) {
-              hasTag = true;
-            }
-          });
-
-          if (hasTag) {
-            item.style.display = 'flex';
-          } else {
-            item.style.display = 'none';
-          }
-        });
-
-        // Reset category filter
-        filterButtons.forEach(btn => btn.classList.remove('active'));
-        filterButtons[0].classList.add('active'); // Select "All Categories"
-      });
-    });
-
-    // Clear tag filter
-    if (tagFilterClear) {
-      tagFilterClear.addEventListener('click', clearTagFilter);
-    }
-
-    function clearTagFilter() {
-      // Remove active class from all tag buttons
-      tagFilterButtons.forEach(btn => btn.classList.remove('active'));
-
-      // Hide clear button
-      tagFilterClear.style.display = 'none';
-
-      // Reset active tag
-      activeTag = null;
-
-      // Show all threads
-      threadItems.forEach(item => {
-        item.style.display = 'flex';
-      });
-
-      // Reset category filter
-      const activeCategory = document.querySelector('.category-filter-button.active');
-      if (activeCategory) {
-        activeCategory.click();
-      }
-    }
 
     // Thread search functionality
     const searchForm = document.getElementById('thread-search-form');
