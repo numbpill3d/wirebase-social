@@ -1,9 +1,9 @@
-                                                                                                                                                                                                                                                                                                 // Minimal server to test functionality
+// Minimal server to test functionality
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 // Create a simple HTTP server
 const server = http.createServer((req, res) => {

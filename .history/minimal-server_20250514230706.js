@@ -1,4 +1,4 @@
-                                                                                                                                                                                                                                                                                                 // Minimal server to test functionality
+// Minimal server to test functionality
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
