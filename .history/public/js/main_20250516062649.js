@@ -181,9 +181,9 @@ function makeDraggable(element, handle) {
 
     handle.style.cursor = 'url("/images/cursors/move.cur"), move';
 
-    // Define functions first before assigning them
-    function dragMouseDown(e) {
-        e = e || window.event;
+    handle.onmousedown = dragMouseDown;
+
+    const dragMouseDown = (e) => {
         e.preventDefault();
         // Get the mouse cursor position at startup
         pos3 = e.clientX;
@@ -199,10 +199,9 @@ function makeDraggable(element, handle) {
         document.onmouseup = closeDragElement;
         // Call function on mouse move
         document.onmousemove = elementDrag;
-    }
+    };
 
-    function elementDrag(e) {
-        e = e || window.event;
+    const elementDrag = (e) => {
         e.preventDefault();
 
         // Calculate the new cursor position
@@ -214,19 +213,16 @@ function makeDraggable(element, handle) {
         // Set the element's new position
         element.style.top = (element.offsetTop - pos2) + "px";
         element.style.left = (element.offsetLeft - pos1) + "px";
-    }
+    };
 
-    function closeDragElement() {
+    const closeDragElement = () => {
         // Remove active state
         element.classList.remove('dragging');
 
         // Stop moving when mouse button is released
         document.onmouseup = null;
         document.onmousemove = null;
-    }
-
-    // Assign the mousedown handler
-    handle.onmousedown = dragMouseDown;
+    };
 }
 
 /**
@@ -1451,19 +1447,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Load CRT effect only if enabled
-        if (window.CRT_EFFECT_ENABLED) {
-            // Use script tag instead of dynamic import for better compatibility
-            const script = document.createElement('script');
-            script.src = './js/crt-effect.js';
-            script.onload = function() {
-                if (typeof setupCRTEffect === 'function') {
-                    setupCRTEffect();
-                }
-            };
-            script.onerror = function(err) {
-                console.error('Failed to load CRT effect:', err);
-            };
-            document.head.appendChild(script);
+        if (window.CRT_EFFECT_ENABLED && typeof import === 'function') {
+            import('./crt-effect.js').then(module => module.setupCRTEffect())
+            .catch(err => console.error('Failed to load CRT effect:', err));
         }
     };
 

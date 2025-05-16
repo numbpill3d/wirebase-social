@@ -330,16 +330,11 @@ app.use((req, res) => {
 });
 
 // Error handler
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   console.error('Server Error:', err.name, err.message);
   console.error('Error Stack:', err.stack);
   console.error('Request URL:', req.method, req.url);
   console.error('Request Headers:', JSON.stringify(req.headers, null, 2));
-
-  // Check if headers have already been sent
-  if (res.headersSent) {
-    return next(err);
-  }
 
   res.status(500).render('error', {
     title: '500 - Server Error',
