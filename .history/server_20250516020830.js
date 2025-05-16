@@ -359,29 +359,12 @@ const gracefulShutdown = async () => {
   console.log('Shutting down gracefully...');
 
   try {
-    // Stop health checks and leak detection
-    console.log('Stopping database monitoring...');
-    clearInterval(healthCheckTimer);
-    clearInterval(leakDetectionTimers.checkTimer);
-    clearInterval(leakDetectionTimers.fixTimer);
-
-    // Fix any connection leaks before shutdown
-    console.log('Checking for connection leaks before shutdown...');
-    await dbLeakDetector.fixLeaks(true);
-
-    // Close server to stop accepting new connections
-    console.log('Closing HTTP server...');
-    await new Promise((resolve) => {
-      server.close(resolve);
-    });
-
     // Close database connections
     console.log('Closing database connections...');
     await knex.destroy();
     console.log('Database connections closed successfully');
 
     // Exit process
-    console.log('Shutdown complete');
     process.exit(0);
   } catch (err) {
     console.error('Error during graceful shutdown:', err);
@@ -393,32 +376,13 @@ const gracefulShutdown = async () => {
 process.on('SIGTERM', gracefulShutdown);
 process.on('SIGINT', gracefulShutdown);
 
-// Initialize timers for health checks and leak detection
-let healthCheckTimer;
-let leakDetectionTimers;
-
 // Start server
 const server = app.listen(PORT, () => {
   console.log(`Wirebase server running in ${NODE_ENV} mode on port ${PORT}`);
-
-  // Start database monitoring after server starts
-  console.log('Starting database monitoring...');
-
-  // Start health checks (every 60 seconds)
-  healthCheckTimer = dbHealth.startPeriodicHealthChecks(60000);
-
-  // Start leak detection (check every 30 seconds, fix every 5 minutes)
-  leakDetectionTimers = dbLeakDetector.startLeakDetection(30000, 300000);
 });
 
 // Add server timeout to prevent hanging connections
 server.timeout = 120000; // 2 minutes
 
-// Export knex instance and monitoring utilities for use in other modules
-module.exports = {
-  knex,
-  dbMonitor,
-  dbHealth,
-  dbErrorHandler,
-  dbLeakDetector
-};
+// Export knex instance for use in other modules
+module.exports = { knex };

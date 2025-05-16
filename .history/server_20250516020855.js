@@ -393,10 +393,6 @@ const gracefulShutdown = async () => {
 process.on('SIGTERM', gracefulShutdown);
 process.on('SIGINT', gracefulShutdown);
 
-// Initialize timers for health checks and leak detection
-let healthCheckTimer;
-let leakDetectionTimers;
-
 // Start server
 const server = app.listen(PORT, () => {
   console.log(`Wirebase server running in ${NODE_ENV} mode on port ${PORT}`);
@@ -405,10 +401,10 @@ const server = app.listen(PORT, () => {
   console.log('Starting database monitoring...');
 
   // Start health checks (every 60 seconds)
-  healthCheckTimer = dbHealth.startPeriodicHealthChecks(60000);
+  const healthCheckTimer = dbHealth.startPeriodicHealthChecks(60000);
 
   // Start leak detection (check every 30 seconds, fix every 5 minutes)
-  leakDetectionTimers = dbLeakDetector.startLeakDetection(30000, 300000);
+  const leakDetectionTimers = dbLeakDetector.startLeakDetection(30000, 300000);
 });
 
 // Add server timeout to prevent hanging connections

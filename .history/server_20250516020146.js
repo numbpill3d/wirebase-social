@@ -177,7 +177,7 @@ app.use((req, res, next) => {
 
 // Session configuration with Knex store - optimized settings
 const store = new KnexSessionStore({
-  knex, // Use the same knex instance to avoid creating multiple pools
+  knex,
   tablename: 'sessions',
   createtable: true,
   // Fix potential memory leak with proper cleanup
@@ -186,12 +186,16 @@ const store = new KnexSessionStore({
   // Performance optimizations
   disableKeepExtensions: true, // Disable extensions to reduce DB load
   disableReaper: false, // Keep reaper to clean up old sessions
-  reapInterval: 43200000, // Reap every 12 hours (reduced frequency further)
-  reapMaxConcurrent: 1, // Reduce to 1 concurrent delete operation
+  reapInterval: 14400000, // Reap every 4 hours (reduced frequency)
+  reapMaxConcurrent: 3, // Reduce concurrent delete operations
   // Serialize/deserialize function options
   serializer: JSON.stringify,
-  deserializer: JSON.parse
-  // Remove separate pool configuration to use the main knex pool
+  deserializer: JSON.parse,
+  // Add connection pool settings specific to session store
+  pool: {
+    min: 0, // Start with no connections
+    max: 3  // Reduce max connections for session store
+  }
 });
 
 app.use(session({
@@ -202,14 +206,14 @@ app.use(session({
   rolling: false, // Disable rolling to reduce database writes
   name: 'wirebase.sid', // Custom cookie name for better security
   cookie: {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days (reduced from 7)
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     httpOnly: true, // Prevent client-side JS from accessing cookie
     path: '/'
   },
   // Add touch option to reduce database writes
-  touchAfter: 24 * 3600 // Only update session once per day
+  touchAfter: 48 * 3600 // Only update session once every 2 days
 }));
 
 // Initialize passport for authentication
@@ -286,18 +290,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Import database utilities
-const dbMonitor = require('./server/utils/db-monitor');
-const dbHealth = require('./server/utils/db-health');
-const dbErrorHandler = require('./server/utils/db-error-handler');
-const dbLeakDetector = require('./server/utils/db-leak-detector');
-const { queryTimeoutMiddleware, transactionTimeoutMiddleware } = require('./server/middleware/query-timeout');
-
-// Apply database middleware
-app.use(queryTimeoutMiddleware(30000)); // 30 second query timeout
-app.use(transactionTimeoutMiddleware(60000)); // 60 second transaction timeout
-app.use(dbErrorHandler.errorHandlerMiddleware());
-
 // Routes
 app.use('/', require('./server/routes/index'));
 app.use('/users', require('./server/routes/users'));
@@ -306,7 +298,6 @@ app.use('/scrapyard', require('./server/routes/scrapyard'));
 app.use('/feed', require('./server/routes/feed'));
 app.use('/api', require('./server/routes/api'));
 app.use('/forum', require('./server/routes/forum'));
-app.use('/admin/api', require('./server/routes/admin-api'));
 
 // 404 handler
 app.use((req, res) => {
@@ -350,75 +341,14 @@ process.on('uncaughtException', (error) => {
   if (process.env.NODE_ENV === 'production') {
     // In production, gracefully shut down to prevent undefined state
     console.error('Shutting down due to uncaught exception');
-    gracefulShutdown();
-  }
-});
-
-// Graceful shutdown function to properly close database connections
-const gracefulShutdown = async () => {
-  console.log('Shutting down gracefully...');
-
-  try {
-    // Stop health checks and leak detection
-    console.log('Stopping database monitoring...');
-    clearInterval(healthCheckTimer);
-    clearInterval(leakDetectionTimers.checkTimer);
-    clearInterval(leakDetectionTimers.fixTimer);
-
-    // Fix any connection leaks before shutdown
-    console.log('Checking for connection leaks before shutdown...');
-    await dbLeakDetector.fixLeaks(true);
-
-    // Close server to stop accepting new connections
-    console.log('Closing HTTP server...');
-    await new Promise((resolve) => {
-      server.close(resolve);
-    });
-
-    // Close database connections
-    console.log('Closing database connections...');
-    await knex.destroy();
-    console.log('Database connections closed successfully');
-
-    // Exit process
-    console.log('Shutdown complete');
-    process.exit(0);
-  } catch (err) {
-    console.error('Error during graceful shutdown:', err);
     process.exit(1);
   }
-};
-
-// Handle termination signals
-process.on('SIGTERM', gracefulShutdown);
-process.on('SIGINT', gracefulShutdown);
-
-// Initialize timers for health checks and leak detection
-let healthCheckTimer;
-let leakDetectionTimers;
-
-// Start server
-const server = app.listen(PORT, () => {
-  console.log(`Wirebase server running in ${NODE_ENV} mode on port ${PORT}`);
-
-  // Start database monitoring after server starts
-  console.log('Starting database monitoring...');
-
-  // Start health checks (every 60 seconds)
-  healthCheckTimer = dbHealth.startPeriodicHealthChecks(60000);
-
-  // Start leak detection (check every 30 seconds, fix every 5 minutes)
-  leakDetectionTimers = dbLeakDetector.startLeakDetection(30000, 300000);
 });
 
-// Add server timeout to prevent hanging connections
-server.timeout = 120000; // 2 minutes
+// Start server
+app.listen(PORT, () => {
+  console.log(`Wirebase server running in ${NODE_ENV} mode on port ${PORT}`);
+});
 
-// Export knex instance and monitoring utilities for use in other modules
-module.exports = {
-  knex,
-  dbMonitor,
-  dbHealth,
-  dbErrorHandler,
-  dbLeakDetector
-};
+// Export knex instance for use in other modules
+module.exports = { knex };

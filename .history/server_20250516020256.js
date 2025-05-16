@@ -286,18 +286,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Import database utilities
-const dbMonitor = require('./server/utils/db-monitor');
-const dbHealth = require('./server/utils/db-health');
-const dbErrorHandler = require('./server/utils/db-error-handler');
-const dbLeakDetector = require('./server/utils/db-leak-detector');
-const { queryTimeoutMiddleware, transactionTimeoutMiddleware } = require('./server/middleware/query-timeout');
-
-// Apply database middleware
-app.use(queryTimeoutMiddleware(30000)); // 30 second query timeout
-app.use(transactionTimeoutMiddleware(60000)); // 60 second transaction timeout
-app.use(dbErrorHandler.errorHandlerMiddleware());
-
 // Routes
 app.use('/', require('./server/routes/index'));
 app.use('/users', require('./server/routes/users'));
@@ -306,7 +294,6 @@ app.use('/scrapyard', require('./server/routes/scrapyard'));
 app.use('/feed', require('./server/routes/feed'));
 app.use('/api', require('./server/routes/api'));
 app.use('/forum', require('./server/routes/forum'));
-app.use('/admin/api', require('./server/routes/admin-api'));
 
 // 404 handler
 app.use((req, res) => {
@@ -359,29 +346,12 @@ const gracefulShutdown = async () => {
   console.log('Shutting down gracefully...');
 
   try {
-    // Stop health checks and leak detection
-    console.log('Stopping database monitoring...');
-    clearInterval(healthCheckTimer);
-    clearInterval(leakDetectionTimers.checkTimer);
-    clearInterval(leakDetectionTimers.fixTimer);
-
-    // Fix any connection leaks before shutdown
-    console.log('Checking for connection leaks before shutdown...');
-    await dbLeakDetector.fixLeaks(true);
-
-    // Close server to stop accepting new connections
-    console.log('Closing HTTP server...');
-    await new Promise((resolve) => {
-      server.close(resolve);
-    });
-
     // Close database connections
     console.log('Closing database connections...');
     await knex.destroy();
     console.log('Database connections closed successfully');
 
     // Exit process
-    console.log('Shutdown complete');
     process.exit(0);
   } catch (err) {
     console.error('Error during graceful shutdown:', err);
@@ -393,32 +363,13 @@ const gracefulShutdown = async () => {
 process.on('SIGTERM', gracefulShutdown);
 process.on('SIGINT', gracefulShutdown);
 
-// Initialize timers for health checks and leak detection
-let healthCheckTimer;
-let leakDetectionTimers;
-
 // Start server
 const server = app.listen(PORT, () => {
   console.log(`Wirebase server running in ${NODE_ENV} mode on port ${PORT}`);
-
-  // Start database monitoring after server starts
-  console.log('Starting database monitoring...');
-
-  // Start health checks (every 60 seconds)
-  healthCheckTimer = dbHealth.startPeriodicHealthChecks(60000);
-
-  // Start leak detection (check every 30 seconds, fix every 5 minutes)
-  leakDetectionTimers = dbLeakDetector.startLeakDetection(30000, 300000);
 });
 
 // Add server timeout to prevent hanging connections
 server.timeout = 120000; // 2 minutes
 
-// Export knex instance and monitoring utilities for use in other modules
-module.exports = {
-  knex,
-  dbMonitor,
-  dbHealth,
-  dbErrorHandler,
-  dbLeakDetector
-};
+// Export knex instance for use in other modules
+module.exports = { knex };
