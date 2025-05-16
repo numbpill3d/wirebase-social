@@ -71,7 +71,7 @@ global.knex = require('knex')({
 });
 
 // Add better error handling with detailed logging
-global.knex.on('error', (err) => {
+knex.on('error', (err) => {
   console.error('Unexpected database error:', err);
   console.error('Error details:', {
     code: err.code,
@@ -90,7 +90,7 @@ global.knex.on('error', (err) => {
 const verifyDatabaseConnection = async (retries = 5, delay = 5000) => {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      await global.knex.raw('SELECT 1');
+      await knex.raw('SELECT 1');
       console.log('Database connection established successfully');
       return true;
     } catch (err) {
@@ -185,7 +185,7 @@ app.use((req, res, next) => {
 
 // Session configuration with Knex store - optimized settings
 const store = new KnexSessionStore({
-  knex: global.knex, // Use the same knex instance to avoid creating multiple pools
+  knex, // Use the same knex instance to avoid creating multiple pools
   tablename: 'sessions',
   createtable: true,
   // Fix potential memory leak with proper cleanup
@@ -302,8 +302,8 @@ const dbLeakDetector = require('./server/utils/db-leak-detector');
 const { queryTimeoutMiddleware, transactionTimeoutMiddleware } = require('./server/middleware/query-timeout');
 
 // Apply database middleware with knex instance
-app.use(queryTimeoutMiddleware(global.knex, 30000)); // 30 second query timeout
-app.use(transactionTimeoutMiddleware(global.knex, 60000)); // 60 second transaction timeout
+app.use(queryTimeoutMiddleware(knex, 30000)); // 30 second query timeout
+app.use(transactionTimeoutMiddleware(knex, 60000)); // 60 second transaction timeout
 app.use(dbErrorHandler.errorHandlerMiddleware());
 
 // Routes
@@ -395,7 +395,7 @@ const gracefulShutdown = async () => {
 
     // Close database connections
     console.log('Closing database connections...');
-    await global.knex.destroy();
+    await knex.destroy();
     console.log('Database connections closed successfully');
 
     // Exit process
@@ -423,13 +423,13 @@ const server = app.listen(PORT, () => {
   console.log('Starting database monitoring...');
 
   // Start health checks (every 60 seconds)
-  healthCheckTimer = dbHealth.startPeriodicHealthChecks(global.knex, 60000);
+  healthCheckTimer = dbHealth.startPeriodicHealthChecks(knex, 60000);
 
   // Start leak detection (check every 30 seconds, fix every 5 minutes)
-  leakDetectionTimers = dbLeakDetector.startLeakDetection(global.knex, 30000, 300000);
+  leakDetectionTimers = dbLeakDetector.startLeakDetection(knex, 30000, 300000);
 
   // Initialize pool monitoring
-  dbMonitor.setupPoolMonitoring(global.knex);
+  dbMonitor.setupPoolMonitoring(knex);
 });
 
 // Add server timeout to prevent hanging connections
@@ -437,7 +437,7 @@ server.timeout = 120000; // 2 minutes
 
 // Export knex instance and monitoring utilities for use in other modules
 module.exports = {
-  knex: global.knex,
+  knex,
   dbMonitor,
   dbHealth,
   dbErrorHandler,

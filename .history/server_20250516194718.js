@@ -437,7 +437,7 @@ server.timeout = 120000; // 2 minutes
 
 // Export knex instance and monitoring utilities for use in other modules
 module.exports = {
-  knex: global.knex,
+  knex,
   dbMonitor,
   dbHealth,
   dbErrorHandler,

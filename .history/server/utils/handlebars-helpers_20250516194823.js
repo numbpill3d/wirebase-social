@@ -112,10 +112,7 @@ module.exports = {
         FORBID_TAGS: ['script', 'iframe', 'object', 'embed'],
         FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover']
       });
-      // Return sanitized HTML as a string that won't be escaped by Handlebars
-      // Note: In Express-Handlebars, we don't need to use Handlebars.SafeString
-      // We can just return the sanitized string and use triple braces in the template: {{{allowedHTML content}}}
-      return sanitized;
+      return new Handlebars.SafeString(sanitized);
     } catch (err) {
       console.error('HTML sanitization error:', err);
       return '';

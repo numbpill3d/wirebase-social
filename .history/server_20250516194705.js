@@ -395,7 +395,7 @@ const gracefulShutdown = async () => {
 
     // Close database connections
     console.log('Closing database connections...');
-    await global.knex.destroy();
+    await knex.destroy();
     console.log('Database connections closed successfully');
 
     // Exit process
@@ -437,7 +437,7 @@ server.timeout = 120000; // 2 minutes
 
 // Export knex instance and monitoring utilities for use in other modules
 module.exports = {
-  knex: global.knex,
+  knex,
   dbMonitor,
   dbHealth,
   dbErrorHandler,

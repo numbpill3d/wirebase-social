@@ -79,7 +79,7 @@ const handleError = async (error, context = 'unknown') => {
 const getErrorStats = () => {
   return {
     ...errorStats,
-    poolStatus: dbMonitor.getPoolStatus(global.knex)
+    poolStatus: dbMonitor.getPoolStatus()
   };
 };
 

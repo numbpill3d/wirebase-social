@@ -30,7 +30,7 @@ const handleError = async (error, context = 'unknown') => {
   errorStats.totalErrors++;
   errorStats.lastError = error;
   errorStats.lastErrorTime = new Date();
-
+  
   // Categorize error
   if (error.message.includes('timeout') || error.message.includes('Timeout')) {
     errorStats.timeoutErrors++;
@@ -43,14 +43,14 @@ const handleError = async (error, context = 'unknown') => {
   } else {
     errorStats.otherErrors++;
   }
-
+  
   // Track errors by code
   const errorCode = error.code || 'UNKNOWN';
   errorStats.errorsByCode[errorCode] = (errorStats.errorsByCode[errorCode] || 0) + 1;
-
-  // Get pool status - use global knex instance from server.js
-  const poolStatus = dbMonitor.getPoolStatus(global.knex);
-
+  
+  // Get pool status
+  const poolStatus = dbMonitor.getPoolStatus();
+  
   // Log error with context and pool status
   console.error(`Database error in ${context}:`, {
     message: error.message,
@@ -58,17 +58,17 @@ const handleError = async (error, context = 'unknown') => {
     stack: error.stack,
     poolStatus
   });
-
+  
   // Check database health on connection errors
   if (errorStats.connectionErrors > 0 && errorStats.connectionErrors % 5 === 0) {
     console.log('Triggering health check due to connection errors');
-    dbHealth.checkHealth(global.knex).catch(console.error);
+    dbHealth.checkHealth().catch(console.error);
   }
-
+  
   // Add context to error
   error.context = context;
   error.poolStatus = poolStatus;
-
+  
   return error;
 };
 
@@ -79,7 +79,7 @@ const handleError = async (error, context = 'unknown') => {
 const getErrorStats = () => {
   return {
     ...errorStats,
-    poolStatus: dbMonitor.getPoolStatus(global.knex)
+    poolStatus: dbMonitor.getPoolStatus()
   };
 };
 
@@ -122,14 +122,14 @@ const errorHandlerMiddleware = () => {
     )) {
       // Handle database error
       handleError(err, `${req.method} ${req.path}`);
-
+      
       // Send appropriate response
       return res.status(503).json({
         error: 'Database error',
         message: 'A database error occurred. Please try again later.'
       });
     }
-
+    
     // Pass to next error handler
     next(err);
   };
