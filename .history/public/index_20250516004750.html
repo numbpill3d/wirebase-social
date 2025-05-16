@@ -11,10 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <script src="js/laincore-loader.js"></script>
     <style>
-        /*
-         * Custom styles for index.html
-         * These styles complement the external CSS files and provide specific styling for this page
-         */
+        /* Base Styles */
         :root {
             --main-bg-color: #000000;
             --main-text-color: #cccccc;
@@ -158,12 +155,6 @@
             background: rgba(70, 20, 100, 0.7);
             font-size: 18px;
             padding: 8px 16px;
-        }
-
-        .cyber-button.active {
-            background: rgba(70, 20, 100, 0.8);
-            box-shadow: 0 0 8px rgba(138, 43, 226, 0.6);
-            text-shadow: 0 0 5px var(--accent-color);
         }
 
         /* Container Layout */
@@ -816,7 +807,7 @@
                                     <span class="stat-value">85%</span>
                                 </div>
                             </div>
-                            <a href="/users/login" class="cyber-button primary">> Plug into the Network</a>
+                            <button class="cyber-button primary" type="button">> Plug into the Network</button>
                             <div class="connection-counter">> Connected Nodes: 12345</div>
                             <div class="system-status">> System Status: Online</div>
                         </div>

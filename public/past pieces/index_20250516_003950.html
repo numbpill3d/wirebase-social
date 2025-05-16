@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>wirebase.city - You don't exist until you're online</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/laincore.css">
+    <link rel="stylesheet" href="css/interface.css">
+    <link rel="stylesheet" href="css/scanlines.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <script src="js/laincore-loader.js"></script>
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo">
+            <img src="images/wirebase-logo.svg" alt="wirebase.city" class="glitch-image">
+            <h1 class="glitch-text" data-text="wirebase.city">wirebase.city</h1>
+        </div>
+        <nav class="cyber-navbar">
+            <a href="/" class="cyber-button">Core</a>
+            <a href="/profile" class="cyber-button">Shell</a>
+            <a href="/scrapyard" class="cyber-button">Nullspace</a>
+            <a href="/feed" class="cyber-button">Stream</a>
+            <a href="/forum" class="cyber-button">Assembly</a>
+            <a href="/users/login" class="cyber-button">Connect</a>
+            <button id="theme-toggle" class="cyber-button" type="button">Disconnect</button>
+        </nav>
+    </header>
+
+    <!-- Add CRT scanlines and glitch effects -->
+    <div class="crt-scanlines"></div>
+    <div class="crt-flicker"></div>
+    <div class="digital-noise"></div>
+
+    <div class="container">
+        <!-- New layout structure with 60/40 split -->
+        <div class="new-layout">
+            <section class="welcome-section">
+                <div class="cyber-window">
+                    <div class="cyber-window-header">
+                        <span class="cyber-window-title">system.connection.established</span>
+                        <div class="cyber-window-controls">
+                            <span class="cyber-window-control">_</span>
+                            <span class="cyber-window-control">□</span>
+                            <span class="cyber-window-control">×</span>
+                        </div>
+                    </div>
+                    <div class="cyber-window-content">
+                        <h2 class="glitch-text" data-text="You don't exist until you're online">You don't exist until you're online</h2>
+                        <p>Create your digital shell with raw HTML/CSS, explore the Nullspace for resources, and connect with other nodes in this cyberschizo network.</p>
+                        <div class="stats-panel">
+                            <div class="stats-header">Node Status</div>
+                            <div class="stat">
+                                <span class="stat-name">Protocol</span>
+                                <span class="stat-value">99%</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-name">Connection</span>
+                                <span class="stat-value">78%</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-name">Bandwidth</span>
+                                <span class="stat-value">85%</span>
+                            </div>
+                        </div>
+                        <button class="cyber-button primary" type="button">Plug into the Network</button>
+                        <div class="connection-counter">Connected Nodes: 12345</div>
+                        <div class="system-status">System Status: Online</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="features-panel">
+                <div class="cyber-window">
+                    <div class="cyber-window-header">
+                        <span class="cyber-window-title">system.protocols</span>
+                        <div class="cyber-window-controls">
+                            <span class="cyber-window-control">_</span>
+                            <span class="cyber-window-control">□</span>
+                            <span class="cyber-window-control">×</span>
+                        </div>
+                    </div>
+                    <div class="cyber-window-content">
+                        <ul class="feature-list">
+                            <li><span class="icon">💻</span> <span class="blinking-text">NEW!</span> Full shell customization with HTML/CSS</li>
+                            <li><span class="icon">🖥️</span> Terminal Interface for direct system access</li>
+                            <li><span class="icon">📡</span> RSS/ATOM feed integration</li>
+                            <li><span class="icon">🔍</span> Global stream monitoring</li>
+                            <li><span class="icon">👁️</span> Connection tracking protocol</li>
+                            <li><span class="icon">🔌</span> Custom CSS interfaces</li>
+                            <li><span class="icon">💾</span> Validation imprints</li>
+                            <li><span class="icon">📝</span> Markup language support</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="scrapyard-grid">
+                <div class="cyber-window">
+                    <div class="cyber-window-header">
+                        <span class="cyber-window-title">system.nullspace</span>
+                        <div class="cyber-window-controls">
+                            <span class="cyber-window-control">_</span>
+                            <span class="cyber-window-control">□</span>
+                            <span class="cyber-window-control">×</span>
+                        </div>
+                    </div>
+                    <div class="cyber-window-content">
+                        <div class="nullspace-categories">
+                            <div class="category">
+                                <h3>Abandoned Processes</h3>
+                                <div class="category-item">Connection Counter</div>
+                                <div class="category-item">Network Widget</div>
+                            </div>
+                            <div class="category">
+                                <h3>Dead Shells</h3>
+                                <div class="category-item">Digital Interface</div>
+                                <div class="category-item">Retro Terminal</div>
+                            </div>
+                            <div class="category">
+                                <h3>Data Fragments</h3>
+                                <div class="category-item">Digital Icons</div>
+                                <div class="category-item">Pixel Symbols</div>
+                            </div>
+                            <div class="category">
+                                <h3>Signal Echoes</h3>
+                                <div class="category-item">Static Patterns</div>
+                                <div class="category-item">Glitch Headers</div>
+                            </div>
+                            <div class="category">
+                                <h3>Visual Artifacts</h3>
+                                <div class="category-item">Digital Noise</div>
+                                <div class="category-item">Scrolling Code</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <section class="profile-example">
+            <div class="cyber-window">
+                <div class="cyber-window-header">
+                    <span class="cyber-window-title">system.identity.uploader</span>
+                    <div class="cyber-window-controls">
+                        <span class="cyber-window-control">_</span>
+                        <span class="cyber-window-control">□</span>
+                        <span class="cyber-window-control">×</span>
+                    </div>
+                </div>
+                <div class="cyber-window-content">
+                    <div class="profile-example-columns">
+                        <div class="profile-tutorial">
+                            <h3>Initialize Node</h3>
+                            <p>Create your digital shell with HTML and CSS!</p>
+                            <ol class="compact-list">
+                                <li>Enter "Terminal Interface" to access system</li>
+                                <li>Type <code>edit html</code> to modify your shell</li>
+                                <li>Enter <code>:wq</code> to save your changes</li>
+                                <li>Customize with CSS using <code>edit css</code></li>
+                            </ol>
+                            <div class="terminal-mode">
+                                <div class="terminal-header">Terminal.exe</div>
+                                <div class="terminal-content">
+                                    <pre>[node_4231@wirebase]&gt; edit profile.html
+&gt; <span class="cursor">_</span></pre>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="profile-dynamic-content">
+                            <div class="profile-preview">
+                                <div class="profile-header">
+                                    <img src="images/laincore/default-avatar.png" alt="Node Avatar" class="pixel-avatar">
+                                    <div class="profile-info">
+                                        <h3>Node_4231 <span class="glyph">👁️</span></h3>
+                                        <p class="status">Connected to the wired</p>
+                                    </div>
+                                </div>
+                                <div class="profile-custom-area">
+                                    <!-- Custom HTML/CSS Area -->
+                                    <div class="cyber-container">
+                                        <h4>Welcome to my cognitive partition</h4>
+                                        <p>This is an example of custom HTML/CSS that users can add to their digital shells.</p>
+                                        <div class="glitch-container">
+                                            <div class="glitch-effect left"></div>
+                                            <div class="glitch-effect right"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="streetpass-widget">
+                                    <h4>Connection Log</h4>
+                                    <div class="visitor-list">
+                                        <div class="visitor">
+                                            <span class="visitor-name">SystemAdmin</span>
+                                            <span class="visitor-emote">👁️</span>
+                                            <span class="visitor-time">2 hours ago</span>
+                                        </div>
+                                        <div class="visitor">
+                                            <span class="visitor-name">DataNode</span>
+                                            <span class="visitor-emote">💾</span>
+                                            <span class="visitor-time">1 day ago</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="micro-economy">
+            <div class="cyber-window">
+                <div class="cyber-window-header">
+                    <span class="cyber-window-title">system.economy</span>
+                    <div class="cyber-window-controls">
+                        <span class="cyber-window-control">_</span>
+                        <span class="cyber-window-control">□</span>
+                        <span class="cyber-window-control">×</span>
+                    </div>
+                </div>
+                <div class="cyber-window-content">
+                    <div class="economy-grid">
+                        <div class="bandwidth-credits">
+                            <h3>Bandwidth Credits</h3>
+                            <div class="token-display">
+                                <span class="token-icon">💾</span>
+                                <span class="token-count">250</span>
+                            </div>
+                            <p>Earn credits by creating content, establishing connections, and participating in network events.</p>
+                        </div>
+                        <div class="validation-imprints">
+                            <h3>Validation Imprints</h3>
+                            <div class="badge-list">
+                                <div class="badge"><span class="badge-icon">💾</span> <span class="badge-name">Data Provider</span></div>
+                                <div class="badge"><span class="badge-icon">💻</span> <span class="badge-name">Protocol Expert</span></div>
+                                <div class="badge"><span class="badge-icon">👁️</span> <span class="badge-name">Network Observer</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="images/wirebase-logo.svg" alt="wirebase.city" class="pixel-image small">
+                <span>wirebase.city</span>
+            </div>
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Terms</a>
+                <a href="#">Privacy</a>
+                <a href="#">Contact</a>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            © 2025 wirebase.city - You don't exist until you're online
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/laincore.js"></script>
+</body>
+</html>

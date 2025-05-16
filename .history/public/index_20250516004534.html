@@ -4,17 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>wirebase.city - You don't exist until you're online</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/laincore.css">
-    <link rel="stylesheet" href="css/interface.css">
-    <link rel="stylesheet" href="css/scanlines.css">
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-    <script src="js/laincore-loader.js"></script>
     <style>
-        /*
-         * Custom styles for index.html
-         * These styles complement the external CSS files and provide specific styling for this page
-         */
+        /* Base Styles */
         :root {
             --main-bg-color: #000000;
             --main-text-color: #cccccc;
@@ -44,7 +36,7 @@
             font-family: 'VT323', 'Courier New', monospace;
             font-size: 16px;
             line-height: 1.4;
-            background-image:
+            background-image: 
                 radial-gradient(circle at 50% 50%, rgba(138, 43, 226, 0.05) 0%, transparent 80%),
                 linear-gradient(to bottom, rgba(20, 10, 30, 0.8), rgba(5, 5, 10, 0.9)),
                 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="black"/><path d="M0,0 L100,100 M100,0 L0,100" stroke="purple" stroke-width="0.5" stroke-opacity="0.2"/></svg>');
@@ -158,12 +150,6 @@
             background: rgba(70, 20, 100, 0.7);
             font-size: 18px;
             padding: 8px 16px;
-        }
-
-        .cyber-button.active {
-            background: rgba(70, 20, 100, 0.8);
-            box-shadow: 0 0 8px rgba(138, 43, 226, 0.6);
-            text-shadow: 0 0 5px var(--accent-color);
         }
 
         /* Container Layout */
@@ -504,7 +490,7 @@
             .profile-example-columns {
                 flex-direction: row;
             }
-
+            
             .profile-tutorial,
             .profile-dynamic-content {
                 width: 50%;
@@ -766,11 +752,10 @@
 <body>
     <header class="main-header">
         <div class="logo">
-            <img src="images/wirebase-logo.svg" alt="wirebase.city" class="glitch-image">
             <h1 class="glitch-text" data-text="wirebase.city">wirebase.city</h1>
         </div>
         <nav class="cyber-navbar">
-            <a href="/" class="cyber-button active">[Core]</a>
+            <a href="/" class="cyber-button">[Core]</a>
             <a href="/profile" class="cyber-button">[Shell]</a>
             <a href="/scrapyard" class="cyber-button">[Nullspace]</a>
             <a href="/feed" class="cyber-button">[Stream]</a>
@@ -816,7 +801,7 @@
                                     <span class="stat-value">85%</span>
                                 </div>
                             </div>
-                            <a href="/users/login" class="cyber-button primary">> Plug into the Network</a>
+                            <button class="cyber-button primary" type="button">> Plug into the Network</button>
                             <div class="connection-counter">> Connected Nodes: 12345</div>
                             <div class="system-status">> System Status: Online</div>
                         </div>
@@ -1019,7 +1004,6 @@
     <footer class="main-footer">
         <div class="footer-content">
             <div class="footer-logo">
-                <img src="images/wirebase-logo.svg" alt="wirebase.city" class="pixel-image small">
                 <span>wirebase.city</span>
             </div>
             <div class="footer-links">
@@ -1034,8 +1018,6 @@
         </div>
     </footer>
 
-    <script src="js/main.js"></script>
-    <script src="js/laincore.js"></script>
     <script>
         // Theme toggle functionality
         document.getElementById('theme-toggle').addEventListener('click', function() {
@@ -1046,15 +1028,15 @@
         function randomGlitch() {
             const glitchTexts = document.querySelectorAll('.glitch-text');
             const randomIndex = Math.floor(Math.random() * glitchTexts.length);
-
+            
             if (glitchTexts[randomIndex]) {
                 glitchTexts[randomIndex].style.opacity = '0.7';
-
+                
                 setTimeout(function() {
                     glitchTexts[randomIndex].style.opacity = '1';
                 }, 100);
             }
-
+            
             setTimeout(randomGlitch, Math.random() * 5000 + 2000);
         }
 
