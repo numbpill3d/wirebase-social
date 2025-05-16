@@ -1,0 +1,735 @@
+<div class="vivid-market browse-page">
+  <div class="breadcrumb">
+    <a href="/market">Vivid Market</a> &gt; 
+    <span>Browse</span>
+    {{#if filters.category}}
+      &gt; <span>{{filters.category}}</span>
+    {{/if}}
+  </div>
+
+  <div class="browse-container">
+    <div class="filter-sidebar">
+      <div class="filter-section">
+        <h3>Search</h3>
+        <form id="search-form" class="search-form">
+          <input type="text" id="search-input" name="search" placeholder="Search items..." value="{{filters.search}}">
+          <button type="submit" class="search-button">Search</button>
+        </form>
+      </div>
+
+      <div class="filter-section">
+        <h3>Category</h3>
+        <div class="category-filters">
+          <div class="category-option {{#unless filters.category}}active{{/unless}}">
+            <a href="/market/browse{{#if filters.search}}?search={{filters.search}}{{/if}}">All Categories</a>
+          </div>
+          {{#each categories}}
+            <div class="category-option {{#if (eq ../filters.category this)}}active{{/if}}">
+              <a href="/market/browse?category={{this}}{{#if ../filters.search}}&search={{../filters.search}}{{/if}}">{{this}}</a>
+            </div>
+          {{/each}}
+        </div>
+      </div>
+
+      <div class="filter-section">
+        <h3>Price Range</h3>
+        <form id="price-filter-form" class="price-filter-form">
+          <div class="price-inputs">
+            <div class="price-input">
+              <label for="min-price">Min</label>
+              <input type="number" id="min-price" name="minPrice" min="0" value="{{filters.minPrice}}" placeholder="0">
+            </div>
+            <div class="price-input">
+              <label for="max-price">Max</label>
+              <input type="number" id="max-price" name="maxPrice" min="0" value="{{filters.maxPrice}}" placeholder="∞">
+            </div>
+          </div>
+          <button type="submit" class="filter-button">Apply</button>
+        </form>
+      </div>
+
+      <div class="filter-section">
+        <h3>Sort By</h3>
+        <div class="sort-options">
+          <div class="sort-option {{#if (eq filters.sort 'newest')}}active{{/if}}" data-sort="newest">
+            <span>Newest</span>
+          </div>
+          <div class="sort-option {{#if (eq filters.sort 'oldest')}}active{{/if}}" data-sort="oldest">
+            <span>Oldest</span>
+          </div>
+          <div class="sort-option {{#if (eq filters.sort 'price_low')}}active{{/if}}" data-sort="price_low">
+            <span>Price: Low to High</span>
+          </div>
+          <div class="sort-option {{#if (eq filters.sort 'price_high')}}active{{/if}}" data-sort="price_high">
+            <span>Price: High to Low</span>
+          </div>
+          <div class="sort-option {{#if (eq filters.sort 'popular')}}active{{/if}}" data-sort="popular">
+            <span>Most Popular</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-section">
+        <h3>Tags</h3>
+        <div class="tags-input-container">
+          <input type="text" id="tags-input" placeholder="Add tags..." class="tags-input">
+          <div class="tags-suggestions"></div>
+        </div>
+        <div class="active-tags">
+          {{#if filters.tags}}
+            {{#each (split filters.tags ',')}}
+              <div class="active-tag">
+                <span>{{this}}</span>
+                <button class="remove-tag" data-tag="{{this}}">×</button>
+              </div>
+            {{/each}}
+          {{/if}}
+        </div>
+      </div>
+
+      <button id="clear-filters" class="clear-filters-button">Clear All Filters</button>
+    </div>
+
+    <div class="items-container">
+      <div class="browse-header">
+        <h1>Browse Market</h1>
+        <div class="results-info">
+          {{#if items.length}}
+            Showing {{items.length}} items
+          {{else}}
+            No items found
+          {{/if}}
+        </div>
+      </div>
+
+      {{#if items.length}}
+        <div class="items-grid">
+          {{#each items}}
+            <div class="market-item">
+              <div class="item-preview">
+                <a href="/market/item/{{this.id}}">
+                  <img src="{{this.previewImage}}" alt="{{this.title}}">
+                </a>
+                <div class="item-category">{{this.categoryName}}</div>
+              </div>
+              <div class="item-details">
+                <h3><a href="/market/item/{{this.id}}">{{this.title}}</a></h3>
+                <div class="item-creator">
+                  <a href="/profile/{{this.creator.username}}">
+                    <img src="{{this.creator.avatar}}" alt="{{this.creator.username}}" class="creator-avatar">
+                    <span>{{this.creator.displayName}}</span>
+                  </a>
+                </div>
+                <div class="item-price">
+                  <span class="wir-price">{{this.wirPrice}} WIR</span>
+                </div>
+              </div>
+            </div>
+          {{/each}}
+        </div>
+
+        <div class="pagination">
+          {{#if pagination.hasPrev}}
+            <a href="/market/browse?page={{subtract pagination.currentPage 1}}{{#if filters.category}}&category={{filters.category}}{{/if}}{{#if filters.search}}&search={{filters.search}}{{/if}}{{#if filters.minPrice}}&minPrice={{filters.minPrice}}{{/if}}{{#if filters.maxPrice}}&maxPrice={{filters.maxPrice}}{{/if}}{{#if filters.sort}}&sort={{filters.sort}}{{/if}}{{#if filters.tags}}&tags={{filters.tags}}{{/if}}" class="pagination-button prev-button">&laquo; Previous</a>
+          {{/if}}
+          
+          <span class="pagination-info">Page {{pagination.currentPage}} of {{pagination.totalPages}}</span>
+          
+          {{#if pagination.hasNext}}
+            <a href="/market/browse?page={{add pagination.currentPage 1}}{{#if filters.category}}&category={{filters.category}}{{/if}}{{#if filters.search}}&search={{filters.search}}{{/if}}{{#if filters.minPrice}}&minPrice={{filters.minPrice}}{{/if}}{{#if filters.maxPrice}}&maxPrice={{filters.maxPrice}}{{/if}}{{#if filters.sort}}&sort={{filters.sort}}{{/if}}{{#if filters.tags}}&tags={{filters.tags}}{{/if}}" class="pagination-button next-button">Next &raquo;</a>
+          {{/if}}
+        </div>
+      {{else}}
+        <div class="no-items-found">
+          <div class="no-items-message">
+            <div class="icon">🔍</div>
+            <h2>No items found</h2>
+            <p>Try adjusting your filters or search terms</p>
+            <button id="clear-filters-empty" class="clear-filters-button">Clear All Filters</button>
+          </div>
+        </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Search form handling
+    const searchForm = document.getElementById('search-form');
+    if (searchForm) {
+      searchForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        applyFilters();
+      });
+    }
+    
+    // Price filter form handling
+    const priceFilterForm = document.getElementById('price-filter-form');
+    if (priceFilterForm) {
+      priceFilterForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        applyFilters();
+      });
+    }
+    
+    // Sort options handling
+    const sortOptions = document.querySelectorAll('.sort-option');
+    sortOptions.forEach(option => {
+      option.addEventListener('click', function() {
+        const sort = this.getAttribute('data-sort');
+        document.querySelectorAll('.sort-option').forEach(opt => opt.classList.remove('active'));
+        this.classList.add('active');
+        applyFilters();
+      });
+    });
+    
+    // Tags input handling
+    const tagsInput = document.getElementById('tags-input');
+    if (tagsInput) {
+      tagsInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ',') {
+          e.preventDefault();
+          const tag = this.value.trim();
+          if (tag) {
+            addTag(tag);
+            this.value = '';
+            applyFilters();
+          }
+        }
+      });
+    }
+    
+    // Remove tag handling
+    const removeTagButtons = document.querySelectorAll('.remove-tag');
+    removeTagButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const tag = this.getAttribute('data-tag');
+        this.parentElement.remove();
+        applyFilters();
+      });
+    });
+    
+    // Clear filters handling
+    const clearFiltersButtons = document.querySelectorAll('#clear-filters, #clear-filters-empty');
+    clearFiltersButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        window.location.href = '/market/browse';
+      });
+    });
+    
+    // Function to add a tag
+    function addTag(tag) {
+      const activeTags = document.querySelector('.active-tags');
+      const tagElement = document.createElement('div');
+      tagElement.className = 'active-tag';
+      tagElement.innerHTML = `
+        <span>${tag}</span>
+        <button class="remove-tag" data-tag="${tag}">×</button>
+      `;
+      activeTags.appendChild(tagElement);
+      
+      // Add event listener to the new remove button
+      tagElement.querySelector('.remove-tag').addEventListener('click', function() {
+        tagElement.remove();
+        applyFilters();
+      });
+    }
+    
+    // Function to apply all filters
+    function applyFilters() {
+      const search = document.getElementById('search-input').value;
+      const category = '{{filters.category}}';
+      const minPrice = document.getElementById('min-price').value;
+      const maxPrice = document.getElementById('max-price').value;
+      const activeSort = document.querySelector('.sort-option.active');
+      const sort = activeSort ? activeSort.getAttribute('data-sort') : 'newest';
+      
+      // Get all active tags
+      const activeTags = [];
+      document.querySelectorAll('.active-tag span').forEach(tag => {
+        activeTags.push(tag.textContent);
+      });
+      const tags = activeTags.join(',');
+      
+      // Build the URL with query parameters
+      let url = '/market/browse?';
+      const params = [];
+      
+      if (search) params.push(`search=${encodeURIComponent(search)}`);
+      if (category) params.push(`category=${encodeURIComponent(category)}`);
+      if (minPrice) params.push(`minPrice=${encodeURIComponent(minPrice)}`);
+      if (maxPrice) params.push(`maxPrice=${encodeURIComponent(maxPrice)}`);
+      if (sort && sort !== 'newest') params.push(`sort=${encodeURIComponent(sort)}`);
+      if (tags) params.push(`tags=${encodeURIComponent(tags)}`);
+      
+      url += params.join('&');
+      
+      // Navigate to the filtered URL
+      window.location.href = url;
+    }
+  });
+</script>
+
+<style>
+  /* Vivid Market Browse Styles */
+  .vivid-market.browse-page {
+    font-family: "MS Sans Serif", "Pixelated MS Sans Serif", Arial, sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    color: #dcdcdc;
+  }
+  
+  /* Breadcrumb */
+  .breadcrumb {
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    color: #888;
+  }
+  
+  .breadcrumb a {
+    color: #aaa;
+    text-decoration: none;
+  }
+  
+  .breadcrumb a:hover {
+    color: #ffd700;
+    text-decoration: underline;
+  }
+  
+  /* Browse Container */
+  .browse-container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 30px;
+  }
+  
+  @media (max-width: 768px) {
+    .browse-container {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* Filter Sidebar */
+  .filter-sidebar {
+    background-color: #2a2a3a;
+    border: 1px solid #444;
+    padding: 20px;
+  }
+  
+  .filter-section {
+    margin-bottom: 25px;
+  }
+  
+  .filter-section h3 {
+    font-size: 1.1rem;
+    color: #ffd700;
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 5px;
+  }
+  
+  /* Search Form */
+  .search-form {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .search-form input {
+    flex: 1;
+    background-color: #1a1a2e;
+    border: 1px solid #444;
+    color: #dcdcdc;
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+  
+  .search-button {
+    background-color: #8a2be2;
+    border: 1px solid #9d50bb;
+    color: #fff;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  
+  .search-button:hover {
+    background-color: #9d50bb;
+  }
+  
+  /* Category Filters */
+  .category-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .category-option {
+    padding: 8px 10px;
+    background-color: #1a1a2e;
+    border: 1px solid #444;
+    transition: all 0.2s ease;
+  }
+  
+  .category-option:hover {
+    background-color: #2a2a4a;
+  }
+  
+  .category-option.active {
+    background-color: #8a2be2;
+    border-color: #9d50bb;
+  }
+  
+  .category-option a {
+    color: #dcdcdc;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .category-option.active a {
+    color: #fff;
+    font-weight: bold;
+  }
+  
+  /* Price Filter */
+  .price-filter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .price-inputs {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .price-input {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .price-input label {
+    font-size: 0.8rem;
+    color: #aaa;
+  }
+  
+  .price-input input {
+    background-color: #1a1a2e;
+    border: 1px solid #444;
+    color: #dcdcdc;
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+  
+  .filter-button {
+    background-color: #1a1a2e;
+    border: 1px solid #444;
+    color: #dcdcdc;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+  }
+  
+  .filter-button:hover {
+    background-color: #2a2a4a;
+  }
+  
+  /* Sort Options */
+  .sort-options {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .sort-option {
+    padding: 8px 10px;
+    background-color: #1a1a2e;
+    border: 1px solid #444;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .sort-option:hover {
+    background-color: #2a2a4a;
+  }
+  
+  .sort-option.active {
+    background-color: #8a2be2;
+    border-color: #9d50bb;
+    color: #fff;
+    font-weight: bold;
+  }
+  
+  /* Tags Input */
+  .tags-input-container {
+    position: relative;
+    margin-bottom: 10px;
+  }
+  
+  .tags-input {
+    width: 100%;
+    background-color: #1a1a2e;
+    border: 1px solid #444;
+    color: #dcdcdc;
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+  
+  .tags-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: #2a2a3a;
+    border: 1px solid #444;
+    border-top: none;
+    z-index: 10;
+    max-height: 150px;
+    overflow-y: auto;
+    display: none;
+  }
+  
+  .tags-suggestions.show {
+    display: block;
+  }
+  
+  .tag-suggestion {
+    padding: 8px 10px;
+    cursor: pointer;
+  }
+  
+  .tag-suggestion:hover {
+    background-color: #3a3a4a;
+  }
+  
+  .active-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  
+  .active-tag {
+    background-color: #1a1a2e;
+    border: 1px solid #8a2be2;
+    color: #8a2be2;
+    padding: 5px 8px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .remove-tag {
+    background: none;
+    border: none;
+    color: #8a2be2;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .remove-tag:hover {
+    color: #9d50bb;
+  }
+  
+  /* Clear Filters Button */
+  .clear-filters-button {
+    width: 100%;
+    background-color: #3a3a4a;
+    border: 1px solid #444;
+    color: #dcdcdc;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+  }
+  
+  .clear-filters-button:hover {
+    background-color: #4a4a5a;
+  }
+  
+  /* Items Container */
+  .items-container {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .browse-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .browse-header h1 {
+    font-size: 1.8rem;
+    margin: 0;
+    color: #ffd700;
+  }
+  
+  .results-info {
+    color: #aaa;
+    font-size: 0.9rem;
+  }
+  
+  /* Items Grid */
+  .items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .market-item {
+    background-color: #2a2a3a;
+    border: 1px solid #444;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .market-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-color: #8a2be2;
+  }
+  
+  .item-preview {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1 / 1;
+  }
+  
+  .item-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .market-item:hover .item-preview img {
+    transform: scale(1.05);
+  }
+  
+  .item-category {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(26, 26, 46, 0.8);
+    color: #ffd700;
+    padding: 3px 8px;
+    font-size: 0.7rem;
+    border-radius: 2px;
+  }
+  
+  .item-details {
+    padding: 15px;
+  }
+  
+  .item-details h3 {
+    margin: 0 0 10px 0;
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .item-details h3 a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .item-creator {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 0.8rem;
+  }
+  
+  .creator-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 5px;
+    object-fit: cover;
+  }
+  
+  .item-creator a {
+    display: flex;
+    align-items: center;
+    color: #aaa;
+    text-decoration: none;
+  }
+  
+  .item-price {
+    font-size: 0.9rem;
+  }
+  
+  .wir-price {
+    color: #ffd700;
+    font-weight: bold;
+  }
+  
+  /* Pagination */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  
+  .pagination-button {
+    background-color: #2a2a3a;
+    border: 1px solid #444;
+    color: #dcdcdc;
+    padding: 8px 15px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  
+  .pagination-button:hover {
+    background-color: #3a3a4a;
+  }
+  
+  .pagination-info {
+    color: #aaa;
+    font-size: 0.9rem;
+  }
+  
+  /* No Items Found */
+  .no-items-found {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+  }
+  
+  .no-items-message {
+    text-align: center;
+    color: #aaa;
+  }
+  
+  .no-items-message .icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+  }
+  
+  .no-items-message h2 {
+    margin: 0 0 10px 0;
+    color: #dcdcdc;
+  }
+  
+  .no-items-message p {
+    margin: 0 0 20px 0;
+  }
+</style>

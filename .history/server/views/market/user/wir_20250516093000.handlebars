@@ -1,0 +1,834 @@
+<div class="vivid-market user-market-page">
+  <div class="breadcrumb">
+    <a href="/market">Vivid Market</a> &gt; 
+    <span>WIR Balance</span>
+  </div>
+
+  <div class="user-market-container">
+    <div class="user-market-sidebar">
+      <div class="user-profile-card">
+        <img src="{{user.avatar}}" alt="{{user.displayName}}" class="user-avatar">
+        <div class="user-info">
+          <h3 class="user-name">{{user.displayName}}</h3>
+          <div class="user-stats">
+            <div class="user-stat">
+              <span class="stat-value">{{user.wirBalance}}</span>
+              <span class="stat-label">WIR</span>
+            </div>
+            <div class="user-stat">
+              <span class="stat-value">{{user.lootTokens}}</span>
+              <span class="stat-label">Loot</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <nav class="user-market-nav">
+        <a href="/market/user/selling" class="nav-link">
+          <span class="nav-icon">📦</span>
+          <span class="nav-text">My Items</span>
+        </a>
+        <a href="/market/user/purchased" class="nav-link">
+          <span class="nav-icon">🛒</span>
+          <span class="nav-text">Purchases</span>
+        </a>
+        <a href="/market/user/collections" class="nav-link">
+          <span class="nav-icon">📁</span>
+          <span class="nav-text">Collections</span>
+        </a>
+        <a href="/market/user/wishlist" class="nav-link">
+          <span class="nav-icon">⭐</span>
+          <span class="nav-text">Wishlist</span>
+        </a>
+        <a href="/market/user/wir" class="nav-link active">
+          <span class="nav-icon">💰</span>
+          <span class="nav-text">WIR Balance</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-actions">
+        <button id="transfer-wir-button" class="action-button transfer-button">Transfer WIR</button>
+        <button id="convert-wir-button" class="action-button convert-button">Convert Currency</button>
+      </div>
+    </div>
+
+    <div class="user-market-content">
+      <div class="content-header">
+        <h1>WIR Balance</h1>
+        <div class="header-actions">
+          <select id="transaction-filter" class="transaction-filter">
+            <option value="all">All Transactions</option>
+            <option value="purchase">Purchases</option>
+            <option value="sale">Sales</option>
+            <option value="transfer">Transfers</option>
+            <option value="conversion">Conversions</option>
+            <option value="listing_fee">Listing Fees</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="balance-cards">
+        <div class="balance-card wir-card">
+          <div class="balance-icon">💰</div>
+          <div class="balance-info">
+            <div class="balance-label">WIR Balance</div>
+            <div class="balance-value">{{user.wirBalance}}</div>
+          </div>
+          <div class="balance-actions">
+            <button id="earn-wir-button" class="balance-action-button">How to Earn</button>
+          </div>
+        </div>
+
+        <div class="balance-card loot-card">
+          <div class="balance-icon">💾</div>
+          <div class="balance-info">
+            <div class="balance-label">Loot Tokens</div>
+            <div class="balance-value">{{user.lootTokens}}</div>
+          </div>
+          <div class="balance-actions">
+            <button id="convert-loot-button" class="balance-action-button">Convert to WIR</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="transaction-section">
+        <h2>Transaction History</h2>
+        
+        {{#if transactions.length}}
+          <div class="transaction-list">
+            {{#each transactions}}
+              <div class="transaction-item type-{{this.transactionType}}">
+                <div class="transaction-icon">
+                  {{#if (eq this.transactionType "purchase")}}
+                    🛒
+                  {{else if (eq this.transactionType "sale")}}
+                    💵
+                  {{else if (eq this.transactionType "transfer")}}
+                    ↔️
+                  {{else if (eq this.transactionType "loot_to_wir_conversion")}}
+                    🔄
+                  {{else if (eq this.transactionType "wir_to_loot_conversion")}}
+                    🔄
+                  {{else if (eq this.transactionType "listing_fee")}}
+                    📋
+                  {{else}}
+                    💱
+                  {{/if}}
+                </div>
+                
+                <div class="transaction-details">
+                  <div class="transaction-title">
+                    {{#if (eq this.transactionType "purchase")}}
+                      Purchased item
+                    {{else if (eq this.transactionType "sale")}}
+                      Sold item
+                    {{else if (eq this.transactionType "transfer")}}
+                      {{#if (eq this.senderId user.id)}}
+                        Sent WIR to {{this.receiver.displayName}}
+                      {{else}}
+                        Received WIR from {{this.sender.displayName}}
+                      {{/if}}
+                    {{else if (eq this.transactionType "loot_to_wir_conversion")}}
+                      Converted Loot to WIR
+                    {{else if (eq this.transactionType "wir_to_loot_conversion")}}
+                      Converted WIR to Loot
+                    {{else if (eq this.transactionType "listing_fee")}}
+                      Listing fee
+                    {{else}}
+                      {{this.transactionType}}
+                    {{/if}}
+                  </div>
+                  
+                  {{#if this.item}}
+                    <div class="transaction-item-name">
+                      <a href="/market/item/{{this.item.id}}">{{this.item.title}}</a>
+                    </div>
+                  {{/if}}
+                  
+                  <div class="transaction-date">{{formatDate this.createdAt}}</div>
+                </div>
+                
+                <div class="transaction-amount {{#if (eq this.senderId user.id)}}outgoing{{else}}incoming{{/if}}">
+                  {{#if (eq this.senderId user.id)}}
+                    -{{this.amount}} WIR
+                  {{else}}
+                    +{{this.amount}} WIR
+                  {{/if}}
+                </div>
+              </div>
+            {{/each}}
+          </div>
+        {{else}}
+          <div class="empty-transactions">
+            <div class="empty-icon">📊</div>
+            <p>No transactions yet</p>
+          </div>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Transfer WIR Modal -->
+<div id="transfer-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Transfer WIR</h2>
+    <form id="transfer-form">
+      <div class="form-group">
+        <label for="receiver-username">Recipient Username <span class="required">*</span></label>
+        <input type="text" id="receiver-username" name="receiverUsername" required>
+      </div>
+      <div class="form-group">
+        <label for="transfer-amount">Amount <span class="required">*</span></label>
+        <input type="number" id="transfer-amount" name="amount" min="1" max="{{user.wirBalance}}" required>
+        <div class="form-hint">Available: {{user.wirBalance}} WIR</div>
+      </div>
+      <div class="form-group">
+        <label for="transfer-notes">Notes</label>
+        <textarea id="transfer-notes" name="notes"></textarea>
+      </div>
+      <div class="form-summary">
+        <div class="summary-item">
+          <span>Transfer Amount:</span>
+          <span id="summary-amount">0 WIR</span>
+        </div>
+        <div class="summary-item">
+          <span>Balance After Transfer:</span>
+          <span id="summary-balance">{{user.wirBalance}} WIR</span>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="cancel-button close-modal">Cancel</button>
+        <button type="submit" class="submit-button" id="confirm-transfer">Confirm Transfer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Convert Currency Modal -->
+<div id="convert-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Convert Currency</h2>
+    <div class="conversion-tabs">
+      <div class="conversion-tab active" data-direction="lootToWir">Loot → WIR</div>
+      <div class="conversion-tab" data-direction="wirToLoot">WIR → Loot</div>
+    </div>
+    <form id="convert-form">
+      <input type="hidden" id="conversion-direction" name="direction" value="lootToWir">
+      
+      <div id="loot-to-wir-form">
+        <div class="form-group">
+          <label for="loot-amount">Loot Amount <span class="required">*</span></label>
+          <input type="number" id="loot-amount" name="amount" min="1" max="{{user.lootTokens}}" required>
+          <div class="form-hint">Available: {{user.lootTokens}} Loot</div>
+        </div>
+        <div class="conversion-rate">
+          <div class="rate-label">Conversion Rate:</div>
+          <div class="rate-value">1 Loot = 1 WIR</div>
+        </div>
+        <div class="form-summary">
+          <div class="summary-item">
+            <span>You'll Receive:</span>
+            <span id="loot-to-wir-result">0 WIR</span>
+          </div>
+          <div class="summary-item">
+            <span>New Loot Balance:</span>
+            <span id="new-loot-balance">{{user.lootTokens}} Loot</span>
+          </div>
+          <div class="summary-item">
+            <span>New WIR Balance:</span>
+            <span id="new-wir-balance-loot">{{user.wirBalance}} WIR</span>
+          </div>
+        </div>
+      </div>
+      
+      <div id="wir-to-loot-form" style="display: none;">
+        <div class="form-group">
+          <label for="wir-amount">WIR Amount <span class="required">*</span></label>
+          <input type="number" id="wir-amount" name="amount" min="1" max="{{user.wirBalance}}" required>
+          <div class="form-hint">Available: {{user.wirBalance}} WIR</div>
+        </div>
+        <div class="conversion-rate">
+          <div class="rate-label">Conversion Rate:</div>
+          <div class="rate-value">1 WIR = 1 Loot</div>
+        </div>
+        <div class="form-summary">
+          <div class="summary-item">
+            <span>You'll Receive:</span>
+            <span id="wir-to-loot-result">0 Loot</span>
+          </div>
+          <div class="summary-item">
+            <span>New WIR Balance:</span>
+            <span id="new-wir-balance">{{user.wirBalance}} WIR</span>
+          </div>
+          <div class="summary-item">
+            <span>New Loot Balance:</span>
+            <span id="new-loot-balance-wir">{{user.lootTokens}} Loot</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" class="cancel-button close-modal">Cancel</button>
+        <button type="submit" class="submit-button" id="confirm-conversion">Convert</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- How to Earn WIR Modal -->
+<div id="earn-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>How to Earn WIR</h2>
+    <div class="earn-methods">
+      <div class="earn-method">
+        <div class="earn-icon">📦</div>
+        <div class="earn-details">
+          <h3>Submit Items</h3>
+          <p>Create and upload digital assets to the marketplace. Each item you sell earns you WIR.</p>
+        </div>
+      </div>
+      <div class="earn-method">
+        <div class="earn-icon">👍</div>
+        <div class="earn-details">
+          <h3>Get Upvotes</h3>
+          <p>When users upvote your items, you earn a small amount of WIR for each upvote.</p>
+        </div>
+      </div>
+      <div class="earn-method">
+        <div class="earn-icon">🔄</div>
+        <div class="earn-details">
+          <h3>Convert Loot</h3>
+          <p>Convert your existing Loot tokens to WIR at a 1:1 ratio.</p>
+        </div>
+      </div>
+      <div class="earn-method">
+        <div class="earn-icon">💾</div>
+        <div class="earn-details">
+          <h3>Item Downloads</h3>
+          <p>Each time someone downloads your free items, you earn a small amount of WIR.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Transaction filter functionality
+    const transactionFilter = document.getElementById('transaction-filter');
+    if (transactionFilter) {
+      transactionFilter.addEventListener('change', function() {
+        const type = this.value;
+        const transactions = document.querySelectorAll('.transaction-item');
+        
+        if (type === 'all') {
+          transactions.forEach(transaction => {
+            transaction.style.display = 'flex';
+          });
+        } else {
+          transactions.forEach(transaction => {
+            if (transaction.classList.contains(`type-${type}`)) {
+              transaction.style.display = 'flex';
+            } else {
+              transaction.style.display = 'none';
+            }
+          });
+        }
+      });
+    }
+    
+    // Transfer WIR button
+    const transferButton = document.getElementById('transfer-wir-button');
+    const transferModal = document.getElementById('transfer-modal');
+    
+    if (transferButton) {
+      transferButton.addEventListener('click', function() {
+        transferModal.style.display = 'block';
+      });
+    }
+    
+    // Convert Currency button
+    const convertButton = document.getElementById('convert-wir-button');
+    const convertLootButton = document.getElementById('convert-loot-button');
+    const convertModal = document.getElementById('convert-modal');
+    
+    if (convertButton) {
+      convertButton.addEventListener('click', function() {
+        convertModal.style.display = 'block';
+      });
+    }
+    
+    if (convertLootButton) {
+      convertLootButton.addEventListener('click', function() {
+        // Set the active tab to Loot to WIR
+        document.querySelector('.conversion-tab[data-direction="lootToWir"]').classList.add('active');
+        document.querySelector('.conversion-tab[data-direction="wirToLoot"]').classList.remove('active');
+        document.getElementById('loot-to-wir-form').style.display = 'block';
+        document.getElementById('wir-to-loot-form').style.display = 'none';
+        document.getElementById('conversion-direction').value = 'lootToWir';
+        
+        convertModal.style.display = 'block';
+      });
+    }
+    
+    // How to Earn WIR button
+    const earnButton = document.getElementById('earn-wir-button');
+    const earnModal = document.getElementById('earn-modal');
+    
+    if (earnButton) {
+      earnButton.addEventListener('click', function() {
+        earnModal.style.display = 'block';
+      });
+    }
+    
+    // Close modal buttons
+    const closeModalButtons = document.querySelectorAll('.close-modal');
+    closeModalButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        document.querySelectorAll('.modal').forEach(modal => {
+          modal.style.display = 'none';
+        });
+      });
+    });
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+      document.querySelectorAll('.modal').forEach(modal => {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+    });
+    
+    // Conversion tabs
+    const conversionTabs = document.querySelectorAll('.conversion-tab');
+    conversionTabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        const direction = this.getAttribute('data-direction');
+        
+        // Update active tab
+        document.querySelectorAll('.conversion-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Show/hide appropriate form
+        if (direction === 'lootToWir') {
+          document.getElementById('loot-to-wir-form').style.display = 'block';
+          document.getElementById('wir-to-loot-form').style.display = 'none';
+        } else {
+          document.getElementById('loot-to-wir-form').style.display = 'none';
+          document.getElementById('wir-to-loot-form').style.display = 'block';
+        }
+        
+        // Update hidden direction field
+        document.getElementById('conversion-direction').value = direction;
+      });
+    });
+    
+    // Transfer amount calculation
+    const transferAmount = document.getElementById('transfer-amount');
+    const summaryAmount = document.getElementById('summary-amount');
+    const summaryBalance = document.getElementById('summary-balance');
+    const userWirBalance = {{user.wirBalance}};
+    
+    if (transferAmount) {
+      transferAmount.addEventListener('input', function() {
+        const amount = parseInt(this.value) || 0;
+        summaryAmount.textContent = `${amount} WIR`;
+        summaryBalance.textContent = `${userWirBalance - amount} WIR`;
+        
+        // Disable button if amount is invalid
+        const confirmButton = document.getElementById('confirm-transfer');
+        if (amount <= 0 || amount > userWirBalance) {
+          confirmButton.disabled = true;
+        } else {
+          confirmButton.disabled = false;
+        }
+      });
+    }
+    
+    // Loot to WIR conversion calculation
+    const lootAmount = document.getElementById('loot-amount');
+    const lootToWirResult = document.getElementById('loot-to-wir-result');
+    const newLootBalance = document.getElementById('new-loot-balance');
+    const newWirBalanceLoot = document.getElementById('new-wir-balance-loot');
+    const userLootBalance = {{user.lootTokens}};
+    
+    if (lootAmount) {
+      lootAmount.addEventListener('input', function() {
+        const amount = parseInt(this.value) || 0;
+        lootToWirResult.textContent = `${amount} WIR`;
+        newLootBalance.textContent = `${userLootBalance - amount} Loot`;
+        newWirBalanceLoot.textContent = `${userWirBalance + amount} WIR`;
+        
+        // Disable button if amount is invalid
+        const confirmButton = document.getElementById('confirm-conversion');
+        if (amount <= 0 || amount > userLootBalance) {
+          confirmButton.disabled = true;
+        } else {
+          confirmButton.disabled = false;
+        }
+      });
+    }
+    
+    // WIR to Loot conversion calculation
+    const wirAmount = document.getElementById('wir-amount');
+    const wirToLootResult = document.getElementById('wir-to-loot-result');
+    const newWirBalance = document.getElementById('new-wir-balance');
+    const newLootBalanceWir = document.getElementById('new-loot-balance-wir');
+    
+    if (wirAmount) {
+      wirAmount.addEventListener('input', function() {
+        const amount = parseInt(this.value) || 0;
+        wirToLootResult.textContent = `${amount} Loot`;
+        newWirBalance.textContent = `${userWirBalance - amount} WIR`;
+        newLootBalanceWir.textContent = `${userLootBalance + amount} Loot`;
+        
+        // Disable button if amount is invalid
+        const confirmButton = document.getElementById('confirm-conversion');
+        if (amount <= 0 || amount > userWirBalance) {
+          confirmButton.disabled = true;
+        } else {
+          confirmButton.disabled = false;
+        }
+      });
+    }
+    
+    // Transfer form submission
+    const transferForm = document.getElementById('transfer-form');
+    if (transferForm) {
+      transferForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = {
+          receiverUsername: document.getElementById('receiver-username').value,
+          amount: parseInt(document.getElementById('transfer-amount').value),
+          notes: document.getElementById('transfer-notes').value
+        };
+        
+        fetch('/market/user/wir/transfer', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showNotification('Transfer successful!', 'success');
+            transferModal.style.display = 'none';
+            
+            // Reload page after a delay
+            setTimeout(() => window.location.reload(), 1500);
+          } else {
+            showNotification(data.message || 'Transfer failed', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showNotification('An error occurred during transfer', 'error');
+        });
+      });
+    }
+    
+    // Convert form submission
+    const convertForm = document.getElementById('convert-form');
+    if (convertForm) {
+      convertForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const direction = document.getElementById('conversion-direction').value;
+        const amount = direction === 'lootToWir' 
+          ? parseInt(document.getElementById('loot-amount').value)
+          : parseInt(document.getElementById('wir-amount').value);
+        
+        const formData = {
+          direction,
+          amount
+        };
+        
+        fetch('/market/wir/convert', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showNotification('Conversion successful!', 'success');
+            convertModal.style.display = 'none';
+            
+            // Reload page after a delay
+            setTimeout(() => window.location.reload(), 1500);
+          } else {
+            showNotification(data.message || 'Conversion failed', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showNotification('An error occurred during conversion', 'error');
+        });
+      });
+    }
+    
+    // Notification function
+    function showNotification(message, type) {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      // Fade in
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 10);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    }
+  });
+</script>
+
+<style>
+  /* User Market Page Styles */
+  .user-market-container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 30px;
+  }
+  
+  @media (max-width: 768px) {
+    .user-market-container {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* Sidebar Styles */
+  .user-market-sidebar {
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+    padding: 20px;
+  }
+  
+  .user-profile-card {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .user-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover;
+  }
+  
+  .user-info {
+    flex: 1;
+  }
+  
+  .user-name {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+    color: #fff;
+  }
+  
+  .user-stats {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .user-stat {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .user-stat .stat-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--secondary-color);
+  }
+  
+  .user-stat .stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  
+  /* Navigation Styles */
+  .user-market-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 20px;
+  }
+  
+  .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    color: var(--text-light);
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+  }
+  
+  .nav-link:hover {
+    background-color: var(--bg-light);
+    border-color: var(--border-color);
+  }
+  
+  .nav-link.active {
+    background-color: var(--primary-color);
+    border-color: var(--primary-hover);
+    color: #fff;
+  }
+  
+  .nav-icon {
+    margin-right: 10px;
+    font-size: 1.2rem;
+  }
+  
+  .sidebar-actions {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .sidebar-actions .action-button {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .transfer-button {
+    background-color: var(--bg-dark);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+  
+  .transfer-button:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+  }
+  
+  .convert-button {
+    background-color: var(--bg-dark);
+    color: var(--secondary-color);
+    border-color: var(--secondary-color);
+  }
+  
+  .convert-button:hover {
+    background-color: var(--secondary-color);
+    color: var(--bg-dark);
+  }
+  
+  /* Content Styles */
+  .user-market-content {
+    flex: 1;
+  }
+  
+  .content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .content-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: var(--secondary-color);
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .transaction-filter {
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+  
+  /* Balance Cards */
+  .balance-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .balance-card {
+    display: flex;
+    align-items: center;
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+    padding: 20px;
+  }
+  
+  .wir-card {
+    border-color: var(--primary-color);
+  }
+  
+  .loot-card {
+    border-color: var(--secondary-color);
+  }
+  
+  .balance-icon {
+    font-size: 2.5rem;
+    margin-right: 20px;
+  }
+  
+  .balance-info {
+    flex: 1;
+  }
+  
+  .balance-label {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+  }
+  
+  .balance-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #fff;
+  }
+  
+  .balance-actions {
+    margin-left: 20px;
+  }
+  
+  .balance-action-button {
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .balance-action-button:hover {
+    background-color: var(--bg-light);
+  }
+  
+  /* Transaction Section */

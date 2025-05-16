@@ -1,0 +1,942 @@
+<div class="vivid-market item-detail-page">
+  <div class="breadcrumb">
+    <a href="/market">Vivid Market</a> &gt; 
+    <a href="/market/browse?category={{item.category}}">{{item.categoryName}}</a> &gt; 
+    <span>{{item.title}}</span>
+  </div>
+
+  <div class="item-detail-container">
+    <div class="item-preview-section">
+      <div class="item-preview-main">
+        <img src="{{item.previewImage}}" alt="{{item.title}}" class="main-preview">
+        <div class="item-category-badge">{{item.categoryName}}</div>
+      </div>
+      
+      <div class="item-actions">
+        {{#if user}}
+          {{#if canPurchase}}
+            <button id="purchase-button" class="action-button purchase-button" data-item-id="{{item.id}}" data-price="{{item.wirPrice}}">
+              Purchase for {{item.wirPrice}} WIR
+            </button>
+          {{else if (eq user.id item.creator.id)}}
+            <button class="action-button own-item-button" disabled>Your Item</button>
+          {{else}}
+            <button class="action-button insufficient-button" disabled>Insufficient WIR</button>
+          {{/if}}
+          
+          <button id="wishlist-button" class="action-button wishlist-button {{#if isInWishlist}}in-wishlist{{/if}}" data-item-id="{{item.id}}">
+            {{#if isInWishlist}}
+              ★ In Wishlist
+            {{else}}
+              ☆ Add to Wishlist
+            {{/if}}
+          </button>
+          
+          <div class="collection-dropdown">
+            <button class="action-button collection-button">+ Add to Collection</button>
+            <div class="collection-dropdown-content">
+              {{#if userCollections.length}}
+                {{#each userCollections}}
+                  <a href="#" class="add-to-collection" data-collection-id="{{this.id}}" data-item-id="{{../item.id}}">
+                    {{this.name}}
+                  </a>
+                {{/each}}
+                <div class="dropdown-divider"></div>
+              {{/if}}
+              <a href="#" id="create-collection-trigger">+ Create New Collection</a>
+            </div>
+          </div>
+        {{else}}
+          <a href="/users/login" class="action-button login-button">Login to Purchase</a>
+        {{/if}}
+      </div>
+    </div>
+    
+    <div class="item-info-section">
+      <h1 class="item-title">{{item.title}}</h1>
+      
+      <div class="item-meta">
+        <div class="creator-info">
+          <a href="/profile/{{item.creator.username}}" class="creator-link">
+            <img src="{{item.creator.avatar}}" alt="{{item.creator.username}}" class="creator-avatar">
+            <span class="creator-name">{{item.creator.displayName}}</span>
+          </a>
+        </div>
+        
+        <div class="item-stats">
+          <div class="stat">
+            <span class="stat-icon">👁️</span>
+            <span class="stat-value">{{item.views}}</span>
+          </div>
+          <div class="stat">
+            <span class="stat-icon">⬇️</span>
+            <span class="stat-value">{{item.downloads}}</span>
+          </div>
+          <div class="stat">
+            <span class="stat-icon">⭐</span>
+            <span class="stat-value">{{item.getVoteScore}}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="item-price-display">
+        <span class="wir-price">{{item.wirPrice}}</span>
+        <span class="wir-label">WIR</span>
+      </div>
+      
+      <div class="item-description">
+        <h3>Description</h3>
+        <div class="description-content">
+          {{item.description}}
+        </div>
+      </div>
+      
+      <div class="item-tags">
+        {{#each item.tags}}
+          <a href="/market/browse?tags={{this}}" class="tag">{{this}}</a>
+        {{/each}}
+      </div>
+      
+      <div class="item-details-table">
+        <div class="detail-row">
+          <div class="detail-label">Category</div>
+          <div class="detail-value">{{item.categoryName}}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Added</div>
+          <div class="detail-value">{{formatDate item.createdAt}}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Updated</div>
+          <div class="detail-value">{{formatDate item.updatedAt}}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Status</div>
+          <div class="detail-value status-{{item.marketplaceStatus}}">{{item.marketplaceStatus}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="item-content-section">
+    <h2>Item Preview</h2>
+    <div class="content-preview">
+      {{#if (eq item.category "template")}}
+        <div class="template-preview">
+          <iframe srcdoc="{{item.content}}" class="template-iframe"></iframe>
+          <a href="#" class="view-source-button" id="view-source-button">View Source</a>
+        </div>
+      {{else if (eq item.category "code")}}
+        <div class="code-preview">
+          <pre><code>{{item.content}}</code></pre>
+        </div>
+      {{else if (eq item.category "audio")}}
+        <div class="audio-preview">
+          <audio controls src="{{item.content}}"></audio>
+        </div>
+      {{else if (eq item.category "gif")}}
+        <div class="gif-preview">
+          <img src="{{item.content}}" alt="{{item.title}} animation">
+        </div>
+      {{else}}
+        <div class="generic-preview">
+          <img src="{{item.previewImage}}" alt="{{item.title}}">
+        </div>
+      {{/if}}
+    </div>
+  </div>
+  
+  <div class="seller-section">
+    <h2>More from {{item.creator.displayName}}</h2>
+    <div class="seller-items">
+      {{#each sellerItems}}
+        <div class="market-item">
+          <div class="item-preview">
+            <a href="/market/item/{{this.id}}">
+              <img src="{{this.previewImage}}" alt="{{this.title}}">
+            </a>
+            <div class="item-category">{{this.categoryName}}</div>
+          </div>
+          <div class="item-details">
+            <h3><a href="/market/item/{{this.id}}">{{this.title}}</a></h3>
+            <div class="item-price">
+              <span class="wir-price">{{this.wirPrice}} WIR</span>
+            </div>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+</div>
+
+<!-- Modal for creating a new collection -->
+<div id="create-collection-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Create New Collection</h2>
+    <form id="create-collection-form">
+      <div class="form-group">
+        <label for="collection-name">Collection Name</label>
+        <input type="text" id="collection-name" name="name" required>
+      </div>
+      <div class="form-group">
+        <label for="collection-description">Description</label>
+        <textarea id="collection-description" name="description"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="collection-public">
+          <input type="checkbox" id="collection-public" name="isPublic" checked>
+          Make collection public
+        </label>
+      </div>
+      <input type="hidden" name="itemId" value="{{item.id}}">
+      <button type="submit" class="submit-button">Create & Add Item</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal for source code view -->
+<div id="source-code-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Source Code</h2>
+    <pre><code>{{item.content}}</code></pre>
+  </div>
+</div>
+
+<!-- Purchase confirmation modal -->
+<div id="purchase-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Confirm Purchase</h2>
+    <p>Are you sure you want to purchase <strong>{{item.title}}</strong> for <strong>{{item.wirPrice}} WIR</strong>?</p>
+    <p>Your current balance: <strong>{{user.wirBalance}} WIR</strong></p>
+    <p>Balance after purchase: <strong><span id="balance-after">{{subtract user.wirBalance item.wirPrice}}</span> WIR</strong></p>
+    
+    <div class="modal-actions">
+      <button id="confirm-purchase" class="action-button purchase-button">Confirm Purchase</button>
+      <button class="action-button cancel-button close-modal">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Collection dropdown
+    const collectionButton = document.querySelector('.collection-button');
+    if (collectionButton) {
+      collectionButton.addEventListener('click', function() {
+        const dropdown = document.querySelector('.collection-dropdown-content');
+        dropdown.classList.toggle('show');
+      });
+    }
+    
+    // Close dropdown when clicking outside
+    window.addEventListener('click', function(event) {
+      if (!event.target.matches('.collection-button')) {
+        const dropdowns = document.querySelectorAll('.collection-dropdown-content');
+        dropdowns.forEach(dropdown => {
+          if (dropdown.classList.contains('show')) {
+            dropdown.classList.remove('show');
+          }
+        });
+      }
+    });
+    
+    // Add to collection functionality
+    const addToCollectionLinks = document.querySelectorAll('.add-to-collection');
+    addToCollectionLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const collectionId = this.getAttribute('data-collection-id');
+        const itemId = this.getAttribute('data-item-id');
+        
+        fetch(`/market/user/collections/${collectionId}/add/${itemId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showNotification('Item added to collection', 'success');
+          } else {
+            showNotification(data.message || 'Failed to add to collection', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showNotification('An error occurred', 'error');
+        });
+      });
+    });
+    
+    // Create collection modal
+    const createCollectionTrigger = document.getElementById('create-collection-trigger');
+    const createCollectionModal = document.getElementById('create-collection-modal');
+    const closeModalButtons = document.querySelectorAll('.close-modal');
+    
+    if (createCollectionTrigger) {
+      createCollectionTrigger.addEventListener('click', function(e) {
+        e.preventDefault();
+        createCollectionModal.style.display = 'block';
+      });
+    }
+    
+    closeModalButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        document.querySelectorAll('.modal').forEach(modal => {
+          modal.style.display = 'none';
+        });
+      });
+    });
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+      document.querySelectorAll('.modal').forEach(modal => {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+    });
+    
+    // Create collection form submission
+    const createCollectionForm = document.getElementById('create-collection-form');
+    if (createCollectionForm) {
+      createCollectionForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = {
+          name: document.getElementById('collection-name').value,
+          description: document.getElementById('collection-description').value,
+          isPublic: document.getElementById('collection-public').checked
+        };
+        
+        fetch('/market/user/collections/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Add item to the newly created collection
+            return fetch(`/market/user/collections/${data.collectionId}/add/{{item.id}}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+          } else {
+            throw new Error(data.message || 'Failed to create collection');
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showNotification('Collection created and item added', 'success');
+            createCollectionModal.style.display = 'none';
+            // Reload page to update collections dropdown
+            setTimeout(() => window.location.reload(), 1500);
+          } else {
+            showNotification(data.message || 'Failed to add item to collection', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showNotification(error.message || 'An error occurred', 'error');
+        });
+      });
+    }
+    
+    // View source button
+    const viewSourceButton = document.getElementById('view-source-button');
+    const sourceCodeModal = document.getElementById('source-code-modal');
+    
+    if (viewSourceButton) {
+      viewSourceButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        sourceCodeModal.style.display = 'block';
+      });
+    }
+    
+    // Wishlist functionality
+    const wishlistButton = document.getElementById('wishlist-button');
+    if (wishlistButton) {
+      wishlistButton.addEventListener('click', function() {
+        const itemId = this.getAttribute('data-item-id');
+        const isInWishlist = this.classList.contains('in-wishlist');
+        
+        const url = isInWishlist 
+          ? `/market/user/wishlist/remove/${itemId}`
+          : `/market/user/wishlist/add/${itemId}`;
+        
+        fetch(url, {
+          method: isInWishlist ? 'DELETE' : 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            if (isInWishlist) {
+              this.classList.remove('in-wishlist');
+              this.textContent = '☆ Add to Wishlist';
+              showNotification('Removed from wishlist', 'success');
+            } else {
+              this.classList.add('in-wishlist');
+              this.textContent = '★ In Wishlist';
+              showNotification('Added to wishlist', 'success');
+            }
+          } else {
+            showNotification(data.message || 'Failed to update wishlist', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showNotification('An error occurred', 'error');
+        });
+      });
+    }
+    
+    // Purchase functionality
+    const purchaseButton = document.getElementById('purchase-button');
+    const purchaseModal = document.getElementById('purchase-modal');
+    const confirmPurchaseButton = document.getElementById('confirm-purchase');
+    
+    if (purchaseButton) {
+      purchaseButton.addEventListener('click', function() {
+        purchaseModal.style.display = 'block';
+      });
+    }
+    
+    if (confirmPurchaseButton) {
+      confirmPurchaseButton.addEventListener('click', function() {
+        const itemId = purchaseButton.getAttribute('data-item-id');
+        
+        fetch(`/market/item/${itemId}/purchase`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showNotification('Purchase successful!', 'success');
+            purchaseModal.style.display = 'none';
+            
+            // Update UI to reflect purchase
+            purchaseButton.disabled = true;
+            purchaseButton.textContent = 'Purchased';
+            purchaseButton.classList.add('purchased');
+            
+            // Update WIR balance display if it exists
+            const wirBalanceElements = document.querySelectorAll('.wir-balance .stat-value');
+            wirBalanceElements.forEach(el => {
+              el.textContent = data.newBalance;
+            });
+            
+            // Redirect to purchased items page after a delay
+            setTimeout(() => {
+              window.location.href = '/market/user/purchased';
+            }, 2000);
+          } else {
+            showNotification(data.message || 'Purchase failed', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showNotification('An error occurred during purchase', 'error');
+        });
+      });
+    }
+    
+    // Notification function
+    function showNotification(message, type) {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      // Fade in
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 10);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    }
+  });
+</script>
+
+<style>
+  /* Vivid Market Item Detail Styles */
+  .vivid-market.item-detail-page {
+    font-family: "MS Sans Serif", "Pixelated MS Sans Serif", Arial, sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    color: #dcdcdc;
+  }
+  
+  /* Breadcrumb */
+  .breadcrumb {
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    color: #888;
+  }
+  
+  .breadcrumb a {
+    color: #aaa;
+    text-decoration: none;
+  }
+  
+  .breadcrumb a:hover {
+    color: #ffd700;
+    text-decoration: underline;
+  }
+  
+  /* Item Detail Container */
+  .item-detail-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+  }
+  
+  @media (max-width: 768px) {
+    .item-detail-container {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* Item Preview Section */
+  .item-preview-section {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .item-preview-main {
+    position: relative;
+    margin-bottom: 20px;
+    border: 1px solid #444;
+    background-color: #2a2a3a;
+    overflow: hidden;
+  }
+  
+  .main-preview {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  
+  .item-category-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(26, 26, 46, 0.8);
+    color: #ffd700;
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+  
+  /* Item Actions */
+  .item-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .action-button {
+    background-color: #2a2a3a;
+    border: 1px solid #444;
+    color: #dcdcdc;
+    padding: 10px 15px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .action-button:hover:not([disabled]) {
+    background-color: #3a3a4a;
+    transform: translateY(-2px);
+  }
+  
+  .action-button[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .purchase-button {
+    background-color: #8a2be2;
+    border-color: #9d50bb;
+    color: #fff;
+    font-weight: bold;
+  }
+  
+  .purchase-button:hover {
+    background-color: #9d50bb;
+  }
+  
+  .purchased {
+    background-color: #2a5a2a;
+    border-color: #3a7a3a;
+  }
+  
+  .wishlist-button {
+    background-color: #1a1a2e;
+    border-color: #444;
+  }
+  
+  .wishlist-button.in-wishlist {
+    background-color: #4a3a2a;
+    border-color: #ffd700;
+    color: #ffd700;
+  }
+  
+  .login-button {
+    background-color: #2a4a6a;
+    border-color: #3a5a7a;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+  }
+  
+  /* Collection Dropdown */
+  .collection-dropdown {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+  }
+  
+  .collection-button {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .collection-dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #2a2a3a;
+    min-width: 100%;
+    border: 1px solid #444;
+    z-index: 1;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  .collection-dropdown-content.show {
+    display: block;
+  }
+  
+  .collection-dropdown-content a {
+    color: #dcdcdc;
+    padding: 10px 15px;
+    text-decoration: none;
+    display: block;
+    border-bottom: 1px solid #444;
+  }
+  
+  .collection-dropdown-content a:hover {
+    background-color: #3a3a4a;
+  }
+  
+  .dropdown-divider {
+    height: 1px;
+    background-color: #444;
+    margin: 5px 0;
+  }
+  
+  /* Item Info Section */
+  .item-info-section {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .item-title {
+    font-size: 1.8rem;
+    margin: 0 0 15px 0;
+    color: #fff;
+  }
+  
+  .item-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .creator-info {
+    display: flex;
+    align-items: center;
+  }
+  
+  .creator-link {
+    display: flex;
+    align-items: center;
+    color: #aaa;
+    text-decoration: none;
+  }
+  
+  .creator-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;
+  }
+  
+  .creator-name {
+    font-size: 1rem;
+  }
+  
+  .item-stats {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .stat {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #aaa;
+    font-size: 0.9rem;
+  }
+  
+  .item-price-display {
+    background-color: #2a2a3a;
+    border: 1px solid #444;
+    padding: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: baseline;
+  }
+  
+  .wir-price {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ffd700;
+    margin-right: 5px;
+  }
+  
+  .wir-label {
+    font-size: 1rem;
+    color: #aaa;
+  }
+  
+  .item-description {
+    margin-bottom: 20px;
+  }
+  
+  .item-description h3 {
+    font-size: 1.2rem;
+    color: #ffd700;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  
+  .description-content {
+    color: #aaa;
+    line-height: 1.5;
+    white-space: pre-line;
+  }
+  
+  .item-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 20px;
+  }
+  
+  .tag {
+    background-color: #1a1a2e;
+    color: #8a2be2;
+    padding: 3px 8px;
+    font-size: 0.8rem;
+    text-decoration: none;
+    border: 1px solid #444;
+  }
+  
+  .tag:hover {
+    background-color: #2a2a3a;
+  }
+  
+  .item-details-table {
+    background-color: #2a2a3a;
+    border: 1px solid #444;
+  }
+  
+  .detail-row {
+    display: flex;
+    border-bottom: 1px solid #444;
+  }
+  
+  .detail-row:last-child {
+    border-bottom: none;
+  }
+  
+  .detail-label {
+    width: 120px;
+    padding: 10px;
+    background-color: #1a1a2e;
+    color: #aaa;
+    font-size: 0.9rem;
+  }
+  
+  .detail-value {
+    flex: 1;
+    padding: 10px;
+    color: #dcdcdc;
+  }
+  
+  .status-available {
+    color: #4caf50;
+  }
+  
+  .status-sold {
+    color: #f44336;
+  }
+  
+  .status-reserved {
+    color: #ff9800;
+  }
+  
+  /* Item Content Section */
+  .item-content-section {
+    margin-bottom: 40px;
+  }
+  
+  .item-content-section h2 {
+    font-size: 1.5rem;
+    color: #ffd700;
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+  
+  .content-preview {
+    background-color: #2a2a3a;
+    border: 1px solid #444;
+    padding: 20px;
+    position: relative;
+  }
+  
+  .template-preview {
+    position: relative;
+  }
+  
+  .template-iframe {
+    width: 100%;
+    height: 400px;
+    border: none;
+    background-color: #fff;
+  }
+  
+  .view-source-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(26, 26, 46, 0.8);
+    color: #ffd700;
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    text-decoration: none;
+    z-index: 1;
+  }
+  
+  .code-preview {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  
+  .code-preview pre {
+    margin: 0;
+    padding: 10px;
+    background-color: #1a1a2e;
+    color: #dcdcdc;
+    overflow-x: auto;
+  }
+  
+  .audio-preview {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .audio-preview audio {
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .gif-preview, .generic-preview {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .gif-preview img, .generic-preview img {
+    max-width: 100%;
+    max-height: 400px;
+  }
+  
+  /* Seller Section */
+  .seller-section {
+    margin-bottom: 40px;
+  }
+  
+  .seller-section h2 {
+    font-size: 1.5rem;
+    color: #ffd700;
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+  
+  .seller-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  
+  .market-item {
+    background-color: #2a2a3a;
+    border: 1px solid #444;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .market-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-color: #8a2be2;
+  }
+  
+  .item-preview {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1 / 1;
+  }
+  
+  .item-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .market-item:hover .item-preview img {
+    transform: scale(1.05);
+  }
+  
+  .item-category {
+    position: absolute;
+    top: 10px;
+    right: 10px;

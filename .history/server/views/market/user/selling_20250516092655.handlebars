@@ -1,0 +1,387 @@
+<div class="vivid-market user-market-page">
+  <div class="breadcrumb">
+    <a href="/market">Vivid Market</a> &gt; 
+    <span>My Items</span>
+  </div>
+
+  <div class="user-market-container">
+    <div class="user-market-sidebar">
+      <div class="user-profile-card">
+        <img src="{{user.avatar}}" alt="{{user.displayName}}" class="user-avatar">
+        <div class="user-info">
+          <h3 class="user-name">{{user.displayName}}</h3>
+          <div class="user-stats">
+            <div class="user-stat">
+              <span class="stat-value">{{user.wirBalance}}</span>
+              <span class="stat-label">WIR</span>
+            </div>
+            <div class="user-stat">
+              <span class="stat-value">{{user.sellingItems.length}}</span>
+              <span class="stat-label">Items</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <nav class="user-market-nav">
+        <a href="/market/user/selling" class="nav-link active">
+          <span class="nav-icon">📦</span>
+          <span class="nav-text">My Items</span>
+        </a>
+        <a href="/market/user/purchased" class="nav-link">
+          <span class="nav-icon">🛒</span>
+          <span class="nav-text">Purchases</span>
+        </a>
+        <a href="/market/user/collections" class="nav-link">
+          <span class="nav-icon">📁</span>
+          <span class="nav-text">Collections</span>
+        </a>
+        <a href="/market/user/wishlist" class="nav-link">
+          <span class="nav-icon">⭐</span>
+          <span class="nav-text">Wishlist</span>
+        </a>
+        <a href="/market/user/wir" class="nav-link">
+          <span class="nav-icon">💰</span>
+          <span class="nav-text">WIR Balance</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-actions">
+        <a href="/market/submit" class="action-button submit-button">+ Submit New Item</a>
+      </div>
+    </div>
+
+    <div class="user-market-content">
+      <div class="content-header">
+        <h1>My Items</h1>
+        <div class="header-actions">
+          <select id="status-filter" class="status-filter">
+            <option value="all">All Items</option>
+            <option value="available">Available</option>
+            <option value="sold">Sold</option>
+            <option value="reserved">Reserved</option>
+          </select>
+        </div>
+      </div>
+
+      {{#if items.length}}
+        <div class="items-grid">
+          {{#each items}}
+            <div class="market-item {{this.marketplaceStatus}}">
+              <div class="item-preview">
+                <a href="/market/item/{{this.id}}">
+                  <img src="{{this.previewImage}}" alt="{{this.title}}">
+                </a>
+                <div class="item-category">{{this.categoryName}}</div>
+                <div class="item-status status-{{this.marketplaceStatus}}">{{this.marketplaceStatus}}</div>
+              </div>
+              <div class="item-details">
+                <h3><a href="/market/item/{{this.id}}">{{this.title}}</a></h3>
+                <div class="item-meta">
+                  <div class="item-price">
+                    <span class="wir-price">{{this.wirPrice}} WIR</span>
+                  </div>
+                  <div class="item-stats">
+                    <span class="item-stat">
+                      <span class="stat-icon">👁️</span>
+                      <span class="stat-value">{{this.views}}</span>
+                    </span>
+                  </div>
+                </div>
+                <div class="item-actions">
+                  <a href="/market/item/{{this.id}}" class="item-action-button">View</a>
+                  <button class="item-action-button edit-button" data-item-id="{{this.id}}">Edit</button>
+                </div>
+              </div>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="empty-state">
+          <div class="empty-icon">📦</div>
+          <h2>No items yet</h2>
+          <p>You haven't submitted any items to the marketplace yet.</p>
+          <a href="/market/submit" class="action-button submit-button">Submit Your First Item</a>
+        </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Status filter functionality
+    const statusFilter = document.getElementById('status-filter');
+    if (statusFilter) {
+      statusFilter.addEventListener('change', function() {
+        const status = this.value;
+        const items = document.querySelectorAll('.market-item');
+        
+        if (status === 'all') {
+          items.forEach(item => {
+            item.style.display = 'block';
+          });
+        } else {
+          items.forEach(item => {
+            if (item.classList.contains(status)) {
+              item.style.display = 'block';
+            } else {
+              item.style.display = 'none';
+            }
+          });
+        }
+      });
+    }
+    
+    // Edit button functionality
+    const editButtons = document.querySelectorAll('.edit-button');
+    editButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const itemId = this.getAttribute('data-item-id');
+        // In a real implementation, this would open an edit modal or redirect to an edit page
+        alert('Edit functionality would be implemented here for item ' + itemId);
+      });
+    });
+  });
+</script>
+
+<style>
+  /* User Market Page Styles */
+  .user-market-container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 30px;
+  }
+  
+  @media (max-width: 768px) {
+    .user-market-container {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* Sidebar Styles */
+  .user-market-sidebar {
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+    padding: 20px;
+  }
+  
+  .user-profile-card {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .user-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover;
+  }
+  
+  .user-info {
+    flex: 1;
+  }
+  
+  .user-name {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+    color: #fff;
+  }
+  
+  .user-stats {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .user-stat {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .user-stat .stat-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--secondary-color);
+  }
+  
+  .user-stat .stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  
+  /* Navigation Styles */
+  .user-market-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 20px;
+  }
+  
+  .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    color: var(--text-light);
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+  }
+  
+  .nav-link:hover {
+    background-color: var(--bg-light);
+    border-color: var(--border-color);
+  }
+  
+  .nav-link.active {
+    background-color: var(--primary-color);
+    border-color: var(--primary-hover);
+    color: #fff;
+  }
+  
+  .nav-icon {
+    margin-right: 10px;
+    font-size: 1.2rem;
+  }
+  
+  .sidebar-actions {
+    margin-top: 20px;
+  }
+  
+  .sidebar-actions .action-button {
+    width: 100%;
+    text-align: center;
+  }
+  
+  /* Content Styles */
+  .user-market-content {
+    flex: 1;
+  }
+  
+  .content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .content-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: var(--secondary-color);
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .status-filter {
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+  
+  /* Item Grid Styles */
+  .items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  
+  .market-item {
+    position: relative;
+  }
+  
+  .item-status {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 3px 8px;
+    font-size: 0.7rem;
+    border-radius: 2px;
+    text-transform: capitalize;
+  }
+  
+  .item-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .item-stats {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .item-stat {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+  
+  .item-actions {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .item-action-button {
+    flex: 1;
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .item-action-button:hover {
+    background-color: var(--bg-light);
+  }
+  
+  .edit-button {
+    background-color: var(--bg-dark);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+  
+  .edit-button:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+  }
+  
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+  }
+  
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    color: var(--text-muted);
+  }
+  
+  .empty-state h2 {
+    margin: 0 0 10px 0;
+    color: #fff;
+  }
+  
+  .empty-state p {
+    margin: 0 0 20px 0;
+    color: var(--text-muted);
+  }
+</style>

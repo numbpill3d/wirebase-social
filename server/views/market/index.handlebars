@@ -1,0 +1,587 @@
+<div class="vivid-market">
+  <header class="market-header">
+    <div class="crt-banner">
+      <h1>The Vivid Market</h1>
+      <p class="subtitle">a relic exchange, resource vivarium</p>
+    </div>
+    
+    <div class="market-stats">
+      <div class="stat-box">
+        <span class="stat-value">{{stats.itemCount}}</span>
+        <span class="stat-label">Items</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-value">{{stats.collectionCount}}</span>
+        <span class="stat-label">Collections</span>
+      </div>
+      {{#if user}}
+      <div class="stat-box wir-balance">
+        <span class="stat-value">{{user.wirBalance}}</span>
+        <span class="stat-label">WIR</span>
+      </div>
+      {{/if}}
+    </div>
+    
+    <div class="market-actions">
+      {{#if user}}
+      <a href="/market/submit" class="action-button submit-button">+ Submit Item</a>
+      <a href="/market/user/selling" class="action-button">My Items</a>
+      <a href="/market/user/collections" class="action-button">My Collections</a>
+      <a href="/market/user/wishlist" class="action-button">Wishlist</a>
+      {{else}}
+      <a href="/users/login" class="action-button">Login to Submit</a>
+      {{/if}}
+      <a href="/market/browse" class="action-button browse-button">Browse All</a>
+    </div>
+  </header>
+  
+  <section class="featured-section">
+    <div class="section-header">
+      <h2>Featured Items</h2>
+      <div class="section-divider"></div>
+    </div>
+    
+    <div class="featured-grid">
+      {{#each featuredItems}}
+      <div class="market-item featured-item">
+        <div class="item-preview">
+          <a href="/market/item/{{this.id}}">
+            <img src="{{this.previewImage}}" alt="{{this.title}}">
+          </a>
+          <div class="item-category">{{this.categoryName}}</div>
+        </div>
+        <div class="item-details">
+          <h3><a href="/market/item/{{this.id}}">{{this.title}}</a></h3>
+          <div class="item-creator">
+            <a href="/profile/{{this.creator.username}}">
+              <img src="{{this.creator.avatar}}" alt="{{this.creator.username}}" class="creator-avatar">
+              <span>{{this.creator.displayName}}</span>
+            </a>
+          </div>
+          <div class="item-price">
+            <span class="wir-price">{{this.wirPrice}} WIR</span>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </section>
+  
+  <section class="recent-section">
+    <div class="section-header">
+      <h2>Recent Additions</h2>
+      <div class="section-divider"></div>
+    </div>
+    
+    <div class="items-grid">
+      {{#each recentItems}}
+      <div class="market-item">
+        <div class="item-preview">
+          <a href="/market/item/{{this.id}}">
+            <img src="{{this.previewImage}}" alt="{{this.title}}">
+          </a>
+          <div class="item-category">{{this.categoryName}}</div>
+        </div>
+        <div class="item-details">
+          <h3><a href="/market/item/{{this.id}}">{{this.title}}</a></h3>
+          <div class="item-creator">
+            <a href="/profile/{{this.creator.username}}">
+              <img src="{{this.creator.avatar}}" alt="{{this.creator.username}}" class="creator-avatar">
+              <span>{{this.creator.displayName}}</span>
+            </a>
+          </div>
+          <div class="item-price">
+            <span class="wir-price">{{this.wirPrice}} WIR</span>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+    
+    <div class="view-more">
+      <a href="/market/browse" class="view-more-button">View More Items</a>
+    </div>
+  </section>
+  
+  <section class="collections-section">
+    <div class="section-header">
+      <h2>Popular Collections</h2>
+      <div class="section-divider"></div>
+    </div>
+    
+    <div class="collections-grid">
+      {{#each popularCollections}}
+      <div class="collection-card">
+        <a href="/market/collections/{{this.id}}">
+          <div class="collection-cover">
+            <img src="{{this.coverImage}}" alt="{{this.name}}">
+          </div>
+          <div class="collection-details">
+            <h3>{{this.name}}</h3>
+            <div class="collection-creator">
+              <img src="{{this.creator.avatar}}" alt="{{this.creator.username}}" class="creator-avatar">
+              <span>{{this.creator.displayName}}</span>
+            </div>
+            <div class="collection-stats">
+              <span>{{this.items.length}} items</span>
+            </div>
+          </div>
+        </a>
+      </div>
+      {{/each}}
+    </div>
+    
+    <div class="view-more">
+      <a href="/market/collections" class="view-more-button">View All Collections</a>
+    </div>
+  </section>
+  
+  <section class="market-info">
+    <div class="info-card">
+      <h3>What is WIR?</h3>
+      <p>WIR (Wirebase Internal Resource) is the virtual currency used in The Vivid Market. You can earn WIR by uploading assets, receiving likes, or converting loot tokens.</p>
+      {{#if user}}
+      <a href="/market/user/wir" class="info-button">Manage WIR</a>
+      {{/if}}
+    </div>
+    
+    <div class="info-card">
+      <h3>How to Submit</h3>
+      <p>Share your digital assets with the community. Upload templates, icons, code snippets, and more to earn WIR and build your collection.</p>
+      <a href="/market/submit" class="info-button">Submit Item</a>
+    </div>
+    
+    <div class="info-card">
+      <h3>Create Collections</h3>
+      <p>Organize your favorite items into themed collections. Share your curated sets with the community or keep them private.</p>
+      {{#if user}}
+      <a href="/market/user/collections" class="info-button">My Collections</a>
+      {{else}}
+      <a href="/users/login" class="info-button">Login to Create</a>
+      {{/if}}
+    </div>
+  </section>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Add scanlines effect to the CRT banner
+    const banner = document.querySelector('.crt-banner');
+    if (banner) {
+      const scanlines = document.createElement('div');
+      scanlines.classList.add('scanlines');
+      banner.appendChild(scanlines);
+    }
+    
+    // Add hover effects to market items
+    const marketItems = document.querySelectorAll('.market-item');
+    marketItems.forEach(item => {
+      item.addEventListener('mouseenter', function() {
+        this.classList.add('item-hover');
+      });
+      item.addEventListener('mouseleave', function() {
+        this.classList.remove('item-hover');
+      });
+    });
+  });
+</script>
+
+<style>
+  /* Vivid Market Styles */
+  .vivid-market {
+    font-family: "MS Sans Serif", "Pixelated MS Sans Serif", Arial, sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    color: #dcdcdc;
+  }
+  
+  /* Header Styles */
+  .market-header {
+    margin-bottom: 30px;
+  }
+  
+  .crt-banner {
+    background-color: #1a1a2e;
+    border: 2px solid #8a2be2;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);
+  }
+  
+  .crt-banner h1 {
+    font-size: 2.5rem;
+    margin: 0;
+    color: #ffd700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+    color: #8a2be2;
+    margin-top: 5px;
+    font-style: italic;
+  }
+  
+  .scanlines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.03) 50%,
+      rgba(0, 0, 0, 0.1) 50%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  .market-stats {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .stat-box {
+    background-color: #2a2a3a;
+    border: 1px solid #444;
+    padding: 10px 20px;
+    text-align: center;
+    min-width: 100px;
+  }
+  
+  .wir-balance {
+    border-color: #ffd700;
+  }
+  
+  .stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+  }
+  
+  .stat-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #aaa;
+    text-transform: uppercase;
+  }
+  
+  .market-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .action-button {
+    background-color: #2a2a3a;
+    border: 1px solid #444;
+    color: #dcdcdc;
+    padding: 8px 15px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+  }
+  
+  .action-button:hover {
+    background-color: #3a3a4a;
+    transform: translateY(-2px);
+  }
+  
+  .submit-button {
+    background-color: #8a2be2;
+    border-color: #9d50bb;
+    color: #fff;
+  }
+  
+  .browse-button {
+    background-color: #1a1a2e;
+    border-color: #444;
+  }
+  
+  /* Section Styles */
+  .section-header {
+    margin-bottom: 20px;
+    position: relative;
+  }
+  
+  .section-header h2 {
+    font-size: 1.5rem;
+    color: #ffd700;
+    margin: 0;
+    display: inline-block;
+    background-color: #1a1a2e;
+    padding-right: 15px;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .section-divider {
+    height: 1px;
+    background-color: #444;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    z-index: 0;
+  }
+  
+  /* Item Grid Styles */
+  .featured-grid, .items-grid, .collections-grid {
+    display: grid;
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .featured-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+  
+  .items-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+  
+  .collections-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+  
+  .market-item {
+    background-color: #2a2a3a;
+    border: 1px solid #444;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .market-item:hover, .item-hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-color: #8a2be2;
+  }
+  
+  .item-preview {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1 / 1;
+  }
+  
+  .item-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .market-item:hover .item-preview img {
+    transform: scale(1.05);
+  }
+  
+  .item-category {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(26, 26, 46, 0.8);
+    color: #ffd700;
+    padding: 3px 8px;
+    font-size: 0.7rem;
+    border-radius: 2px;
+  }
+  
+  .item-details {
+    padding: 15px;
+  }
+  
+  .item-details h3 {
+    margin: 0 0 10px 0;
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .item-details h3 a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .item-creator {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 0.8rem;
+  }
+  
+  .creator-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 5px;
+    object-fit: cover;
+  }
+  
+  .item-creator a {
+    display: flex;
+    align-items: center;
+    color: #aaa;
+    text-decoration: none;
+  }
+  
+  .item-price {
+    font-size: 0.9rem;
+  }
+  
+  .wir-price {
+    color: #ffd700;
+    font-weight: bold;
+  }
+  
+  /* Collection Card Styles */
+  .collection-card {
+    background-color: #2a2a3a;
+    border: 1px solid #444;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .collection-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-color: #8a2be2;
+  }
+  
+  .collection-card a {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .collection-cover {
+    height: 150px;
+    overflow: hidden;
+  }
+  
+  .collection-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .collection-card:hover .collection-cover img {
+    transform: scale(1.05);
+  }
+  
+  .collection-details {
+    padding: 15px;
+  }
+  
+  .collection-details h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.1rem;
+    color: #fff;
+  }
+  
+  .collection-creator {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 0.8rem;
+    color: #aaa;
+  }
+  
+  .collection-stats {
+    font-size: 0.8rem;
+    color: #888;
+  }
+  
+  /* View More Button */
+  .view-more {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 40px;
+  }
+  
+  .view-more-button {
+    display: inline-block;
+    background-color: transparent;
+    border: 1px solid #8a2be2;
+    color: #8a2be2;
+    padding: 8px 20px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  
+  .view-more-button:hover {
+    background-color: #8a2be2;
+    color: #fff;
+  }
+  
+  /* Info Section */
+  .market-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 40px;
+  }
+  
+  .info-card {
+    background-color: #2a2a3a;
+    border: 1px solid #444;
+    padding: 20px;
+  }
+  
+  .info-card h3 {
+    color: #ffd700;
+    margin-top: 0;
+    font-size: 1.2rem;
+  }
+  
+  .info-card p {
+    color: #aaa;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+  }
+  
+  .info-button {
+    display: inline-block;
+    background-color: #1a1a2e;
+    border: 1px solid #444;
+    color: #dcdcdc;
+    padding: 5px 10px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+  }
+  
+  .info-button:hover {
+    background-color: #3a3a4a;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .crt-banner h1 {
+      font-size: 2rem;
+    }
+    
+    .market-stats {
+      flex-wrap: wrap;
+    }
+    
+    .featured-grid, .items-grid {
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+    
+    .collections-grid {
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+  }
+</style>

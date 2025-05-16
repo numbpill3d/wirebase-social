@@ -1,0 +1,787 @@
+<div class="vivid-market collection-detail-page">
+  <div class="breadcrumb">
+    <a href="/market">Vivid Market</a> &gt; 
+    <a href="/market/collections">Collections</a> &gt; 
+    <span>{{collection.name}}</span>
+  </div>
+
+  <div class="collection-header">
+    <div class="collection-cover">
+      <img src="{{collection.coverImage}}" alt="{{collection.name}}">
+      {{#unless collection.isPublic}}
+        <div class="collection-privacy">Private</div>
+      {{/unless}}
+    </div>
+    
+    <div class="collection-info">
+      <h1 class="collection-title">{{collection.name}}</h1>
+      
+      <div class="collection-meta">
+        <div class="collection-creator">
+          <a href="/profile/{{collection.creator.username}}" class="creator-link">
+            <img src="{{collection.creator.avatar}}" alt="{{collection.creator.username}}" class="creator-avatar">
+            <span class="creator-name">{{collection.creator.displayName}}</span>
+          </a>
+        </div>
+        
+        <div class="collection-stats">
+          <div class="stat">
+            <span class="stat-icon">📦</span>
+            <span class="stat-value">{{collection.items.length}} items</span>
+          </div>
+          <div class="stat">
+            <span class="stat-icon">👁️</span>
+            <span class="stat-value">{{collection.views}} views</span>
+          </div>
+          <div class="stat">
+            <span class="stat-icon">📅</span>
+            <span class="stat-value">Created {{formatDate collection.createdAt}}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="collection-description">
+        {{#if collection.description}}
+          {{collection.description}}
+        {{else}}
+          <em>No description provided</em>
+        {{/if}}
+      </div>
+      
+      <div class="collection-actions">
+        {{#if isOwner}}
+          <button id="edit-collection-button" class="action-button edit-button">Edit Collection</button>
+          <button id="add-items-button" class="action-button add-button">Add Items</button>
+        {{else}}
+          <button id="follow-collection-button" class="action-button follow-button {{#if isFollowing}}following{{/if}}">
+            {{#if isFollowing}}
+              Following
+            {{else}}
+              Follow Collection
+            {{/if}}
+          </button>
+        {{/if}}
+        <button id="share-collection-button" class="action-button share-button">Share</button>
+        <button id="embed-collection-button" class="action-button embed-button">Embed</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="collection-content">
+    <div class="content-header">
+      <div class="view-options">
+        <button class="view-option active" data-view="grid">
+          <span class="view-icon">▦</span>
+          <span class="view-text">Grid</span>
+        </button>
+        <button class="view-option" data-view="list">
+          <span class="view-icon">☰</span>
+          <span class="view-text">List</span>
+        </button>
+        <button class="view-option" data-view="desktop">
+          <span class="view-icon">🖥️</span>
+          <span class="view-text">Desktop</span>
+        </button>
+      </div>
+      
+      <div class="filter-options">
+        <select id="sort-filter" class="sort-filter">
+          <option value="custom">Custom Order</option>
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="price_low">Price: Low to High</option>
+          <option value="price_high">Price: High to Low</option>
+        </select>
+        
+        <input type="text" id="search-input" class="search-input" placeholder="Search in collection...">
+      </div>
+    </div>
+    
+    {{#if collection.items.length}}
+      <div class="items-container grid-view">
+        {{#each collection.items}}
+          <div class="collection-item" data-price="{{this.wirPrice}}" data-date="{{this.addedAt}}" data-title="{{this.title}}" data-category="{{this.categoryName}}">
+            <div class="item-preview">
+              <a href="/market/item/{{this.id}}">
+                <img src="{{this.previewImage}}" alt="{{this.title}}">
+              </a>
+              <div class="item-category">{{this.categoryName}}</div>
+              {{#if ../isOwner}}
+                <button class="remove-item-button" data-item-id="{{this.id}}">×</button>
+              {{/if}}
+            </div>
+            <div class="item-details">
+              <h3><a href="/market/item/{{this.id}}">{{this.title}}</a></h3>
+              <div class="item-creator">
+                <a href="/profile/{{this.creator.username}}">
+                  <img src="{{this.creator.avatar}}" alt="{{this.creator.username}}" class="creator-avatar">
+                  <span>{{this.creator.displayName}}</span>
+                </a>
+              </div>
+              <div class="item-price">
+                <span class="wir-price">{{this.wirPrice}} WIR</span>
+              </div>
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    {{else}}
+      <div class="empty-collection">
+        <div class="empty-icon">📂</div>
+        <h2>This collection is empty</h2>
+        {{#if isOwner}}
+          <p>Add items to your collection to display them here.</p>
+          <button id="empty-add-items-button" class="action-button add-button">Add Items</button>
+        {{else}}
+          <p>The creator hasn't added any items to this collection yet.</p>
+        {{/if}}
+      </div>
+    {{/if}}
+  </div>
+</div>
+
+<!-- Edit Collection Modal -->
+<div id="edit-collection-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Edit Collection</h2>
+    <form id="edit-collection-form">
+      <div class="form-group">
+        <label for="collection-name">Collection Name <span class="required">*</span></label>
+        <input type="text" id="collection-name" name="name" value="{{collection.name}}" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="collection-description">Description</label>
+        <textarea id="collection-description" name="description">{{collection.description}}</textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="collection-cover">Cover Image URL</label>
+        <input type="text" id="collection-cover" name="coverImage" value="{{collection.coverImage}}" placeholder="https://example.com/image.jpg">
+        <div class="form-hint">Leave empty for default cover</div>
+      </div>
+      
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="collection-public" name="isPublic" {{#if collection.isPublic}}checked{{/if}}>
+          <label for="collection-public">Make collection public</label>
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" class="cancel-button close-modal">Cancel</button>
+        <button type="submit" class="submit-button" id="save-collection">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add Items Modal -->
+<div id="add-items-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Add Items to Collection</h2>
+    
+    <div class="add-items-tabs">
+      <div class="tab active" data-tab="my-items">My Items</div>
+      <div class="tab" data-tab="purchased">Purchased Items</div>
+      <div class="tab" data-tab="wishlist">Wishlist</div>
+    </div>
+    
+    <div class="add-items-search">
+      <input type="text" id="add-items-search-input" placeholder="Search items...">
+    </div>
+    
+    <div class="add-items-container">
+      <div class="tab-content active" id="my-items-content">
+        {{#if userItems.length}}
+          <div class="add-items-grid">
+            {{#each userItems}}
+              <div class="add-item-card" data-item-id="{{this.id}}" data-title="{{this.title}}">
+                <div class="add-item-preview">
+                  <img src="{{this.previewImage}}" alt="{{this.title}}">
+                  <div class="add-item-category">{{this.categoryName}}</div>
+                </div>
+                <div class="add-item-details">
+                  <h4>{{this.title}}</h4>
+                  <div class="add-item-price">{{this.wirPrice}} WIR</div>
+                </div>
+                <div class="add-item-checkbox">
+                  <input type="checkbox" class="item-checkbox" {{#if (itemInCollection this.id ../collection.items)}}checked disabled{{/if}}>
+                </div>
+              </div>
+            {{/each}}
+          </div>
+        {{else}}
+          <div class="empty-tab-content">
+            <p>You don't have any items to add.</p>
+          </div>
+        {{/if}}
+      </div>
+      
+      <div class="tab-content" id="purchased-content">
+        {{#if purchasedItems.length}}
+          <div class="add-items-grid">
+            {{#each purchasedItems}}
+              <div class="add-item-card" data-item-id="{{this.id}}" data-title="{{this.title}}">
+                <div class="add-item-preview">
+                  <img src="{{this.previewImage}}" alt="{{this.title}}">
+                  <div class="add-item-category">{{this.categoryName}}</div>
+                </div>
+                <div class="add-item-details">
+                  <h4>{{this.title}}</h4>
+                  <div class="add-item-price">{{this.wirPrice}} WIR</div>
+                </div>
+                <div class="add-item-checkbox">
+                  <input type="checkbox" class="item-checkbox" {{#if (itemInCollection this.id ../collection.items)}}checked disabled{{/if}}>
+                </div>
+              </div>
+            {{/each}}
+          </div>
+        {{else}}
+          <div class="empty-tab-content">
+            <p>You haven't purchased any items yet.</p>
+          </div>
+        {{/if}}
+      </div>
+      
+      <div class="tab-content" id="wishlist-content">
+        {{#if wishlistItems.length}}
+          <div class="add-items-grid">
+            {{#each wishlistItems}}
+              <div class="add-item-card" data-item-id="{{this.id}}" data-title="{{this.title}}">
+                <div class="add-item-preview">
+                  <img src="{{this.previewImage}}" alt="{{this.title}}">
+                  <div class="add-item-category">{{this.categoryName}}</div>
+                </div>
+                <div class="add-item-details">
+                  <h4>{{this.title}}</h4>
+                  <div class="add-item-price">{{this.wirPrice}} WIR</div>
+                </div>
+                <div class="add-item-checkbox">
+                  <input type="checkbox" class="item-checkbox" {{#if (itemInCollection this.id ../collection.items)}}checked disabled{{/if}}>
+                </div>
+              </div>
+            {{/each}}
+          </div>
+        {{else}}
+          <div class="empty-tab-content">
+            <p>You don't have any items in your wishlist.</p>
+          </div>
+        {{/if}}
+      </div>
+    </div>
+    
+    <div class="form-actions">
+      <button type="button" class="cancel-button close-modal">Cancel</button>
+      <button type="button" class="submit-button" id="add-selected-items">Add Selected Items</button>
+    </div>
+  </div>
+</div>
+
+<!-- Share Modal -->
+<div id="share-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Share Collection</h2>
+    
+    <div class="share-options">
+      <div class="share-option">
+        <label for="share-url">Collection URL</label>
+        <div class="share-input-group">
+          <input type="text" id="share-url" value="{{baseUrl}}/market/collections/{{collection.id}}" readonly>
+          <button class="copy-button" data-target="share-url">Copy</button>
+        </div>
+      </div>
+      
+      <div class="share-social">
+        <a href="https://twitter.com/intent/tweet?url={{encodeUrl baseUrl}}/market/collections/{{collection.id}}&text=Check out this collection: {{collection.name}}" target="_blank" class="social-share-button twitter">
+          Twitter
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u={{encodeUrl baseUrl}}/market/collections/{{collection.id}}" target="_blank" class="social-share-button facebook">
+          Facebook
+        </a>
+        <a href="mailto:?subject=Check out this collection: {{collection.name}}&body={{encodeUrl baseUrl}}/market/collections/{{collection.id}}" class="social-share-button email">
+          Email
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Embed Modal -->
+<div id="embed-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Embed Collection</h2>
+    
+    <div class="embed-preview">
+      <h3>Preview</h3>
+      <div class="embed-preview-container">
+        <iframe src="{{baseUrl}}/market/collections/{{collection.id}}/embed" width="100%" height="300" frameborder="0"></iframe>
+      </div>
+    </div>
+    
+    <div class="embed-options">
+      <div class="embed-option">
+        <label for="embed-code">Embed Code</label>
+        <div class="share-input-group">
+          <input type="text" id="embed-code" value='<iframe src="{{baseUrl}}/market/collections/{{collection.id}}/embed" width="100%" height="300" frameborder="0"></iframe>' readonly>
+          <button class="copy-button" data-target="embed-code">Copy</button>
+        </div>
+      </div>
+      
+      <div class="embed-customization">
+        <h3>Customize</h3>
+        <div class="form-group">
+          <label for="embed-width">Width</label>
+          <input type="text" id="embed-width" value="100%" data-default="100%">
+        </div>
+        <div class="form-group">
+          <label for="embed-height">Height</label>
+          <input type="text" id="embed-height" value="300" data-default="300">
+        </div>
+        <button id="update-embed" class="action-button">Update Embed Code</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Remove Item Confirmation Modal -->
+<div id="remove-item-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Remove Item</h2>
+    <p>Are you sure you want to remove this item from the collection?</p>
+    <p><strong>Note:</strong> This will only remove the item from this collection, not delete the item itself.</p>
+    
+    <div class="form-actions">
+      <button type="button" class="cancel-button close-modal">Cancel</button>
+      <button type="button" class="delete-button" id="confirm-remove-item">Remove</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // View options
+    const viewOptions = document.querySelectorAll('.view-option');
+    const itemsContainer = document.querySelector('.items-container');
+    
+    viewOptions.forEach(option => {
+      option.addEventListener('click', function() {
+        const view = this.getAttribute('data-view');
+        
+        // Update active button
+        viewOptions.forEach(opt => opt.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Update view class
+        itemsContainer.className = `items-container ${view}-view`;
+      });
+    });
+    
+    // Sort filter
+    const sortFilter = document.getElementById('sort-filter');
+    if (sortFilter) {
+      sortFilter.addEventListener('change', function() {
+        const sort = this.value;
+        const items = Array.from(document.querySelectorAll('.collection-item'));
+        
+        if (sort === 'custom') {
+          // Do nothing, keep original order
+          return;
+        }
+        
+        items.sort((a, b) => {
+          if (sort === 'newest' || sort === 'oldest') {
+            const dateA = new Date(a.getAttribute('data-date'));
+            const dateB = new Date(b.getAttribute('data-date'));
+            
+            return sort === 'newest' ? dateB - dateA : dateA - dateB;
+          } else {
+            const priceA = parseFloat(a.getAttribute('data-price'));
+            const priceB = parseFloat(b.getAttribute('data-price'));
+            
+            return sort === 'price_low' ? priceA - priceB : priceB - priceA;
+          }
+        });
+        
+        // Clear the container and append sorted items
+        const container = document.querySelector('.items-container');
+        container.innerHTML = '';
+        items.forEach(item => {
+          container.appendChild(item);
+        });
+      });
+    }
+    
+    // Search functionality
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const items = document.querySelectorAll('.collection-item');
+        
+        items.forEach(item => {
+          const title = item.getAttribute('data-title').toLowerCase();
+          const category = item.getAttribute('data-category').toLowerCase();
+          
+          if (title.includes(searchTerm) || category.includes(searchTerm)) {
+            item.style.display = '';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+    }
+    
+    // Edit Collection button
+    const editCollectionButton = document.getElementById('edit-collection-button');
+    const editCollectionModal = document.getElementById('edit-collection-modal');
+    
+    if (editCollectionButton) {
+      editCollectionButton.addEventListener('click', function() {
+        editCollectionModal.style.display = 'block';
+      });
+    }
+    
+    // Edit Collection form submission
+    const editCollectionForm = document.getElementById('edit-collection-form');
+    if (editCollectionForm) {
+      editCollectionForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = {
+          name: document.getElementById('collection-name').value,
+          description: document.getElementById('collection-description').value,
+          coverImage: document.getElementById('collection-cover').value,
+          isPublic: document.getElementById('collection-public').checked
+        };
+        
+        fetch(`/market/user/collections/{{collection.id}}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showNotification('Collection updated successfully', 'success');
+            editCollectionModal.style.display = 'none';
+            
+            // Reload page after a delay
+            setTimeout(() => window.location.reload(), 1500);
+          } else {
+            showNotification(data.message || 'Failed to update collection', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showNotification('An error occurred', 'error');
+        });
+      });
+    }
+    
+    // Add Items button
+    const addItemsButton = document.getElementById('add-items-button');
+    const emptyAddItemsButton = document.getElementById('empty-add-items-button');
+    const addItemsModal = document.getElementById('add-items-modal');
+    
+    function openAddItemsModal() {
+      addItemsModal.style.display = 'block';
+    }
+    
+    if (addItemsButton) {
+      addItemsButton.addEventListener('click', openAddItemsModal);
+    }
+    
+    if (emptyAddItemsButton) {
+      emptyAddItemsButton.addEventListener('click', openAddItemsModal);
+    }
+    
+    // Add Items tabs
+    const addItemsTabs = document.querySelectorAll('.add-items-tabs .tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    addItemsTabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        const tabId = this.getAttribute('data-tab');
+        
+        // Update active tab
+        addItemsTabs.forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Show corresponding content
+        tabContents.forEach(content => {
+          content.classList.remove('active');
+        });
+        document.getElementById(`${tabId}-content`).classList.add('active');
+      });
+    });
+    
+    // Add Items search
+    const addItemsSearchInput = document.getElementById('add-items-search-input');
+    if (addItemsSearchInput) {
+      addItemsSearchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const itemCards = document.querySelectorAll('.add-item-card');
+        
+        itemCards.forEach(card => {
+          const title = card.getAttribute('data-title').toLowerCase();
+          
+          if (title.includes(searchTerm)) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    }
+    
+    // Add selected items
+    const addSelectedItemsButton = document.getElementById('add-selected-items');
+    if (addSelectedItemsButton) {
+      addSelectedItemsButton.addEventListener('click', function() {
+        const selectedItems = Array.from(document.querySelectorAll('.item-checkbox:checked:not([disabled])')).map(checkbox => {
+          return checkbox.closest('.add-item-card').getAttribute('data-item-id');
+        });
+        
+        if (selectedItems.length === 0) {
+          showNotification('No items selected', 'error');
+          return;
+        }
+        
+        fetch(`/market/user/collections/{{collection.id}}/add-items`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ itemIds: selectedItems })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showNotification(`Added ${selectedItems.length} items to collection`, 'success');
+            addItemsModal.style.display = 'none';
+            
+            // Reload page after a delay
+            setTimeout(() => window.location.reload(), 1500);
+          } else {
+            showNotification(data.message || 'Failed to add items', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showNotification('An error occurred', 'error');
+        });
+      });
+    }
+    
+    // Share button
+    const shareButton = document.getElementById('share-collection-button');
+    const shareModal = document.getElementById('share-modal');
+    
+    if (shareButton) {
+      shareButton.addEventListener('click', function() {
+        shareModal.style.display = 'block';
+      });
+    }
+    
+    // Embed button
+    const embedButton = document.getElementById('embed-collection-button');
+    const embedModal = document.getElementById('embed-modal');
+    
+    if (embedButton) {
+      embedButton.addEventListener('click', function() {
+        embedModal.style.display = 'block';
+      });
+    }
+    
+    // Update embed code
+    const updateEmbedButton = document.getElementById('update-embed');
+    if (updateEmbedButton) {
+      updateEmbedButton.addEventListener('click', function() {
+        const width = document.getElementById('embed-width').value || '100%';
+        const height = document.getElementById('embed-height').value || '300';
+        
+        const embedCode = `<iframe src="{{baseUrl}}/market/collections/{{collection.id}}/embed" width="${width}" height="${height}" frameborder="0"></iframe>`;
+        document.getElementById('embed-code').value = embedCode;
+      });
+    }
+    
+    // Copy buttons
+    const copyButtons = document.querySelectorAll('.copy-button');
+    copyButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const targetId = this.getAttribute('data-target');
+        const input = document.getElementById(targetId);
+        
+        input.select();
+        document.execCommand('copy');
+        
+        // Show feedback
+        const originalText = this.textContent;
+        this.textContent = 'Copied!';
+        setTimeout(() => {
+          this.textContent = originalText;
+        }, 2000);
+      });
+    });
+    
+    // Follow Collection button
+    const followButton = document.getElementById('follow-collection-button');
+    if (followButton) {
+      followButton.addEventListener('click', function() {
+        const isFollowing = this.classList.contains('following');
+        const method = isFollowing ? 'DELETE' : 'POST';
+        
+        fetch(`/market/collections/{{collection.id}}/follow`, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            if (isFollowing) {
+              this.classList.remove('following');
+              this.textContent = 'Follow Collection';
+              showNotification('Unfollowed collection', 'success');
+            } else {
+              this.classList.add('following');
+              this.textContent = 'Following';
+              showNotification('Following collection', 'success');
+            }
+          } else {
+            showNotification(data.message || 'Failed to update follow status', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showNotification('An error occurred', 'error');
+        });
+      });
+    }
+    
+    // Remove item buttons
+    const removeItemButtons = document.querySelectorAll('.remove-item-button');
+    const removeItemModal = document.getElementById('remove-item-modal');
+    let itemToRemove = null;
+    
+    removeItemButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        itemToRemove = this.getAttribute('data-item-id');
+        removeItemModal.style.display = 'block';
+      });
+    });
+    
+    // Confirm remove item
+    const confirmRemoveItemButton = document.getElementById('confirm-remove-item');
+    if (confirmRemoveItemButton) {
+      confirmRemoveItemButton.addEventListener('click', function() {
+        if (!itemToRemove) return;
+        
+        fetch(`/market/user/collections/{{collection.id}}/remove/${itemToRemove}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showNotification('Item removed from collection', 'success');
+            removeItemModal.style.display = 'none';
+            
+            // Remove item from DOM
+            const itemElement = document.querySelector(`.remove-item-button[data-item-id="${itemToRemove}"]`).closest('.collection-item');
+            itemElement.remove();
+            
+            // Check if collection is now empty
+            const remainingItems = document.querySelectorAll('.collection-item');
+            if (remainingItems.length === 0) {
+              // Reload page to show empty state
+              setTimeout(() => window.location.reload(), 1000);
+            }
+          } else {
+            showNotification(data.message || 'Failed to remove item', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showNotification('An error occurred', 'error');
+        });
+      });
+    }
+    
+    // Close modal buttons
+    const closeModalButtons = document.querySelectorAll('.close-modal');
+    closeModalButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        document.querySelectorAll('.modal').forEach(modal => {
+          modal.style.display = 'none';
+        });
+      });
+    });
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+      document.querySelectorAll('.modal').forEach(modal => {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+    });
+    
+    // Notification function
+    function showNotification(message, type) {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      // Fade in
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 10);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    }
+  });
+</script>
+
+<style>
+  /* Collection Detail Page Styles */
+  .vivid-market.collection-detail-page {
+    font-family: "MS Sans Serif", "Pixelated MS Sans Serif", Arial, sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    color: var(--text-light);
+  }
+  
+  /* Breadcrumb */
+  .breadcrumb {
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+  }
+  
+  .breadcrumb a {
+    color: var(--text-muted);
+    text-decoration: none;

@@ -1,0 +1,844 @@
+<div class="vivid-market user-market-page">
+  <div class="breadcrumb">
+    <a href="/market">Vivid Market</a> &gt; 
+    <span>My Wishlist</span>
+  </div>
+
+  <div class="user-market-container">
+    <div class="user-market-sidebar">
+      <div class="user-profile-card">
+        <img src="{{user.avatar}}" alt="{{user.displayName}}" class="user-avatar">
+        <div class="user-info">
+          <h3 class="user-name">{{user.displayName}}</h3>
+          <div class="user-stats">
+            <div class="user-stat">
+              <span class="stat-value">{{user.wirBalance}}</span>
+              <span class="stat-label">WIR</span>
+            </div>
+            <div class="user-stat">
+              <span class="stat-value">{{user.wishlistItems.length}}</span>
+              <span class="stat-label">Wishlist</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <nav class="user-market-nav">
+        <a href="/market/user/selling" class="nav-link">
+          <span class="nav-icon">📦</span>
+          <span class="nav-text">My Items</span>
+        </a>
+        <a href="/market/user/purchased" class="nav-link">
+          <span class="nav-icon">🛒</span>
+          <span class="nav-text">Purchases</span>
+        </a>
+        <a href="/market/user/collections" class="nav-link">
+          <span class="nav-icon">📁</span>
+          <span class="nav-text">Collections</span>
+        </a>
+        <a href="/market/user/wishlist" class="nav-link active">
+          <span class="nav-icon">⭐</span>
+          <span class="nav-text">Wishlist</span>
+        </a>
+        <a href="/market/user/wir" class="nav-link">
+          <span class="nav-icon">💰</span>
+          <span class="nav-text">WIR Balance</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-actions">
+        <a href="/market/browse" class="action-button browse-button">Browse Market</a>
+      </div>
+    </div>
+
+    <div class="user-market-content">
+      <div class="content-header">
+        <h1>My Wishlist</h1>
+        <div class="header-actions">
+          <select id="sort-filter" class="sort-filter">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="price_low">Price: Low to High</option>
+            <option value="price_high">Price: High to Low</option>
+          </select>
+        </div>
+      </div>
+
+      {{#if items.length}}
+        <div class="items-grid">
+          {{#each items}}
+            <div class="market-item" data-price="{{this.wirPrice}}" data-date="{{this.addedToWishlistAt}}">
+              <div class="item-preview">
+                <a href="/market/item/{{this.id}}">
+                  <img src="{{this.previewImage}}" alt="{{this.title}}">
+                </a>
+                <div class="item-category">{{this.categoryName}}</div>
+                <div class="wishlist-date">Added: {{formatDate this.addedToWishlistAt}}</div>
+                {{#if this.priceChanged}}
+                  <div class="price-change {{this.priceChangeDirection}}">
+                    {{#if (eq this.priceChangeDirection "decreased")}}
+                      Price Decreased
+                    {{else}}
+                      Price Increased
+                    {{/if}}
+                  </div>
+                {{/if}}
+              </div>
+              <div class="item-details">
+                <h3><a href="/market/item/{{this.id}}">{{this.title}}</a></h3>
+                <div class="item-creator">
+                  <a href="/profile/{{this.creator.username}}">
+                    <img src="{{this.creator.avatar}}" alt="{{this.creator.username}}" class="creator-avatar">
+                    <span>{{this.creator.displayName}}</span>
+                  </a>
+                </div>
+                <div class="item-price">
+                  <span class="wir-price">{{this.wirPrice}} WIR</span>
+                  {{#if this.originalPrice}}
+                    <span class="original-price">{{this.originalPrice}} WIR</span>
+                  {{/if}}
+                </div>
+                <div class="item-actions">
+                  <a href="/market/item/{{this.id}}" class="item-action-button">View</a>
+                  {{#if this.canPurchase}}
+                    <button class="item-action-button purchase-button" data-item-id="{{this.id}}">Purchase</button>
+                  {{else}}
+                    <button class="item-action-button purchase-button" disabled>Insufficient WIR</button>
+                  {{/if}}
+                  <button class="item-action-button remove-button" data-item-id="{{this.id}}">Remove</button>
+                </div>
+              </div>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="empty-state">
+          <div class="empty-icon">⭐</div>
+          <h2>Your wishlist is empty</h2>
+          <p>Browse the marketplace and add items to your wishlist.</p>
+          <a href="/market/browse" class="action-button browse-button">Browse the Market</a>
+        </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+
+<!-- Purchase Confirmation Modal -->
+<div id="purchase-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Confirm Purchase</h2>
+    <div class="purchase-item-info">
+      <div class="purchase-item-image">
+        <img id="purchase-item-image" src="" alt="Item Image">
+      </div>
+      <div class="purchase-item-details">
+        <h3 id="purchase-item-title"></h3>
+        <div class="purchase-item-price">
+          <span id="purchase-item-price"></span> WIR
+        </div>
+      </div>
+    </div>
+    
+    <div class="purchase-summary">
+      <div class="summary-item">
+        <span>Your Balance:</span>
+        <span>{{user.wirBalance}} WIR</span>
+      </div>
+      <div class="summary-item">
+        <span>Item Price:</span>
+        <span id="summary-price">0 WIR</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item">
+        <span>Balance After Purchase:</span>
+        <span id="summary-balance">{{user.wirBalance}} WIR</span>
+      </div>
+    </div>
+    
+    <div class="form-actions">
+      <button type="button" class="cancel-button close-modal">Cancel</button>
+      <button type="button" class="submit-button" id="confirm-purchase">Confirm Purchase</button>
+    </div>
+  </div>
+</div>
+
+<!-- Remove Confirmation Modal -->
+<div id="remove-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Remove from Wishlist</h2>
+    <p>Are you sure you want to remove this item from your wishlist?</p>
+    
+    <div class="form-actions">
+      <button type="button" class="cancel-button close-modal">Cancel</button>
+      <button type="button" class="delete-button" id="confirm-remove">Remove</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Sort filter functionality
+    const sortFilter = document.getElementById('sort-filter');
+    if (sortFilter) {
+      sortFilter.addEventListener('change', function() {
+        const sort = this.value;
+        const itemsGrid = document.querySelector('.items-grid');
+        const items = Array.from(itemsGrid.querySelectorAll('.market-item'));
+        
+        items.sort((a, b) => {
+          if (sort === 'newest' || sort === 'oldest') {
+            const dateA = new Date(a.getAttribute('data-date'));
+            const dateB = new Date(b.getAttribute('data-date'));
+            
+            return sort === 'newest' ? dateB - dateA : dateA - dateB;
+          } else {
+            const priceA = parseFloat(a.getAttribute('data-price'));
+            const priceB = parseFloat(b.getAttribute('data-price'));
+            
+            return sort === 'price_low' ? priceA - priceB : priceB - priceA;
+          }
+        });
+        
+        // Clear the grid and append sorted items
+        itemsGrid.innerHTML = '';
+        items.forEach(item => {
+          itemsGrid.appendChild(item);
+        });
+      });
+    }
+    
+    // Purchase button functionality
+    const purchaseButtons = document.querySelectorAll('.purchase-button:not([disabled])');
+    const purchaseModal = document.getElementById('purchase-modal');
+    let currentItemId = null;
+    
+    purchaseButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        currentItemId = this.getAttribute('data-item-id');
+        
+        // Find the item data
+        const itemCard = this.closest('.market-item');
+        const itemTitle = itemCard.querySelector('h3 a').textContent;
+        const itemPrice = parseFloat(itemCard.getAttribute('data-price'));
+        const itemImage = itemCard.querySelector('.item-preview img').src;
+        
+        // Populate the modal
+        document.getElementById('purchase-item-title').textContent = itemTitle;
+        document.getElementById('purchase-item-price').textContent = itemPrice;
+        document.getElementById('purchase-item-image').src = itemImage;
+        
+        // Update summary
+        document.getElementById('summary-price').textContent = `${itemPrice} WIR`;
+        const userBalance = {{user.wirBalance}};
+        document.getElementById('summary-balance').textContent = `${userBalance - itemPrice} WIR`;
+        
+        // Show modal
+        purchaseModal.style.display = 'block';
+      });
+    });
+    
+    // Confirm purchase button
+    const confirmPurchaseButton = document.getElementById('confirm-purchase');
+    if (confirmPurchaseButton) {
+      confirmPurchaseButton.addEventListener('click', function() {
+        if (!currentItemId) return;
+        
+        fetch(`/market/item/${currentItemId}/purchase`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showNotification('Purchase successful!', 'success');
+            purchaseModal.style.display = 'none';
+            
+            // Remove item from wishlist
+            const itemCard = document.querySelector(`.market-item .purchase-button[data-item-id="${currentItemId}"]`).closest('.market-item');
+            itemCard.remove();
+            
+            // Redirect to purchased items page after a delay
+            setTimeout(() => {
+              window.location.href = '/market/user/purchased';
+            }, 1500);
+          } else {
+            showNotification(data.message || 'Purchase failed', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showNotification('An error occurred during purchase', 'error');
+        });
+      });
+    }
+    
+    // Remove button functionality
+    const removeButtons = document.querySelectorAll('.remove-button');
+    const removeModal = document.getElementById('remove-modal');
+    
+    removeButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        currentItemId = this.getAttribute('data-item-id');
+        removeModal.style.display = 'block';
+      });
+    });
+    
+    // Confirm remove button
+    const confirmRemoveButton = document.getElementById('confirm-remove');
+    if (confirmRemoveButton) {
+      confirmRemoveButton.addEventListener('click', function() {
+        if (!currentItemId) return;
+        
+        fetch(`/market/user/wishlist/remove/${currentItemId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showNotification('Item removed from wishlist', 'success');
+            removeModal.style.display = 'none';
+            
+            // Remove item from DOM
+            const itemCard = document.querySelector(`.market-item .remove-button[data-item-id="${currentItemId}"]`).closest('.market-item');
+            itemCard.remove();
+            
+            // Check if wishlist is empty
+            const remainingItems = document.querySelectorAll('.market-item');
+            if (remainingItems.length === 0) {
+              // Reload page to show empty state
+              setTimeout(() => window.location.reload(), 1000);
+            }
+          } else {
+            showNotification(data.message || 'Failed to remove item', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showNotification('An error occurred', 'error');
+        });
+      });
+    }
+    
+    // Close modal buttons
+    const closeModalButtons = document.querySelectorAll('.close-modal');
+    closeModalButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        document.querySelectorAll('.modal').forEach(modal => {
+          modal.style.display = 'none';
+        });
+      });
+    });
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+      document.querySelectorAll('.modal').forEach(modal => {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+    });
+    
+    // Notification function
+    function showNotification(message, type) {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      // Fade in
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 10);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    }
+  });
+</script>
+
+<style>
+  /* User Market Page Styles */
+  .user-market-container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 30px;
+  }
+  
+  @media (max-width: 768px) {
+    .user-market-container {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* Sidebar Styles */
+  .user-market-sidebar {
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+    padding: 20px;
+  }
+  
+  .user-profile-card {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .user-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover;
+  }
+  
+  .user-info {
+    flex: 1;
+  }
+  
+  .user-name {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+    color: #fff;
+  }
+  
+  .user-stats {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .user-stat {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .user-stat .stat-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--secondary-color);
+  }
+  
+  .user-stat .stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  
+  /* Navigation Styles */
+  .user-market-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 20px;
+  }
+  
+  .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    color: var(--text-light);
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+  }
+  
+  .nav-link:hover {
+    background-color: var(--bg-light);
+    border-color: var(--border-color);
+  }
+  
+  .nav-link.active {
+    background-color: var(--primary-color);
+    border-color: var(--primary-hover);
+    color: #fff;
+  }
+  
+  .nav-icon {
+    margin-right: 10px;
+    font-size: 1.2rem;
+  }
+  
+  .sidebar-actions {
+    margin-top: 20px;
+  }
+  
+  .sidebar-actions .action-button {
+    width: 100%;
+    text-align: center;
+  }
+  
+  /* Content Styles */
+  .user-market-content {
+    flex: 1;
+  }
+  
+  .content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .content-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: var(--secondary-color);
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .sort-filter {
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+  
+  /* Items Grid */
+  .items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  
+  .market-item {
+    position: relative;
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .market-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-color: var(--primary-color);
+  }
+  
+  .item-preview {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1 / 1;
+  }
+  
+  .item-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .market-item:hover .item-preview img {
+    transform: scale(1.05);
+  }
+  
+  .item-category {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(26, 26, 46, 0.8);
+    color: var(--secondary-color);
+    padding: 3px 8px;
+    font-size: 0.7rem;
+    border-radius: 2px;
+  }
+  
+  .wishlist-date {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: rgba(26, 26, 46, 0.8);
+    color: var(--text-light);
+    padding: 3px 8px;
+    font-size: 0.7rem;
+    border-radius: 2px;
+  }
+  
+  .price-change {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    padding: 3px 8px;
+    font-size: 0.7rem;
+    border-radius: 2px;
+  }
+  
+  .price-change.decreased {
+    background-color: rgba(76, 175, 80, 0.8);
+    color: #fff;
+  }
+  
+  .price-change.increased {
+    background-color: rgba(244, 67, 54, 0.8);
+    color: #fff;
+  }
+  
+  .item-details {
+    padding: 15px;
+  }
+  
+  .item-details h3 {
+    margin: 0 0 10px 0;
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .item-details h3 a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .item-creator {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 0.8rem;
+  }
+  
+  .creator-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 5px;
+    object-fit: cover;
+  }
+  
+  .item-creator a {
+    display: flex;
+    align-items: center;
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+  
+  .item-price {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .wir-price {
+    color: var(--secondary-color);
+    font-weight: bold;
+  }
+  
+  .original-price {
+    color: var(--text-muted);
+    text-decoration: line-through;
+    font-size: 0.8rem;
+  }
+  
+  .item-actions {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .item-action-button {
+    flex: 1;
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .item-action-button:hover:not([disabled]) {
+    background-color: var(--bg-light);
+  }
+  
+  .item-action-button[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .purchase-button {
+    background-color: var(--bg-dark);
+    color: var(--success-color);
+    border-color: var(--success-color);
+  }
+  
+  .purchase-button:hover:not([disabled]) {
+    background-color: var(--success-color);
+    color: #fff;
+  }
+  
+  .remove-button {
+    background-color: var(--bg-dark);
+    color: var(--error-color);
+    border-color: var(--error-color);
+  }
+  
+  .remove-button:hover {
+    background-color: var(--error-color);
+    color: #fff;
+  }
+  
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+  }
+  
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    color: var(--text-muted);
+  }
+  
+  .empty-state h2 {
+    margin: 0 0 10px 0;
+    color: #fff;
+  }
+  
+  .empty-state p {
+    margin: 0 0 20px 0;
+    color: var(--text-muted);
+  }
+  
+  /* Modal Styles */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  
+  .modal-content {
+    background-color: var(--bg-medium);
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    width: 80%;
+    max-width: 500px;
+    position: relative;
+  }
+  
+  .close-modal {
+    color: var(--text-muted);
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .close-modal:hover {
+    color: #fff;
+  }
+  
+  /* Purchase Modal */
+  .purchase-item-info {
+    display: flex;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .purchase-item-image {
+    width: 100px;
+    height: 100px;
+    margin-right: 20px;
+    overflow: hidden;
+  }
+  
+  .purchase-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .purchase-item-details {
+    flex: 1;
+  }
+  
+  .purchase-item-details h3 {
+    margin: 0 0 10px 0;
+    color: #fff;
+  }
+  
+  .purchase-item-price {
+    font-size: 1.2rem;
+    color: var(--secondary-color);
+    font-weight: bold;
+  }
+  
+  .purchase-summary {
+    background-color: var(--bg-dark);
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+  }
+  
+  .summary-divider {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 10px 0;
+  }
+  
+  /* Form Actions */
+  .form-actions {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  /* Notification */
+  .notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    background-color: var(--bg-medium);
+    border-left: 4px solid var(--primary-color);
+    color: var(--text-light);
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: translateX(120%);
+    transition: transform 0.3s ease;
+  }
+  
+  .notification.show {
+    transform: translateX(0);
+  }
+  
+  .notification.success {
+    border-left-color: var(--success-color);
+  }
+  
+  .notification.error {
+    border-left-color: var(--error-color);
+  }
+</style>

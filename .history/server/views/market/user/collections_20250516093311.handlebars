@@ -1,0 +1,782 @@
+<div class="vivid-market user-market-page">
+  <div class="breadcrumb">
+    <a href="/market">Vivid Market</a> &gt; 
+    <span>My Collections</span>
+  </div>
+
+  <div class="user-market-container">
+    <div class="user-market-sidebar">
+      <div class="user-profile-card">
+        <img src="{{user.avatar}}" alt="{{user.displayName}}" class="user-avatar">
+        <div class="user-info">
+          <h3 class="user-name">{{user.displayName}}</h3>
+          <div class="user-stats">
+            <div class="user-stat">
+              <span class="stat-value">{{user.wirBalance}}</span>
+              <span class="stat-label">WIR</span>
+            </div>
+            <div class="user-stat">
+              <span class="stat-value">{{user.collections.length}}</span>
+              <span class="stat-label">Collections</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <nav class="user-market-nav">
+        <a href="/market/user/selling" class="nav-link">
+          <span class="nav-icon">📦</span>
+          <span class="nav-text">My Items</span>
+        </a>
+        <a href="/market/user/purchased" class="nav-link">
+          <span class="nav-icon">🛒</span>
+          <span class="nav-text">Purchases</span>
+        </a>
+        <a href="/market/user/collections" class="nav-link active">
+          <span class="nav-icon">📁</span>
+          <span class="nav-text">Collections</span>
+        </a>
+        <a href="/market/user/wishlist" class="nav-link">
+          <span class="nav-icon">⭐</span>
+          <span class="nav-text">Wishlist</span>
+        </a>
+        <a href="/market/user/wir" class="nav-link">
+          <span class="nav-icon">💰</span>
+          <span class="nav-text">WIR Balance</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-actions">
+        <button id="create-collection-button" class="action-button create-button">+ Create Collection</button>
+      </div>
+    </div>
+
+    <div class="user-market-content">
+      <div class="content-header">
+        <h1>My Collections</h1>
+        <div class="header-actions">
+          <select id="visibility-filter" class="visibility-filter">
+            <option value="all">All Collections</option>
+            <option value="public">Public Only</option>
+            <option value="private">Private Only</option>
+          </select>
+        </div>
+      </div>
+
+      {{#if collections.length}}
+        <div class="collections-grid">
+          {{#each collections}}
+            <div class="collection-card {{#unless this.isPublic}}private{{/unless}}">
+              <div class="collection-cover">
+                <a href="/market/collections/{{this.id}}">
+                  <img src="{{this.coverImage}}" alt="{{this.name}}">
+                </a>
+                {{#unless this.isPublic}}
+                  <div class="collection-privacy">Private</div>
+                {{/unless}}
+              </div>
+              <div class="collection-details">
+                <h3><a href="/market/collections/{{this.id}}">{{this.name}}</a></h3>
+                <div class="collection-meta">
+                  <div class="collection-item-count">{{this.items.length}} items</div>
+                  <div class="collection-date">Created: {{formatDate this.createdAt}}</div>
+                </div>
+                <div class="collection-description">
+                  {{#if this.description}}
+                    {{this.description}}
+                  {{else}}
+                    <em>No description</em>
+                  {{/if}}
+                </div>
+                <div class="collection-actions">
+                  <a href="/market/collections/{{this.id}}" class="collection-action-button view-button">View</a>
+                  <button class="collection-action-button edit-button" data-collection-id="{{this.id}}">Edit</button>
+                  <button class="collection-action-button delete-button" data-collection-id="{{this.id}}">Delete</button>
+                </div>
+              </div>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="empty-state">
+          <div class="empty-icon">📁</div>
+          <h2>No collections yet</h2>
+          <p>Create your first collection to organize your favorite items.</p>
+          <button id="empty-create-collection-button" class="action-button create-button">Create Your First Collection</button>
+        </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+
+<!-- Create/Edit Collection Modal -->
+<div id="collection-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2 id="collection-modal-title">Create New Collection</h2>
+    <form id="collection-form">
+      <input type="hidden" id="collection-id" name="id" value="">
+      
+      <div class="form-group">
+        <label for="collection-name">Collection Name <span class="required">*</span></label>
+        <input type="text" id="collection-name" name="name" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="collection-description">Description</label>
+        <textarea id="collection-description" name="description"></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="collection-cover">Cover Image URL</label>
+        <input type="text" id="collection-cover" name="coverImage" placeholder="https://example.com/image.jpg">
+        <div class="form-hint">Leave empty for default cover</div>
+      </div>
+      
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="collection-public" name="isPublic" checked>
+          <label for="collection-public">Make collection public</label>
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" class="cancel-button close-modal">Cancel</button>
+        <button type="submit" class="submit-button" id="save-collection">Save Collection</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="delete-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Delete Collection</h2>
+    <p>Are you sure you want to delete this collection? This action cannot be undone.</p>
+    <p><strong>Note:</strong> Items in this collection will not be deleted, only the collection itself.</p>
+    
+    <div class="form-actions">
+      <button type="button" class="cancel-button close-modal">Cancel</button>
+      <button type="button" class="delete-button" id="confirm-delete">Delete Collection</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Visibility filter functionality
+    const visibilityFilter = document.getElementById('visibility-filter');
+    if (visibilityFilter) {
+      visibilityFilter.addEventListener('change', function() {
+        const visibility = this.value;
+        const collections = document.querySelectorAll('.collection-card');
+        
+        if (visibility === 'all') {
+          collections.forEach(collection => {
+            collection.style.display = 'block';
+          });
+        } else if (visibility === 'public') {
+          collections.forEach(collection => {
+            if (collection.classList.contains('private')) {
+              collection.style.display = 'none';
+            } else {
+              collection.style.display = 'block';
+            }
+          });
+        } else if (visibility === 'private') {
+          collections.forEach(collection => {
+            if (collection.classList.contains('private')) {
+              collection.style.display = 'block';
+            } else {
+              collection.style.display = 'none';
+            }
+          });
+        }
+      });
+    }
+    
+    // Create Collection button
+    const createCollectionButton = document.getElementById('create-collection-button');
+    const emptyCreateCollectionButton = document.getElementById('empty-create-collection-button');
+    const collectionModal = document.getElementById('collection-modal');
+    
+    function openCreateCollectionModal() {
+      // Reset form
+      document.getElementById('collection-form').reset();
+      document.getElementById('collection-id').value = '';
+      document.getElementById('collection-modal-title').textContent = 'Create New Collection';
+      document.getElementById('save-collection').textContent = 'Create Collection';
+      
+      // Show modal
+      collectionModal.style.display = 'block';
+    }
+    
+    if (createCollectionButton) {
+      createCollectionButton.addEventListener('click', openCreateCollectionModal);
+    }
+    
+    if (emptyCreateCollectionButton) {
+      emptyCreateCollectionButton.addEventListener('click', openCreateCollectionModal);
+    }
+    
+    // Edit Collection button
+    const editButtons = document.querySelectorAll('.edit-button');
+    editButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const collectionId = this.getAttribute('data-collection-id');
+        
+        // Fetch collection data
+        fetch(`/market/user/collections/${collectionId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Populate form
+            document.getElementById('collection-id').value = data.collection.id;
+            document.getElementById('collection-name').value = data.collection.name;
+            document.getElementById('collection-description').value = data.collection.description || '';
+            document.getElementById('collection-cover').value = data.collection.coverImage || '';
+            document.getElementById('collection-public').checked = data.collection.isPublic;
+            
+            // Update modal title and button
+            document.getElementById('collection-modal-title').textContent = 'Edit Collection';
+            document.getElementById('save-collection').textContent = 'Save Changes';
+            
+            // Show modal
+            collectionModal.style.display = 'block';
+          } else {
+            showNotification(data.message || 'Failed to load collection', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showNotification('An error occurred', 'error');
+        });
+      });
+    });
+    
+    // Delete Collection button
+    const deleteButtons = document.querySelectorAll('.delete-button');
+    const deleteModal = document.getElementById('delete-modal');
+    let collectionToDelete = null;
+    
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        collectionToDelete = this.getAttribute('data-collection-id');
+        deleteModal.style.display = 'block';
+      });
+    });
+    
+    // Confirm Delete button
+    const confirmDeleteButton = document.getElementById('confirm-delete');
+    if (confirmDeleteButton) {
+      confirmDeleteButton.addEventListener('click', function() {
+        if (!collectionToDelete) return;
+        
+        fetch(`/market/user/collections/${collectionToDelete}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showNotification('Collection deleted successfully', 'success');
+            deleteModal.style.display = 'none';
+            
+            // Remove collection from DOM
+            const collectionCard = document.querySelector(`.collection-card[data-collection-id="${collectionToDelete}"]`);
+            if (collectionCard) {
+              collectionCard.remove();
+            }
+            
+            // Reload page after a delay
+            setTimeout(() => window.location.reload(), 1500);
+          } else {
+            showNotification(data.message || 'Failed to delete collection', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showNotification('An error occurred', 'error');
+        });
+      });
+    }
+    
+    // Collection form submission
+    const collectionForm = document.getElementById('collection-form');
+    if (collectionForm) {
+      collectionForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const collectionId = document.getElementById('collection-id').value;
+        const isEdit = collectionId !== '';
+        
+        const formData = {
+          name: document.getElementById('collection-name').value,
+          description: document.getElementById('collection-description').value,
+          coverImage: document.getElementById('collection-cover').value,
+          isPublic: document.getElementById('collection-public').checked
+        };
+        
+        const url = isEdit 
+          ? `/market/user/collections/${collectionId}`
+          : '/market/user/collections/create';
+        
+        const method = isEdit ? 'PUT' : 'POST';
+        
+        fetch(url, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showNotification(
+              isEdit ? 'Collection updated successfully' : 'Collection created successfully', 
+              'success'
+            );
+            collectionModal.style.display = 'none';
+            
+            // Reload page after a delay
+            setTimeout(() => window.location.reload(), 1500);
+          } else {
+            showNotification(data.message || 'Failed to save collection', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showNotification('An error occurred', 'error');
+        });
+      });
+    }
+    
+    // Close modal buttons
+    const closeModalButtons = document.querySelectorAll('.close-modal');
+    closeModalButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        document.querySelectorAll('.modal').forEach(modal => {
+          modal.style.display = 'none';
+        });
+      });
+    });
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+      document.querySelectorAll('.modal').forEach(modal => {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+    });
+    
+    // Notification function
+    function showNotification(message, type) {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      // Fade in
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 10);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    }
+  });
+</script>
+
+<style>
+  /* User Market Page Styles */
+  .user-market-container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 30px;
+  }
+  
+  @media (max-width: 768px) {
+    .user-market-container {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* Sidebar Styles */
+  .user-market-sidebar {
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+    padding: 20px;
+  }
+  
+  .user-profile-card {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .user-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover;
+  }
+  
+  .user-info {
+    flex: 1;
+  }
+  
+  .user-name {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+    color: #fff;
+  }
+  
+  .user-stats {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .user-stat {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .user-stat .stat-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--secondary-color);
+  }
+  
+  .user-stat .stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  
+  /* Navigation Styles */
+  .user-market-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 20px;
+  }
+  
+  .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    color: var(--text-light);
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+  }
+  
+  .nav-link:hover {
+    background-color: var(--bg-light);
+    border-color: var(--border-color);
+  }
+  
+  .nav-link.active {
+    background-color: var(--primary-color);
+    border-color: var(--primary-hover);
+    color: #fff;
+  }
+  
+  .nav-icon {
+    margin-right: 10px;
+    font-size: 1.2rem;
+  }
+  
+  .sidebar-actions {
+    margin-top: 20px;
+  }
+  
+  .sidebar-actions .action-button {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .create-button {
+    background-color: var(--primary-color);
+    border-color: var(--primary-hover);
+    color: #fff;
+  }
+  
+  .create-button:hover {
+    background-color: var(--primary-hover);
+  }
+  
+  /* Content Styles */
+  .user-market-content {
+    flex: 1;
+  }
+  
+  .content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .content-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: var(--secondary-color);
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .visibility-filter {
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+  
+  /* Collections Grid */
+  .collections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .collection-card {
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .collection-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-color: var(--primary-color);
+  }
+  
+  .collection-card.private {
+    border-color: #888;
+  }
+  
+  .collection-cover {
+    position: relative;
+    height: 150px;
+    overflow: hidden;
+  }
+  
+  .collection-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .collection-card:hover .collection-cover img {
+    transform: scale(1.05);
+  }
+  
+  .collection-privacy {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    padding: 3px 8px;
+    font-size: 0.7rem;
+    border-radius: 2px;
+  }
+  
+  .collection-details {
+    padding: 15px;
+  }
+  
+  .collection-details h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+  }
+  
+  .collection-details h3 a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .collection-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  
+  .collection-description {
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    max-height: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+  
+  .collection-actions {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .collection-action-button {
+    flex: 1;
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .collection-action-button:hover {
+    background-color: var(--bg-light);
+  }
+  
+  .view-button {
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+  }
+  
+  .view-button:hover {
+    background-color: var(--bg-light);
+  }
+  
+  .edit-button {
+    background-color: var(--bg-dark);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+  
+  .edit-button:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+  }
+  
+  .delete-button {
+    background-color: var(--bg-dark);
+    color: var(--error-color);
+    border-color: var(--error-color);
+  }
+  
+  .delete-button:hover {
+    background-color: var(--error-color);
+    color: #fff;
+  }
+  
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+  }
+  
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    color: var(--text-muted);
+  }
+  
+  .empty-state h2 {
+    margin: 0 0 10px 0;
+    color: #fff;
+  }
+  
+  .empty-state p {
+    margin: 0 0 20px 0;
+    color: var(--text-muted);
+  }
+  
+  /* Modal Styles */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  
+  .modal-content {
+    background-color: var(--bg-medium);
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    width: 80%;
+    max-width: 500px;
+    position: relative;
+  }
+  
+  .close-modal {
+    color: var(--text-muted);
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .close-modal:hover {
+    color: #fff;
+  }
+  
+  /* Notification */
+  .notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    background-color: var(--bg-medium);
+    border-left: 4px solid var(--primary-color);
+    color: var(--text-light);
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: translateX(120%);
+    transition: transform 0.3s ease;
+  }
+  
+  .notification.show {
+    transform: translateX(0);
+  }
+  
+  .notification.success {
+    border-left-color: var(--success-color);
+  }
+  
+  .notification.error {
+    border-left-color: var(--error-color);
+  }
+</style>

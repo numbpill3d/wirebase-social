@@ -1,0 +1,677 @@
+<div class="vivid-market user-market-page">
+  <div class="breadcrumb">
+    <a href="/market">Vivid Market</a> &gt; 
+    <span>My Purchases</span>
+  </div>
+
+  <div class="user-market-container">
+    <div class="user-market-sidebar">
+      <div class="user-profile-card">
+        <img src="{{user.avatar}}" alt="{{user.displayName}}" class="user-avatar">
+        <div class="user-info">
+          <h3 class="user-name">{{user.displayName}}</h3>
+          <div class="user-stats">
+            <div class="user-stat">
+              <span class="stat-value">{{user.wirBalance}}</span>
+              <span class="stat-label">WIR</span>
+            </div>
+            <div class="user-stat">
+              <span class="stat-value">{{user.purchasedItems.length}}</span>
+              <span class="stat-label">Purchases</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <nav class="user-market-nav">
+        <a href="/market/user/selling" class="nav-link">
+          <span class="nav-icon">📦</span>
+          <span class="nav-text">My Items</span>
+        </a>
+        <a href="/market/user/purchased" class="nav-link active">
+          <span class="nav-icon">🛒</span>
+          <span class="nav-text">Purchases</span>
+        </a>
+        <a href="/market/user/collections" class="nav-link">
+          <span class="nav-icon">📁</span>
+          <span class="nav-text">Collections</span>
+        </a>
+        <a href="/market/user/wishlist" class="nav-link">
+          <span class="nav-icon">⭐</span>
+          <span class="nav-text">Wishlist</span>
+        </a>
+        <a href="/market/user/wir" class="nav-link">
+          <span class="nav-icon">💰</span>
+          <span class="nav-text">WIR Balance</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-actions">
+        <a href="/market/browse" class="action-button browse-button">Browse Market</a>
+      </div>
+    </div>
+
+    <div class="user-market-content">
+      <div class="content-header">
+        <h1>My Purchases</h1>
+        <div class="header-actions">
+          <select id="sort-filter" class="sort-filter">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+          </select>
+        </div>
+      </div>
+
+      {{#if items.length}}
+        <div class="items-grid">
+          {{#each items}}
+            <div class="market-item purchased">
+              <div class="item-preview">
+                <a href="/market/item/{{this.id}}">
+                  <img src="{{this.previewImage}}" alt="{{this.title}}">
+                </a>
+                <div class="item-category">{{this.categoryName}}</div>
+                <div class="purchase-date">{{formatDate this.purchaseDate}}</div>
+              </div>
+              <div class="item-details">
+                <h3><a href="/market/item/{{this.id}}">{{this.title}}</a></h3>
+                <div class="item-creator">
+                  <a href="/profile/{{this.creator.username}}">
+                    <img src="{{this.creator.avatar}}" alt="{{this.creator.username}}" class="creator-avatar">
+                    <span>{{this.creator.displayName}}</span>
+                  </a>
+                </div>
+                <div class="item-price">
+                  <span class="wir-price">{{this.wirPrice}} WIR</span>
+                </div>
+                <div class="item-actions">
+                  <a href="/market/item/{{this.id}}" class="item-action-button">View</a>
+                  <button class="item-action-button download-button" data-item-id="{{this.id}}">Download</button>
+                  <button class="item-action-button add-collection-button" data-item-id="{{this.id}}">Add to Collection</button>
+                </div>
+              </div>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="empty-state">
+          <div class="empty-icon">🛒</div>
+          <h2>No purchases yet</h2>
+          <p>You haven't purchased any items from the marketplace yet.</p>
+          <a href="/market/browse" class="action-button browse-button">Browse the Market</a>
+        </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+
+<!-- Collection Selection Modal -->
+<div id="collection-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Add to Collection</h2>
+    <div class="collection-list">
+      {{#if user.collections.length}}
+        {{#each user.collections}}
+          <div class="collection-option" data-collection-id="{{this.id}}">
+            <div class="collection-option-name">{{this.name}}</div>
+            <div class="collection-option-count">{{this.items.length}} items</div>
+          </div>
+        {{/each}}
+      {{else}}
+        <p>You don't have any collections yet.</p>
+      {{/if}}
+      <div class="collection-option new-collection">
+        <div class="collection-option-name">+ Create New Collection</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- New Collection Modal -->
+<div id="new-collection-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Create New Collection</h2>
+    <form id="create-collection-form">
+      <div class="form-group">
+        <label for="collection-name">Collection Name <span class="required">*</span></label>
+        <input type="text" id="collection-name" name="name" required>
+      </div>
+      <div class="form-group">
+        <label for="collection-description">Description</label>
+        <textarea id="collection-description" name="description"></textarea>
+      </div>
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="collection-public" name="isPublic" checked>
+          <label for="collection-public">Make collection public</label>
+        </div>
+      </div>
+      <input type="hidden" id="collection-item-id" name="itemId" value="">
+      <button type="submit" class="submit-button">Create & Add Item</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Sort filter functionality
+    const sortFilter = document.getElementById('sort-filter');
+    if (sortFilter) {
+      sortFilter.addEventListener('change', function() {
+        const sort = this.value;
+        const itemsGrid = document.querySelector('.items-grid');
+        const items = Array.from(itemsGrid.querySelectorAll('.market-item'));
+        
+        items.sort((a, b) => {
+          const dateA = new Date(a.querySelector('.purchase-date').textContent);
+          const dateB = new Date(b.querySelector('.purchase-date').textContent);
+          
+          if (sort === 'newest') {
+            return dateB - dateA;
+          } else {
+            return dateA - dateB;
+          }
+        });
+        
+        // Clear the grid and append sorted items
+        itemsGrid.innerHTML = '';
+        items.forEach(item => {
+          itemsGrid.appendChild(item);
+        });
+      });
+    }
+    
+    // Download button functionality
+    const downloadButtons = document.querySelectorAll('.download-button');
+    downloadButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const itemId = this.getAttribute('data-item-id');
+        // In a real implementation, this would trigger a download
+        alert('Download functionality would be implemented here for item ' + itemId);
+      });
+    });
+    
+    // Add to Collection button functionality
+    const addCollectionButtons = document.querySelectorAll('.add-collection-button');
+    const collectionModal = document.getElementById('collection-modal');
+    const newCollectionModal = document.getElementById('new-collection-modal');
+    const closeModalButtons = document.querySelectorAll('.close-modal');
+    
+    addCollectionButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const itemId = this.getAttribute('data-item-id');
+        document.getElementById('collection-item-id').value = itemId;
+        collectionModal.style.display = 'block';
+      });
+    });
+    
+    // Collection option selection
+    const collectionOptions = document.querySelectorAll('.collection-option');
+    collectionOptions.forEach(option => {
+      option.addEventListener('click', function() {
+        if (this.classList.contains('new-collection')) {
+          // Show new collection modal
+          collectionModal.style.display = 'none';
+          newCollectionModal.style.display = 'block';
+        } else {
+          // Add to existing collection
+          const collectionId = this.getAttribute('data-collection-id');
+          const itemId = document.getElementById('collection-item-id').value;
+          
+          fetch(`/market/user/collections/${collectionId}/add/${itemId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              showNotification('Item added to collection', 'success');
+              collectionModal.style.display = 'none';
+            } else {
+              showNotification(data.message || 'Failed to add to collection', 'error');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            showNotification('An error occurred', 'error');
+          });
+        }
+      });
+    });
+    
+    // Close modal buttons
+    closeModalButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        document.querySelectorAll('.modal').forEach(modal => {
+          modal.style.display = 'none';
+        });
+      });
+    });
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+      document.querySelectorAll('.modal').forEach(modal => {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+    });
+    
+    // Create collection form submission
+    const createCollectionForm = document.getElementById('create-collection-form');
+    if (createCollectionForm) {
+      createCollectionForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = {
+          name: document.getElementById('collection-name').value,
+          description: document.getElementById('collection-description').value,
+          isPublic: document.getElementById('collection-public').checked
+        };
+        
+        fetch('/market/user/collections/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Add item to the newly created collection
+            const itemId = document.getElementById('collection-item-id').value;
+            return fetch(`/market/user/collections/${data.collectionId}/add/${itemId}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+          } else {
+            throw new Error(data.message || 'Failed to create collection');
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showNotification('Collection created and item added', 'success');
+            newCollectionModal.style.display = 'none';
+            // Reload page to update collections
+            setTimeout(() => window.location.reload(), 1500);
+          } else {
+            showNotification(data.message || 'Failed to add item to collection', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showNotification(error.message || 'An error occurred', 'error');
+        });
+      });
+    }
+    
+    // Notification function
+    function showNotification(message, type) {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      // Fade in
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 10);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    }
+  });
+</script>
+
+<style>
+  /* User Market Page Styles */
+  .user-market-container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 30px;
+  }
+  
+  @media (max-width: 768px) {
+    .user-market-container {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* Sidebar Styles */
+  .user-market-sidebar {
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+    padding: 20px;
+  }
+  
+  .user-profile-card {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .user-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover;
+  }
+  
+  .user-info {
+    flex: 1;
+  }
+  
+  .user-name {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+    color: #fff;
+  }
+  
+  .user-stats {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .user-stat {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .user-stat .stat-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--secondary-color);
+  }
+  
+  .user-stat .stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  
+  /* Navigation Styles */
+  .user-market-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 20px;
+  }
+  
+  .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    color: var(--text-light);
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+  }
+  
+  .nav-link:hover {
+    background-color: var(--bg-light);
+    border-color: var(--border-color);
+  }
+  
+  .nav-link.active {
+    background-color: var(--primary-color);
+    border-color: var(--primary-hover);
+    color: #fff;
+  }
+  
+  .nav-icon {
+    margin-right: 10px;
+    font-size: 1.2rem;
+  }
+  
+  .sidebar-actions {
+    margin-top: 20px;
+  }
+  
+  .sidebar-actions .action-button {
+    width: 100%;
+    text-align: center;
+  }
+  
+  /* Content Styles */
+  .user-market-content {
+    flex: 1;
+  }
+  
+  .content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .content-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: var(--secondary-color);
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .sort-filter {
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+  
+  /* Item Grid Styles */
+  .items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  
+  .market-item {
+    position: relative;
+  }
+  
+  .purchase-date {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: rgba(26, 26, 46, 0.8);
+    color: var(--text-light);
+    padding: 3px 8px;
+    font-size: 0.7rem;
+    border-radius: 2px;
+  }
+  
+  .item-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 10px;
+  }
+  
+  .item-action-button {
+    flex: 1;
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .item-action-button:hover {
+    background-color: var(--bg-light);
+  }
+  
+  .download-button {
+    background-color: var(--bg-dark);
+    color: var(--success-color);
+    border-color: var(--success-color);
+  }
+  
+  .download-button:hover {
+    background-color: var(--success-color);
+    color: #fff;
+  }
+  
+  .add-collection-button {
+    background-color: var(--bg-dark);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+  
+  .add-collection-button:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+  }
+  
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+  }
+  
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    color: var(--text-muted);
+  }
+  
+  .empty-state h2 {
+    margin: 0 0 10px 0;
+    color: #fff;
+  }
+  
+  .empty-state p {
+    margin: 0 0 20px 0;
+    color: var(--text-muted);
+  }
+  
+  /* Modal Styles */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  
+  .modal-content {
+    background-color: var(--bg-medium);
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    width: 80%;
+    max-width: 500px;
+    position: relative;
+  }
+  
+  .close-modal {
+    color: var(--text-muted);
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .close-modal:hover {
+    color: #fff;
+  }
+  
+  /* Collection List */
+  .collection-list {
+    margin-top: 20px;
+  }
+  
+  .collection-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    margin-bottom: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .collection-option:hover {
+    background-color: var(--bg-light);
+  }
+  
+  .collection-option-count {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  
+  .new-collection {
+    background-color: var(--bg-dark);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+  
+  .new-collection:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+  }
+  
+  .new-collection .collection-option-name {
+    width: 100%;
+    text-align: center;
+  }
+  
+  /* Notification */
+  .notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    background-color: var(--bg-medium);
+    border-left: 4px solid var(--primary-color);
+    color: var(--text-light);
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: translateX(120%);
+    transition: transform 0.3s ease;
+  }
+  
+  .notification.show {
+    transform: translateX(0);
+  }
+  
+  .notification.success {
+    border-left-color: var(--success-color);
+  }
+  
+  .notification.error {
+    border-left-color: var(--error-color);
+  }
+</style>

@@ -1,0 +1,794 @@
+<div class="vivid-market collections-page">
+  <div class="breadcrumb">
+    <a href="/market">Vivid Market</a> &gt; 
+    <span>Collections</span>
+  </div>
+
+  <div class="collections-header">
+    <h1>Explore Collections</h1>
+    <p class="collections-description">Discover curated sets of digital assets created by the community.</p>
+    
+    <div class="collections-actions">
+      {{#if user}}
+        <a href="/market/user/collections" class="action-button my-collections-button">My Collections</a>
+        <button id="create-collection-button" class="action-button create-button">+ Create Collection</button>
+      {{else}}
+        <a href="/users/login" class="action-button login-button">Login to Create</a>
+      {{/if}}
+    </div>
+  </div>
+  
+  <div class="collections-filters">
+    <div class="filter-group">
+      <label for="sort-filter">Sort By</label>
+      <select id="sort-filter" class="filter-select">
+        <option value="newest">Newest</option>
+        <option value="popular">Most Popular</option>
+        <option value="items">Most Items</option>
+      </select>
+    </div>
+    
+    <div class="filter-group">
+      <label for="creator-filter">Creator</label>
+      <select id="creator-filter" class="filter-select">
+        <option value="all">All Creators</option>
+        {{#each creators}}
+          <option value="{{this.id}}">{{this.displayName}}</option>
+        {{/each}}
+      </select>
+    </div>
+    
+    <div class="search-group">
+      <input type="text" id="search-input" class="search-input" placeholder="Search collections...">
+      <button id="search-button" class="search-button">Search</button>
+    </div>
+  </div>
+  
+  {{#if collections.length}}
+    <div class="collections-grid">
+      {{#each collections}}
+        <div class="collection-card" data-creator="{{this.creator.id}}" data-items="{{this.items.length}}" data-date="{{this.createdAt}}">
+          <div class="collection-cover">
+            <a href="/market/collections/{{this.id}}">
+              <img src="{{this.coverImage}}" alt="{{this.name}}">
+            </a>
+          </div>
+          <div class="collection-details">
+            <h3><a href="/market/collections/{{this.id}}">{{this.name}}</a></h3>
+            <div class="collection-meta">
+              <div class="collection-creator">
+                <a href="/profile/{{this.creator.username}}">
+                  <img src="{{this.creator.avatar}}" alt="{{this.creator.username}}" class="creator-avatar">
+                  <span>{{this.creator.displayName}}</span>
+                </a>
+              </div>
+              <div class="collection-stats">
+                <span class="collection-item-count">{{this.items.length}} items</span>
+                <span class="collection-views">{{this.views}} views</span>
+              </div>
+            </div>
+            <div class="collection-description">
+              {{#if this.description}}
+                {{truncate this.description 100}}
+              {{else}}
+                <em>No description</em>
+              {{/if}}
+            </div>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+    
+    <div class="pagination">
+      {{#if pagination.hasPrev}}
+        <a href="/market/collections?page={{subtract pagination.currentPage 1}}{{#if filters.sort}}&sort={{filters.sort}}{{/if}}{{#if filters.creator}}&creator={{filters.creator}}{{/if}}{{#if filters.search}}&search={{filters.search}}{{/if}}" class="pagination-button prev-button">&laquo; Previous</a>
+      {{/if}}
+      
+      <span class="pagination-info">Page {{pagination.currentPage}} of {{pagination.totalPages}}</span>
+      
+      {{#if pagination.hasNext}}
+        <a href="/market/collections?page={{add pagination.currentPage 1}}{{#if filters.sort}}&sort={{filters.sort}}{{/if}}{{#if filters.creator}}&creator={{filters.creator}}{{/if}}{{#if filters.search}}&search={{filters.search}}{{/if}}" class="pagination-button next-button">Next &raquo;</a>
+      {{/if}}
+    </div>
+  {{else}}
+    <div class="empty-collections">
+      <div class="empty-icon">📁</div>
+      <h2>No collections found</h2>
+      <p>Be the first to create a collection!</p>
+      {{#if user}}
+        <button id="empty-create-collection-button" class="action-button create-button">Create Collection</button>
+      {{else}}
+        <a href="/users/login" class="action-button login-button">Login to Create</a>
+      {{/if}}
+    </div>
+  {{/if}}
+  
+  <div class="featured-collections">
+    <h2>Featured Collections</h2>
+    
+    <div class="featured-grid">
+      {{#each featuredCollections}}
+        <div class="featured-collection">
+          <div class="featured-cover">
+            <a href="/market/collections/{{this.id}}">
+              <img src="{{this.coverImage}}" alt="{{this.name}}">
+            </a>
+            <div class="featured-badge">Featured</div>
+          </div>
+          <div class="featured-details">
+            <h3><a href="/market/collections/{{this.id}}">{{this.name}}</a></h3>
+            <div class="featured-creator">
+              <a href="/profile/{{this.creator.username}}">
+                <img src="{{this.creator.avatar}}" alt="{{this.creator.username}}" class="creator-avatar">
+                <span>{{this.creator.displayName}}</span>
+              </a>
+            </div>
+            <div class="featured-description">
+              {{#if this.description}}
+                {{truncate this.description 150}}
+              {{else}}
+                <em>No description</em>
+              {{/if}}
+            </div>
+            <div class="featured-stats">
+              <span class="featured-item-count">{{this.items.length}} items</span>
+              <span class="featured-views">{{this.views}} views</span>
+            </div>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+</div>
+
+<!-- Create Collection Modal -->
+<div id="create-collection-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Create New Collection</h2>
+    <form id="create-collection-form">
+      <div class="form-group">
+        <label for="collection-name">Collection Name <span class="required">*</span></label>
+        <input type="text" id="collection-name" name="name" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="collection-description">Description</label>
+        <textarea id="collection-description" name="description"></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="collection-cover">Cover Image URL</label>
+        <input type="text" id="collection-cover" name="coverImage" placeholder="https://example.com/image.jpg">
+        <div class="form-hint">Leave empty for default cover</div>
+      </div>
+      
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="collection-public" name="isPublic" checked>
+          <label for="collection-public">Make collection public</label>
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" class="cancel-button close-modal">Cancel</button>
+        <button type="submit" class="submit-button" id="save-collection">Create Collection</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  /* Collections Page Styles */
+  .collections-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Collections Header */
+  .collections-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .collections-header h1 {
+    font-size: 2rem;
+    margin: 0 0 10px 0;
+    color: var(--secondary-color);
+  }
+  
+  .collections-description {
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+  
+  .collections-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+  
+  /* Collections Filters */
+  .collections-filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+    padding: 15px;
+  }
+  
+  @media (max-width: 768px) {
+    .collections-filters {
+      flex-direction: column;
+      gap: 15px;
+      align-items: stretch;
+    }
+  }
+  
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .filter-group label {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+  
+  .filter-select {
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+  
+  .search-group {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .search-input {
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    padding: 8px 10px;
+    font-size: 0.9rem;
+    width: 200px;
+  }
+  
+  .search-button {
+    background-color: var(--primary-color);
+    border: 1px solid var(--primary-hover);
+    color: #fff;
+    padding: 8px 15px;
+    cursor: pointer;
+  }
+  
+  .search-button:hover {
+    background-color: var(--primary-hover);
+  }
+  
+  /* Collections Grid */
+  .collections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .collection-card {
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .collection-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-color: var(--primary-color);
+  }
+  
+  .collection-cover {
+    height: 150px;
+    overflow: hidden;
+  }
+  
+  .collection-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .collection-card:hover .collection-cover img {
+    transform: scale(1.05);
+  }
+  
+  .collection-details {
+    padding: 15px;
+  }
+  
+  .collection-details h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+  }
+  
+  .collection-details h3 a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .collection-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  
+  .collection-creator {
+    display: flex;
+    align-items: center;
+  }
+  
+  .collection-creator a {
+    display: flex;
+    align-items: center;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+  
+  .creator-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 5px;
+    object-fit: cover;
+  }
+  
+  .collection-stats {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  
+  .collection-description {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-top: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  
+  /* Pagination */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 40px;
+  }
+  
+  .pagination-button {
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    padding: 8px 15px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  
+  .pagination-button:hover {
+    background-color: var(--bg-light);
+  }
+  
+  .pagination-info {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+  
+  /* Empty Collections */
+  .empty-collections {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+    margin-bottom: 40px;
+  }
+  
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    color: var(--text-muted);
+  }
+  
+  .empty-collections h2 {
+    margin: 0 0 10px 0;
+    color: #fff;
+  }
+  
+  .empty-collections p {
+    margin: 0 0 20px 0;
+    color: var(--text-muted);
+  }
+  
+  /* Featured Collections */
+  .featured-collections {
+    margin-bottom: 40px;
+  }
+  
+  .featured-collections h2 {
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+    position: relative;
+  }
+  
+  .featured-collections h2:after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background-color: var(--secondary-color);
+  }
+  
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+  }
+  
+  .featured-collection {
+    display: flex;
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .featured-collection:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-color: var(--primary-color);
+  }
+  
+  .featured-cover {
+    position: relative;
+    width: 120px;
+    overflow: hidden;
+  }
+  
+  .featured-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .featured-badge {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    background-color: var(--secondary-color);
+    color: var(--bg-dark);
+    padding: 3px 8px;
+    font-size: 0.7rem;
+    font-weight: bold;
+  }
+  
+  .featured-details {
+    flex: 1;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .featured-details h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.1rem;
+  }
+  
+  .featured-details h3 a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .featured-creator {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .featured-creator a {
+    display: flex;
+    align-items: center;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+  
+  .featured-description {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 10px;
+    flex: 1;
+  }
+  
+  .featured-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  
+  /* Action Buttons */
+  .action-button {
+    background-color: var(--bg-medium);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    padding: 8px 15px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .action-button:hover {
+    background-color: var(--bg-light);
+  }
+  
+  .my-collections-button {
+    background-color: var(--bg-medium);
+    color: var(--text-light);
+  }
+  
+  .create-button {
+    background-color: var(--primary-color);
+    border-color: var(--primary-hover);
+    color: #fff;
+  }
+  
+  .create-button:hover {
+    background-color: var(--primary-hover);
+  }
+  
+  .login-button {
+    background-color: var(--bg-medium);
+    color: var(--secondary-color);
+    border-color: var(--secondary-color);
+  }
+  
+  .login-button:hover {
+    background-color: var(--secondary-color);
+    color: var(--bg-dark);
+  }
+  
+  /* Modal Styles */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  
+  .modal-content {
+    background-color: var(--bg-medium);
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    width: 80%;
+    max-width: 500px;
+    position: relative;
+  }
+  
+  .close-modal {
+    color: var(--text-muted);
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .close-modal:hover {
+    color: #fff;
+  }
+  
+  /* Form Styles */
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text-light);
+  }
+  
+  .required {
+    color: var(--error-color);
+  }
+  
+  .form-group input[type="text"],
+  .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    font-size: 1rem;
+  }
+  
+  .form-hint {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 5px;
+  }
+  
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .cancel-button {
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  
+  .submit-button {
+    background-color: var(--primary-color);
+    border: 1px solid var(--primary-hover);
+    color: #fff;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  
+  .submit-button:hover {
+    background-color: var(--primary-hover);
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Create Collection button
+    const createCollectionButton = document.getElementById('create-collection-button');
+    const emptyCreateCollectionButton = document.getElementById('empty-create-collection-button');
+    const createCollectionModal = document.getElementById('create-collection-modal');
+    const closeModalButton = document.querySelector('.close-modal');
+    
+    function openCreateCollectionModal() {
+      createCollectionModal.style.display = 'block';
+    }
+    
+    if (createCollectionButton) {
+      createCollectionButton.addEventListener('click', openCreateCollectionModal);
+    }
+    
+    if (emptyCreateCollectionButton) {
+      emptyCreateCollectionButton.addEventListener('click', openCreateCollectionModal);
+    }
+    
+    if (closeModalButton) {
+      closeModalButton.addEventListener('click', function() {
+        createCollectionModal.style.display = 'none';
+      });
+    }
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+      if (event.target === createCollectionModal) {
+        createCollectionModal.style.display = 'none';
+      }
+    });
+    
+    // Create Collection form submission
+    const createCollectionForm = document.getElementById('create-collection-form');
+    if (createCollectionForm) {
+      createCollectionForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = {
+          name: document.getElementById('collection-name').value,
+          description: document.getElementById('collection-description').value,
+          coverImage: document.getElementById('collection-cover').value,
+          isPublic: document.getElementById('collection-public').checked
+        };
+        
+        fetch('/market/user/collections/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Redirect to the new collection
+            window.location.href = `/market/collections/${data.collectionId}`;
+          } else {
+            alert(data.message || 'Failed to create collection');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while creating the collection');
+        });
+      });
+    }
+    
+    // Filter functionality
+    const sortFilter = document.getElementById('sort-filter');
+    const creatorFilter = document.getElementById('creator-filter');
+    const searchInput = document.getElementById('search-input');
+    const searchButton = document.getElementById('search-button');
+    
+    function applyFilters() {
+      const sort = sortFilter.value;
+      const creator = creatorFilter.value;
+      const search = searchInput.value;
+      
+      let url = '/market/collections?';
+      const params = [];
+      
+      if (sort && sort !== 'newest') {
+        params.push(`sort=${sort}`);
+      }
+      
+      if (creator && creator !== 'all') {
+        params.push(`creator=${creator}`);
+      }
+      
+      if (search) {
+        params.push(`search=${encodeURIComponent(search)}`);
+      }
+      
+      url += params.join('&');
+      window.location.href = url;
+    }
+    
+    if (sortFilter) {
+      sortFilter.addEventListener('change', applyFilters);
+    }
+    
+    if (creatorFilter) {
+      creatorFilter.addEventListener('change', applyFilters);
+    }
+    
+    if (searchButton) {
+      searchButton.addEventListener('click', applyFilters);
+    }
+    
+    if (searchInput) {
+      searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          applyFilters();
+        }
+      });
+    }
+  });
+</script>
