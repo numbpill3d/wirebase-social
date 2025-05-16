@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect - wirebase.city</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="../../css/laincore.css">
+    <link rel="stylesheet" href="../../css/interface.css">
+    <link rel="stylesheet" href="../../css/scanlines.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <script src="../../js/laincore-loader.js"></script>
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo">
+            <img src="../../images/wirebase-logo.svg" alt="wirebase.city" class="glitch-image">
+            <h1 class="glitch-text" data-text="wirebase.city">wirebase.city</h1>
+        </div>
+        <nav class="cyber-navbar">
+            <a href="/" class="cyber-button">Core</a>
+            <a href="/profile" class="cyber-button">Shell</a>
+            <a href="/scrapyard" class="cyber-button">Nullspace</a>
+            <a href="/feed" class="cyber-button">Stream</a>
+            <a href="/forum" class="cyber-button">Assembly</a>
+            <a href="/users/login" class="cyber-button active">Connect</a>
+            <button id="theme-toggle" class="cyber-button" type="button">Disconnect</button>
+        </nav>
+    </header>
+
+    <!-- Add CRT scanlines and glitch effects -->
+    <div class="crt-scanlines"></div>
+    <div class="crt-flicker"></div>
+    <div class="digital-noise"></div>
+
+    <div class="container">
+        <div class="cyber-window login-window">
+            <div class="cyber-window-header">
+                <span class="cyber-window-title">system.authentication</span>
+                <div class="cyber-window-controls">
+                    <span class="cyber-window-control">_</span>
+                    <span class="cyber-window-control">□</span>
+                    <span class="cyber-window-control">×</span>
+                </div>
+            </div>
+            <div class="cyber-window-content">
+                <div class="login-container">
+                    <div class="login-header">
+                        <h2>Network Authentication</h2>
+                        <p>Establish connection to access your digital shell</p>
+                    </div>
+                    
+                    <div class="terminal-window">
+                        <div class="terminal-header">Terminal.exe</div>
+                        <div class="terminal-content">
+                            <pre>[system@wirebase]> auth --protocol=secure
+Initializing secure connection...
+Enter credentials to authenticate:
+<span class="cursor">_</span></pre>
+                        </div>
+                    </div>
+                    
+                    <form class="login-form" action="/users/login" method="post">
+                        <div class="form-group">
+                            <label for="username">Node ID</label>
+                            <input type="text" id="username" name="username" class="cyber-input" placeholder="Enter your node identifier" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password">Access Key</label>
+                            <input type="password" id="password" name="password" class="cyber-input" placeholder="Enter your access key" required>
+                        </div>
+                        
+                        <div class="form-options">
+                            <div class="remember-me">
+                                <input type="checkbox" id="remember" name="remember">
+                                <label for="remember">Maintain Connection</label>
+                            </div>
+                            <a href="/users/forgot-password" class="forgot-password">Reset Access Key</a>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="cyber-button primary">Authenticate</button>
+                            <a href="/users/register" class="cyber-button">Create New Identity</a>
+                        </div>
+                    </form>
+                    
+                    <div class="login-footer">
+                        <div class="connection-status">
+                            <span class="status-icon"></span>
+                            <span class="status-text">Secure Connection Established</span>
+                        </div>
+                        <div class="auth-options">
+                            <a href="/users/oauth/github">
+                                <span class="auth-icon">🔗</span>
+                                <span>GitHub Auth</span>
+                            </a>
+                            <a href="/users/oauth/google">
+                                <span class="auth-icon">🔗</span>
+                                <span>Google Auth</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="../../images/wirebase-logo.svg" alt="wirebase.city" class="pixel-image small">
+                <span>wirebase.city</span>
+            </div>
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Terms</a>
+                <a href="#">Privacy</a>
+                <a href="#">Contact</a>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            © 2025 wirebase.city - You don't exist until you're online
+        </div>
+    </footer>
+
+    <script src="../../js/main.js"></script>
+    <script src="../../js/laincore.js"></script>
+</body>
+</html>

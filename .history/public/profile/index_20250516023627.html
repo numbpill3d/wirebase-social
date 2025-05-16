@@ -643,6 +643,7 @@
                     <div class="profile-header">
                         <div class="profile-avatar-container">
                             <img src="../images/laincore/default-avatar.png" alt="Default Avatar" class="profile-avatar">
+                            <span class="profile-glyph">👁️</span>
                         </div>
                         <div class="profile-info">
                             <h1>Guest_Node</h1>
@@ -652,243 +653,34 @@
                                     <span class="stat-value">Unverified</span>
                                 </div>
                                 <div class="stat">
-                                    <span class="stat-name">Connection</span>
+                                    <span class="stat-name">Connections</span>
+                                    <span class="stat-value">0</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-name">Bandwidth</span>
                                     <span class="stat-value">Limited</span>
                                 </div>
-                                <div class="stat">
-                                    <span class="stat-name">Node Level</span>
-                                    <span class="stat-value">0</span>
-                                </div>
-                                <div class="stat">
-                                    <span class="stat-name">Access</span>
-                                    <span class="stat-value">Public</span>
-                                </div>
-                                <div class="stat">
-                                    <span class="stat-name">Transmissions</span>
-                                    <span class="stat-value">0</span>
-                                </div>
-                                <div class="stat">
-                                    <span class="stat-name">Sync Date</span>
-                                    <span class="stat-value">Null</span>
-                                </div>
-                            </div>
-                            
-                            <div class="badge-list">
-                                <span class="badge">uninitialized</span>
-                                <span class="badge">protocol v.0.7</span>
-                                <span class="badge">layer 0</span>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="profile-tabs">
-                        <button class="profile-tab active" data-tab="feed">Feed</button>
-                        <button class="profile-tab" data-tab="activity">Activity</button>
-                        <button class="profile-tab" data-tab="gallery">Gallery</button>
-                        <button class="profile-tab" data-tab="files">Files</button>
-                        <button class="profile-tab" data-tab="connections">Connections</button>
-                        <button class="profile-tab" data-tab="customize">Customize</button>
-                        <button class="profile-tab" data-tab="terminal">Terminal</button>
-                        <button class="profile-tab" data-tab="statistics">Statistics</button>
                     </div>
                     
                     <div class="profile-main">
-                        <div class="profile-sections">
-                            <!-- Feed Section -->
-                            <div class="profile-section active" id="feed-section">
-                                <h2>Identity Not Initialized</h2>
-                                <p>You need to connect to the network to create your digital shell.</p>
-                                
-                                <div class="post-list">
-                                    <div class="post-item">
-                                        <div class="post-header">
-                                            <span class="post-author">system</span>
-                                            <span class="post-timestamp">00:00:00</span>
-                                        </div>
-                                        <div class="post-content">
-                                            Welcome to wirebase.city. This is a temporary shell. Initialize connection to create a permanent identity.
-                                        </div>
-                                        <div class="post-actions">
-                                            <span class="post-action">reply</span>
-                                            <span class="post-action">amplify</span>
-                                            <span class="post-action">encrypt</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="post-item">
-                                        <div class="post-header">
-                                            <span class="post-author">admin</span>
-                                            <span class="post-timestamp">00:00:00</span>
-                                        </div>
-                                        <div class="post-content">
-                                            Identity verification required. Access to deeper layers of wirebase.city will be granted incrementally as your node accumulates trust.
-                                        </div>
-                                        <div class="post-actions">
-                                            <span class="post-action">reply</span>
-                                            <span class="post-action">amplify</span>
-                                            <span class="post-action">encrypt</span>
-                                        </div>
-                                        
-                                        <div class="comment-list">
-                                            <div class="comment-item">
-                                                <div class="comment-header">
-                                                    <span class="comment-author">system</span>
-                                                    <span class="comment-timestamp">00:00:01</span>
-                                                </div>
-                                                <div class="comment-content">
-                                                    Verification protocols will require multiple authentication factors.
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Connections Section -->
-                            <div class="profile-section" id="connections-section">
-                                <h2>Network Connections</h2>
-                                <p>Your node has not established any connections yet.</p>
-                                
-                                <div class="connection-list">
-                                    <div class="connection-item">
-                                        <img src="../images/laincore/default-avatar.png" alt="System" class="connection-avatar">
-                                        <div class="connection-info">
-                                            <div class="connection-username">system</div>
-                                            <div class="connection-status">Always connected</div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="connection-item">
-                                        <img src="../images/laincore/default-avatar.png" alt="Admin" class="connection-avatar">
-                                        <div class="connection-info">
-                                            <div class="connection-username">admin</div>
-                                            <div class="connection-status">Monitoring</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <h3>Discover Nodes</h3>
-                                <p>These nodes appear to share protocol signatures with your temporary identity.</p>
-                                
-                                <div class="connection-list">
-                                    <div class="connection-item">
-                                        <img src="../images/laincore/default-avatar.png" alt="Node" class="connection-avatar">
-                                        <div class="connection-info">
-                                            <div class="connection-username">circuit_dream</div>
-                                            <div class="connection-status">Layer 2 • Active 3h ago</div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="connection-item">
-                                        <img src="../images/laincore/default-avatar.png" alt="Node" class="connection-avatar">
-                                        <div class="connection-info">
-                                            <div class="connection-username">neural.echo</div>
-                                            <div class="connection-status">Layer 1 • Active 27m ago</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Terminal Section -->
-                            <div class="profile-section" id="terminal-section">
-                                <h2>Terminal Access</h2>
-                                <p>Direct interface with wirebase.city network.</p>
-                                
-                                <div class="terminal-mode">
-                                    <div class="terminal-header">Terminal.exe</div>
-                                    <div class="terminal-content">
-                                        <pre>[guest@wirebase]> identity --status
+                        <div class="profile-custom-content">
+                            <h2>Identity Not Initialized</h2>
+                            <p>You need to connect to the network to create your digital shell.</p>
+                            <div class="terminal-mode">
+                                <div class="terminal-header">Terminal.exe</div>
+                                <div class="terminal-content">
+                                    <pre>[guest@wirebase]> identity --status
 ERROR: No identity found
-
-[guest@wirebase]> help
-Available commands:
-  identity    - manage digital identity
-  connect     - establish network connection
-  browse      - access network resources
-  message     - communication functions
-  encrypt     - security operations
-  customize   - modify shell appearance
-  status      - display system status
-
 [guest@wirebase]> connect --auth
 Redirecting to authentication portal...
 <span class="cursor">_</span></pre>
-                                    </div>
-                                </div>
-                                
-                                <h3>Connection Logs</h3>
-                                <div class="terminal-mode">
-                                    <div class="terminal-header">connection_log.txt</div>
-                                    <div class="terminal-content">
-                                        <pre>00:00:00 | System initialized
-00:00:01 | Temporary shell created
-00:00:01 | Protocol v.0.7 loaded
-00:00:02 | Connection status: Limited
-00:00:02 | Permissions: Read-only (Public layer)
-00:00:03 | Security check: Pending
-00:00:03 | Awaiting identity verification
-
-<span class="cursor">_</span></pre>
-                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div class="profile-sidebar">
-                            <div class="cyber-window">
-                                <div class="cyber-window-header">
-                                    <span class="cyber-window-title">node.status</span>
-                                </div>
-                                <div class="cyber-window-content">
-                                    <div class="stat">
-                                        <span class="stat-name">Connection</span>
-                                        <span class="stat-value">Unstable</span>
-                                    </div>
-                                    <div class="stat">
-                                        <span class="stat-name">Packet Loss</span>
-                                        <span class="stat-value">78%</span>
-                                    </div>
-                                    <div class="stat">
-                                        <span class="stat-name">Latency</span>
-                                        <span class="stat-value">∞ ms</span>
-                                    </div>
-                                    
-                                    <div class="terminal-mode">
-                                        <div class="terminal-content">
-                                            <pre>[SYSTEM]: Identity required
-[SYSTEM]: Limited bandwidth
-[SYSTEM]: Layer 0 access only</pre>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="connection-actions">
-                                        <a href="/users/login" class="cyber-button primary">Initialize</a>
-                                        <a href="/users/register" class="cyber-button">Register</a>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="cyber-window">
-                                <div class="cyber-window-header">
-                                    <span class="cyber-window-title">net.protocols</span>
-                                </div>
-                                <div class="cyber-window-content">
-                                    <div class="badge-list">
-                                        <span class="badge">text.msg</span>
-                                        <span class="badge">image.view</span>
-                                        <span class="badge">feed.read</span>
-                                        <span class="badge">node.search</span>
-                                    </div>
-                                    
-                                    <h3>Locked Protocols</h3>
-                                    <div class="badge-list">
-                                        <span class="badge">data.encrypt</span>
-                                        <span class="badge">file.transfer</span>
-                                        <span class="badge">voice.stream</span>
-                                        <span class="badge">custom.code</span>
-                                        <span class="badge">layer.dive</span>
-                                    </div>
-                                </div>
+                            <div class="connection-actions">
+                                <a href="/users/login" class="cyber-button primary">Initialize Connection</a>
+                                <a href="/users/register" class="cyber-button">Create New Identity</a>
                             </div>
                         </div>
                     </div>
@@ -917,151 +709,5 @@ Redirecting to authentication portal...
 
     <script src="../js/main.js"></script>
     <script src="../js/laincore.js"></script>
-    <script>
-        // Tab switching functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const tabs = document.querySelectorAll('.profile-tab');
-            
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    // Remove active class from all tabs and sections
-                    document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.profile-section').forEach(s => s.classList.remove('active'));
-                    
-                    // Add active class to clicked tab
-                    this.classList.add('active');
-                    
-                    // Show corresponding section
-                    const tabId = this.getAttribute('data-tab');
-                    document.getElementById(`${tabId}-section`).classList.add('active');
-                });
-            });
-            
-            // Theme toggle functionality
-            const themeToggle = document.getElementById('theme-toggle');
-            themeToggle.addEventListener('click', function() {
-                document.body.classList.toggle('light-theme');
-                themeToggle.textContent = document.body.classList.contains('light-theme') ? 'Dark Mode' : 'Light Mode';
-            });
-            
-            // Terminal cursor blinking
-            setInterval(function() {
-                const cursors = document.querySelectorAll('.cursor');
-                cursors.forEach(cursor => {
-                    cursor.style.visibility = cursor.style.visibility === 'hidden' ? 'visible' : 'hidden';
-                });
-            }, 500);
-            
-            // Random CRT flicker effect
-            setInterval(function() {
-                const flicker = document.querySelector('.crt-flicker');
-                if (Math.random() > 0.95) {
-                    flicker.style.opacity = (Math.random() * 0.3).toString();
-                    setTimeout(function() {
-                        flicker.style.opacity = '0';
-                    }, 50);
-                }
-            }, 200);
-            
-            // Glitch effect on logo
-            const glitchText = document.querySelector('.glitch-text');
-            setInterval(function() {
-                if (Math.random() > 0.95) {
-                    glitchText.style.letterSpacing = `${Math.random() * 10}px`;
-                    setTimeout(function() {
-                        glitchText.style.letterSpacing = '';
-                    }, 100);
-                }
-            }, 3000);
-            
-            // Layer shift effect for various elements
-            const layerElements = document.querySelectorAll('.profile-header, .profile-avatar-container, .system-message, .file-card, .gallery-item');
-            setInterval(function() {
-                if (Math.random() > 0.9) {
-                    const randomElement = layerElements[Math.floor(Math.random() * layerElements.length)];
-                    if (randomElement) {
-                        randomElement.style.transform = `translate(${(Math.random() * 5) - 2.5}px, ${(Math.random() * 5) - 2.5}px)`;
-                        randomElement.style.boxShadow = `0 0 ${Math.random() * 15}px rgba(157, 52, 217, ${Math.random() * 0.5})`;
-                        
-                        setTimeout(function() {
-                            randomElement.style.transform = '';
-                            randomElement.style.boxShadow = '';
-                        }, 500);
-                    }
-                }
-            }, 2000);
-            
-            // Data flow animation for various text elements
-            const textElements = document.querySelectorAll('h1, h2, h3, .terminal-content pre');
-            setInterval(function() {
-                if (Math.random() > 0.95) {
-                    const randomElement = textElements[Math.floor(Math.random() * textElements.length)];
-                    if (randomElement) {
-                        randomElement.style.color = 'var(--accent-glow)';
-                        randomElement.style.textShadow = '0 0 8px var(--accent-glow)';
-                        
-                        setTimeout(function() {
-                            randomElement.style.color = '';
-                            randomElement.style.textShadow = '';
-                        }, 300);
-                    }
-                }
-            }, 1000);
-            
-            // Scanline animation
-            const scanline = document.createElement('div');
-            scanline.className = 'scanline-effect';
-            scanline.style.position = 'fixed';
-            scanline.style.top = '0';
-            scanline.style.left = '0';
-            scanline.style.width = '100%';
-            scanline.style.height = '2px';
-            scanline.style.backgroundColor = 'rgba(157, 52, 217, 0.2)';
-            scanline.style.boxShadow = '0 0 10px rgba(157, 52, 217, 0.5)';
-            scanline.style.zIndex = '1000';
-            scanline.style.pointerEvents = 'none';
-            document.body.appendChild(scanline);
-            
-            let scanlinePos = 0;
-            
-            function animateScanline() {
-                scanlinePos += 2;
-                if (scanlinePos > window.innerHeight) {
-                    scanlinePos = -10;
-                }
-                scanline.style.top = scanlinePos + 'px';
-                requestAnimationFrame(animateScanline);
-            }
-            
-            animateScanline();
-            
-            // Data chunk glitch animation
-            function createGlitchChunk() {
-                if (Math.random() > 0.99) {
-                    const chunk = document.createElement('div');
-                    chunk.className = 'data-chunk';
-                    chunk.style.position = 'fixed';
-                    chunk.style.width = `${Math.random() * 300 + 50}px`;
-                    chunk.style.height = `${Math.random() * 3 + 1}px`;
-                    chunk.style.backgroundColor = 'var(--accent-color)';
-                    chunk.style.opacity = `${Math.random() * 0.5 + 0.1}`;
-                    chunk.style.left = `${Math.random() * 100}%`;
-                    chunk.style.top = `${Math.random() * 100}%`;
-                    chunk.style.zIndex = '999';
-                    chunk.style.pointerEvents = 'none';
-                    chunk.style.boxShadow = '0 0 10px var(--accent-glow)';
-                    document.body.appendChild(chunk);
-                    
-                    setTimeout(() => {
-                        chunk.remove();
-                    }, Math.random() * 500 + 100);
-                }
-                
-                requestAnimationFrame(createGlitchChunk);
-            }
-            
-            createGlitchChunk();
-        });
-    </script>
 </body>
 </html>

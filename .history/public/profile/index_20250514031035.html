@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shell - wirebase.city</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/laincore.css">
+    <link rel="stylesheet" href="../css/interface.css">
+    <link rel="stylesheet" href="../css/scanlines.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <script src="../js/laincore-loader.js"></script>
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo">
+            <img src="../images/wirebase-logo.svg" alt="wirebase.city" class="glitch-image">
+            <h1 class="glitch-text" data-text="wirebase.city">wirebase.city</h1>
+        </div>
+        <nav class="cyber-navbar">
+            <a href="/" class="cyber-button">Core</a>
+            <a href="/profile" class="cyber-button active">Shell</a>
+            <a href="/scrapyard" class="cyber-button">Nullspace</a>
+            <a href="/feed" class="cyber-button">Stream</a>
+            <a href="/forum" class="cyber-button">Assembly</a>
+            <a href="/users/login" class="cyber-button">Connect</a>
+            <button id="theme-toggle" class="cyber-button" type="button">Disconnect</button>
+        </nav>
+    </header>
+
+    <!-- Add CRT scanlines and glitch effects -->
+    <div class="crt-scanlines"></div>
+    <div class="crt-flicker"></div>
+    <div class="digital-noise"></div>
+
+    <div class="container">
+        <div class="cyber-window">
+            <div class="cyber-window-header">
+                <span class="cyber-window-title">system.identity</span>
+                <div class="cyber-window-controls">
+                    <span class="cyber-window-control">_</span>
+                    <span class="cyber-window-control">□</span>
+                    <span class="cyber-window-control">×</span>
+                </div>
+            </div>
+            <div class="cyber-window-content">
+                <div class="profile-container">
+                    <div class="profile-header">
+                        <div class="profile-avatar-container">
+                            <img src="../images/laincore/default-avatar.png" alt="Default Avatar" class="profile-avatar">
+                            <span class="profile-glyph">👁️</span>
+                        </div>
+                        <div class="profile-info">
+                            <h1>Guest_Node</h1>
+                            <div class="profile-stats">
+                                <div class="stat">
+                                    <span class="stat-name">Status</span>
+                                    <span class="stat-value">Unverified</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-name">Connections</span>
+                                    <span class="stat-value">0</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-name">Bandwidth</span>
+                                    <span class="stat-value">Limited</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-main">
+                        <div class="profile-custom-content">
+                            <h2>Identity Not Initialized</h2>
+                            <p>You need to connect to the network to create your digital shell.</p>
+                            <div class="terminal-mode">
+                                <div class="terminal-header">Terminal.exe</div>
+                                <div class="terminal-content">
+                                    <pre>[guest@wirebase]> identity --status
+ERROR: No identity found
+[guest@wirebase]> connect --auth
+Redirecting to authentication portal...
+<span class="cursor">_</span></pre>
+                                </div>
+                            </div>
+                            <div class="connection-actions">
+                                <a href="/users/login" class="cyber-button primary">Initialize Connection</a>
+                                <a href="/users/register" class="cyber-button">Create New Identity</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="../images/wirebase-logo.svg" alt="wirebase.city" class="pixel-image small">
+                <span>wirebase.city</span>
+            </div>
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Terms</a>
+                <a href="#">Privacy</a>
+                <a href="#">Contact</a>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            © 2025 wirebase.city - You don't exist until you're online
+        </div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/laincore.js"></script>
+</body>
+</html>

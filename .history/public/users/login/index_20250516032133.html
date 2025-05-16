@@ -28,7 +28,7 @@
         /* Typography */
         @font-face {
             font-family: 'PxPlus IBM VGA8';
-            src: url('https://cdn.jsdelivr.net/npm/ibm-plex-mono@1.2.0/IBM-Plex-Mono-Regular.woff2') format('woff2');
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js');
             font-style: normal;
             font-weight: normal;
         }
@@ -738,194 +738,28 @@
             width: 100%;
         }
 
-        .footer-content {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .footer-logo {
-            display: flex;
-            align-items: center;
-        }
-
-        .footer-logo img {
-            width: 20px;
-            height: 20px;
-            margin-right: 5px;
-            filter: brightness(0.8);
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .footer-copyright {
-            margin-top: 0.5rem;
-            text-align: center;
-            opacity: 0.7;
-            font-size: 0.7rem;
-            max-width: 1200px;
-            margin: 0.5rem auto 0;
-        }
-
-        /* Animations */
-        @keyframes cursor-blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-
-        @keyframes flicker {
-            0% { opacity: 0.1; }
-            5% { opacity: 0.2; }
-            10% { opacity: 0.1; }
-            15% { opacity: 0.3; }
-            20% { opacity: 0.1; }
-            25% { opacity: 0.2; }
-            30% { opacity: 0.1; }
-            35% { opacity: 0.3; }
-            40% { opacity: 0.1; }
-            45% { opacity: 0.2; }
-            50% { opacity: 0.1; }
-            55% { opacity: 0.3; }
-            60% { opacity: 0.1; }
-            65% { opacity: 0.2; }
-            70% { opacity: 0.1; }
-            75% { opacity: 0.3; }
-            80% { opacity: 0.1; }
-            85% { opacity: 0.2; }
-            90% { opacity: 0.1; }
-            95% { opacity: 0.3; }
-            100% { opacity: 0.1; }
-        }
-
-        @keyframes glitch {
-            0% { clip: rect(42px, 9999px, 44px, 0); }
-            5% { clip: rect(12px, 9999px, 59px, 0); }
-            10% { clip: rect(48px, 9999px, 29px, 0); }
-            15% { clip: rect(42px, 9999px, 73px, 0); }
-            20% { clip: rect(63px, 9999px, 27px, 0); }
-            25% { clip: rect(34px, 9999px, 55px, 0); }
-            30% { clip: rect(86px, 9999px, 73px, 0); }
-            35% { clip: rect(20px, 9999px, 20px, 0); }
-            40% { clip: rect(26px, 9999px, 60px, 0); }
-            45% { clip: rect(25px, 9999px, 66px, 0); }
-            50% { clip: rect(57px, 9999px, 98px, 0); }
-            55% { clip: rect(5px, 9999px, 46px, 0); }
-            60% { clip: rect(82px, 9999px, 31px, 0); }
-            65% { clip: rect(54px, 9999px, 27px, 0); }
-            70% { clip: rect(28px, 9999px, 99px, 0); }
-            75% { clip: rect(45px, 9999px, 69px, 0); }
-            80% { clip: rect(23px, 9999px, 85px, 0); }
-            85% { clip: rect(54px, 9999px, 84px, 0); }
-            90% { clip: rect(45px, 9999px, 47px, 0); }
-            95% { clip: rect(37px, 9999px, 20px, 0); }
-            100% { clip: rect(4px, 9999px, 91px, 0); }
-        }
-
-        @keyframes textNoise {
-            0% { text-shadow: 1px 0 0 #ff00ea, -1px 0 0 #00ffff; }
-            25% { text-shadow: -1px 0 0 #ff00ea, 1px 0 0 #00ffff; }
-            50% { text-shadow: 1px 0 0 #ff00ea, -1px 0 0 #00ffff; }
-            75% { text-shadow: -1px 0 0 #ff00ea, 1px 0 0 #00ffff; }
-            100% { text-shadow: 1px 0 0 #ff00ea, -1px 0 0 #00ffff; }
-        }
-        
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-        
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(157, 52, 217, 0.4); }
-            70% { box-shadow: 0 0 0 5px rgba(157, 52, 217, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(157, 52, 217, 0); }
-        }
-
-        @keyframes dataFlow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        @keyframes layerShift {
-            0% { transform: translate(0, 0) scale(1); filter: hue-rotate(0deg); }
-            33% { transform: translate(-3px, 2px) scale(1.02); filter: hue-rotate(30deg); }
-            66% { transform: translate(3px, -2px) scale(0.98); filter: hue-rotate(-30deg); }
-            100% { transform: translate(0, 0) scale(1); filter: hue-rotate(0deg); }
-        }
-
-        @keyframes borderFlash {
-            0% { border-color: var(--border-color); }
-            50% { border-color: var(--accent-color); }
-            100% { border-color: var(--border-color); }
-        }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .container {
-                padding: 0.5rem;
-            }
-            
-            .cyber-navbar {
-                flex-direction: column;
-                gap: 5px;
-            }
-            
-            .form-actions {
-                flex-direction: column;
-            }
-            
-            .form-options {
-                flex-direction: column;
-                gap: 0.5rem;
-                align-items: flex-start;
-            }
-            
-            .auth-options {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-        }
-
-        /* Data chunk glitch effect */
-        .data-chunk {
-            position: fixed;
-            pointer-events: none;
-            z-index: 999;
-            box-shadow: 0 0 5px var(--accent-glow);
-        }
-    </style>
-</head>
+        .
 <body>
     <header class="main-header">
-        <div class="header-inner">
-            <div class="logo">
-                <img src="../../images/wirebase-logo.svg" alt="wirebase.city" class="glitch-image">
-                <h1 class="glitch-text" data-text="wirebase.city">wirebase.city</h1>
-            </div>
-            <nav class="cyber-navbar">
-                <a href="/" class="cyber-button">Core</a>
-                <a href="/profile" class="cyber-button">Shell</a>
-                <a href="/scrapyard" class="cyber-button">Nullspace</a>
-                <a href="/feed" class="cyber-button">Stream</a>
-                <a href="/forum" class="cyber-button">Assembly</a>
-                <a href="/users/login" class="cyber-button active">Connect</a>
-                <button id="theme-toggle" class="cyber-button" type="button">Disconnect</button>
-            </nav>
+        <div class="logo">
+            <img src="../../images/wirebase-logo.svg" alt="wirebase.city" class="glitch-image">
+            <h1 class="glitch-text" data-text="wirebase.city">wirebase.city</h1>
         </div>
+        <nav class="cyber-navbar">
+            <a href="/" class="cyber-button">Core</a>
+            <a href="/profile" class="cyber-button">Shell</a>
+            <a href="/scrapyard" class="cyber-button">Nullspace</a>
+            <a href="/feed" class="cyber-button">Stream</a>
+            <a href="/forum" class="cyber-button">Assembly</a>
+            <a href="/users/login" class="cyber-button active">Connect</a>
+            <button id="theme-toggle" class="cyber-button" type="button">Disconnect</button>
+        </nav>
     </header>
 
-    <!-- CRT scanlines and glitch effects -->
+    <!-- Add CRT scanlines and glitch effects -->
     <div class="crt-scanlines"></div>
     <div class="crt-flicker"></div>
     <div class="digital-noise"></div>
-    <div class="scanline-effect"></div>
 
     <div class="container">
         <div class="cyber-window login-window">
@@ -933,8 +767,8 @@
                 <span class="cyber-window-title">system.authentication</span>
                 <div class="cyber-window-controls">
                     <span class="cyber-window-control">_</span>
-                    <span class="cyber-window-control">[]</span>
-                    <span class="cyber-window-control">X</span>
+                    <span class="cyber-window-control">□</span>
+                    <span class="cyber-window-control">×</span>
                 </div>
             </div>
             <div class="cyber-window-content">
@@ -986,11 +820,11 @@ Enter credentials to authenticate:
                         </div>
                         <div class="auth-options">
                             <a href="/users/oauth/github">
-                                <span class="auth-icon">[G]</span>
+                                <span class="auth-icon">🔗</span>
                                 <span>GitHub Auth</span>
                             </a>
                             <a href="/users/oauth/google">
-                                <span class="auth-icon">[G+]</span>
+                                <span class="auth-icon">🔗</span>
                                 <span>Google Auth</span>
                             </a>
                         </div>
@@ -1020,161 +854,5 @@ Enter credentials to authenticate:
 
     <script src="../../js/main.js"></script>
     <script src="../../js/laincore.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Cursor blinking in terminal
-            setInterval(function() {
-                const cursors = document.querySelectorAll('.cursor');
-                cursors.forEach(cursor => {
-                    cursor.style.visibility = cursor.style.visibility === 'hidden' ? 'visible' : 'hidden';
-                });
-            }, 500);
-            
-            // Random CRT flicker effect
-            setInterval(function() {
-                const flicker = document.querySelector('.crt-flicker');
-                if (Math.random() > 0.95) {
-                    flicker.style.opacity = (Math.random() * 0.3).toString();
-                    setTimeout(function() {
-                        flicker.style.opacity = '0';
-                    }, 50);
-                }
-            }, 200);
-            
-            // Glitch effect on logo text
-            const glitchText = document.querySelector('.glitch-text');
-            setInterval(function() {
-                if (Math.random() > 0.95) {
-                    glitchText.style.letterSpacing = `${Math.random() * 10}px`;
-                    setTimeout(function() {
-                        glitchText.style.letterSpacing = '';
-                    }, 100);
-                }
-            }, 3000);
-            
-            // Theme toggle functionality
-            const themeToggle = document.getElementById('theme-toggle');
-            if (themeToggle) {
-                themeToggle.addEventListener('click', function() {
-                    document.body.classList.toggle('light-theme');
-                    themeToggle.textContent = document.body.classList.contains('light-theme') ? 'Dark Mode' : 'Disconnect';
-                });
-            }
-            
-            // Dynamic terminal text
-            const terminalContent = document.querySelector('.terminal-content pre');
-            const typingSpeed = 50; // ms per character
-            
-            function simulateTyping(text, element, startIndex = 0) {
-                if (startIndex < text.length) {
-                    element.textContent = text.substring(0, startIndex + 1);
-                    element.appendChild(document.createElement('span')).className = 'cursor';
-                    
-                    setTimeout(() => {
-                        simulateTyping(text, element, startIndex + 1);
-                    }, typingSpeed);
-                }
-            }
-            
-            // Update terminal with random system messages
-            function updateTerminal() {
-                const messages = [
-                    "[system@wirebase]> auth --protocol=secure\nInitializing secure connection...\nEnter credentials to authenticate:",
-                    "[system@wirebase]> scan --network\nScanning nearby nodes...\nRestricted access: Authentication required.",
-                    "[system@wirebase]> check --status\nConnection: ACTIVE\nSecurity Protocol: ENABLED\nAuthentication: PENDING",
-                    "[system@wirebase]> mem --usage\nShell allocation: 256MB\nNode capacity: RESTRICTED\nUpdate required: AUTH"
-                ];
-                
-                if (Math.random() > 0.7) {
-                    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-                    const newTerminal = document.createElement('pre');
-                    terminalContent.innerHTML = '';
-                    terminalContent.appendChild(newTerminal);
-                    simulateTyping(randomMessage, newTerminal);
-                }
-            }
-            
-            // Periodically update terminal
-            setInterval(updateTerminal, 8000);
-            
-            // Data chunk glitch animation
-            function createGlitchChunk() {
-                if (Math.random() > 0.99) {
-                    const chunk = document.createElement('div');
-                    chunk.className = 'data-chunk';
-                    chunk.style.width = `${Math.random() * 300 + 50}px`;
-                    chunk.style.height = `${Math.random() * 3 + 1}px`;
-                    chunk.style.backgroundColor = 'var(--accent-color)';
-                    chunk.style.opacity = `${Math.random() * 0.5 + 0.1}`;
-                    chunk.style.left = `${Math.random() * 100}%`;
-                    chunk.style.top = `${Math.random() * 100}%`;
-                    document.body.appendChild(chunk);
-                    
-                    setTimeout(() => {
-                        chunk.remove();
-                    }, Math.random() * 500 + 100);
-                }
-                
-                requestAnimationFrame(createGlitchChunk);
-            }
-            
-            createGlitchChunk();
-            
-            // Subtle form field animation
-            const inputs = document.querySelectorAll('.cyber-input');
-            
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.classList.add('active');
-                    const formGroup = this.closest('.form-group');
-                    formGroup.style.borderLeft = '2px solid var(--accent-color)';
-                    formGroup.style.paddingLeft = '10px';
-                    formGroup.style.transition = 'all 0.3s ease';
-                });
-                
-                input.addEventListener('blur', function() {
-                    this.classList.remove('active');
-                    const formGroup = this.closest('.form-group');
-                    formGroup.style.borderLeft = '';
-                    formGroup.style.paddingLeft = '';
-                });
-            });
-            
-            // Simulate network activity on the status indicator
-            const statusIcon = document.querySelector('.status-icon');
-            const statusText = document.querySelector('.status-text');
-            
-            setInterval(function() {
-                if (Math.random() > 0.8) {
-                    statusIcon.style.backgroundColor = 'var(--error-color)';
-                    statusText.textContent = 'Connection Fluctuating...';
-                    
-                    setTimeout(function() {
-                        statusIcon.style.backgroundColor = 'var(--success-color)';
-                        statusText.textContent = 'Secure Connection Established';
-                    }, 800);
-                }
-            }, 5000);
-            
-            // Add perspective tilt effect based on mouse movement
-            const loginWindow = document.querySelector('.login-window');
-            
-            document.addEventListener('mousemove', function(e) {
-                if (loginWindow) {
-                    const xAxis = (window.innerWidth / 2 - e.pageX) / 50;
-                    const yAxis = (window.innerHeight / 2 - e.pageY) / 50;
-                    
-                    loginWindow.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-                }
-            });
-            
-            // Reset perspective when mouse leaves
-            document.addEventListener('mouseleave', function() {
-                if (loginWindow) {
-                    loginWindow.style.transform = 'rotateY(0deg) rotateX(0deg)';
-                }
-            });
-        });
-    </script>
 </body>
 </html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shell - wirebase.city</title>
+    <style>
+        /* Base styles with dark theme and purple accents */
+        :root {
+            --bg-color: #050508;
+            --text-color: #e0e0e0;
+            --accent-color: #9d34d9;
+            --accent-glow: #be5aff;
+            --terminal-bg: #0a0a12;
+            --window-bg: #111118;
+            --border-color: #343467;
+            --header-color: #131320;
+            --link-color: #a571d0;
+            --link-hover: #d384ff;
+            --error-color: #ff3e66;
+            --success-color: #39ff99;
+            --code-color: #77dd77;
+            --grid-color: rgba(157, 52, 217, 0.07);
+        }
+
+        /* Typography */
+        @font-face {
+            font-family: 'PxPlus IBM VGA8';
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js');
+            font-style: normal;
+            font-weight: normal;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'VT323', 'PxPlus IBM VGA8', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 16px;
+            line-height: 1.4;
+            overflow-x: hidden;
+            position: relative;
+            padding-bottom: 80px;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(0deg, transparent 24%, 
+                var(--grid-color) 25%, 
+                var(--grid-color) 26%, 
+                transparent 27%, transparent 74%, 
+                var(--grid-color) 75%, 
+                var(--grid-color) 76%, transparent 77%, transparent),
+                linear-gradient(90deg, transparent 24%, 
+                var(--grid-color) 25%, 
+                var(--grid-color) 26%, 
+                transparent 27%, transparent 74%, 
+                var(--grid-color) 75%, 
+                var(--grid-color) 76%, transparent 77%, transparent);
+            background-size: 50px 50px;
+            z-index: -1;
+        }
+
+        a {
+            color: var(--link-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--link-hover);
+            text-shadow: 0 0 5px var(--link-hover);
+        }
+
+        h1, h2, h3 {
+            font-weight: normal;
+            margin-bottom: 1rem;
+            text-transform: lowercase;
+            letter-spacing: 1px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: var(--accent-color);
+            text-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        h2 {
+            </div>
+        </div>
+        <div class="footer-copyright">
+            © 2025 wirebase.city - You don't exist until you're online
+        </div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/laincore.js"></script>
+</body>
+</html>

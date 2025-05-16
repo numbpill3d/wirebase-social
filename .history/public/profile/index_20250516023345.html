@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shell - wirebase.city</title>
+    <style>
+        /* Base styles with dark theme and purple accents */
+        :root {
+            --bg-color: #050508;
+            --text-color: #e0e0e0;
+            --accent-color: #9d34d9;
+            --accent-glow: #be5aff;
+            --terminal-bg: #0a0a12;
+            --window-bg: #111118;
+            --border-color: #343467;
+            --header-color: #131320;
+            --link-color: #a571d0;
+            --link-hover: #d384ff;
+            --error-color: #ff3e66;
+            --success-color: #39ff99;
+            --code-color: #77dd77;
+            --grid-color: rgba(157, 52, 217, 0.07);
+        }
+
+        /* Typography */
+        @font-face {
+            font-family: 'PxPlus IBM VGA8';
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js');
+            font-style: normal;
+            font-weight: normal;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'VT323', 'PxPlus IBM VGA8', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 16px;
+            line-height: 1.4;
+            overflow-x: hidden;
+            position: relative;
+            padding-bottom: 80px;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(0deg, transparent 24%,
+                var(--grid-color) 25%,
+                var(--grid-color) 26%,
+                transparent 27%, transparent 74%,
+                var(--grid-color) 75%,
+                var(--grid-color) 76%, transparent 77%, transparent),
+                linear-gradient(90deg, transparent 24%,
+                var(--grid-color) 25%,
+                var(--grid-color) 26%,
+                transparent 27%, transparent 74%,
+                var(--grid-color) 75%,
+                var(--grid-color) 76%, transparent 77%, transparent);
+            background-size: 50px 50px;
+            z-index: -1;
+        }
+
+        a {
+            color: var(--link-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--link-hover);
+            text-shadow: 0 0 5px var(--link-hover);
+        }
+
+        h1, h2, h3 {
+            font-weight: normal;
+            margin-bottom: 1rem;
+            text-transform: lowercase;
+            letter-spacing: 1px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: var(--accent-color);
+            text-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+            margin-top: 1.5rem;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            color: var(--accent-color);
+        }
+
+        button, .cyber-button {
+            background-color: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover, .cyber-button:hover {
+            background-color: rgba(157, 52, 217, 0.2);
+            box-shadow: 0 0 10px var(--accent-glow);
+            color: white;
+        }
+
+        button::before, .cyber-button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(157, 52, 217, 0.4), transparent);
+            transition: all 0.6s;
+            z-index: -1;
+        }
+
+        button:hover::before, .cyber-button:hover::before {
+            left: 100%;
+        }
+
+        .cyber-button.active {
+            background-color: rgba(157, 52, 217, 0.3);
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        .cyber-button.primary {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo">
+            <img src="../images/wirebase-logo.svg" alt="wirebase.city" class="glitch-image">
+            <h1 class="glitch-text" data-text="wirebase.city">wirebase.city</h1>
+        </div>
+        <nav class="cyber-navbar">
+            <a href="/" class="cyber-button">Core</a>
+            <a href="/profile" class="cyber-button active">Shell</a>
+            <a href="/scrapyard" class="cyber-button">Nullspace</a>
+            <a href="/feed" class="cyber-button">Stream</a>
+            <a href="/forum" class="cyber-button">Assembly</a>
+            <a href="/users/login" class="cyber-button">Connect</a>
+            <button id="theme-toggle" class="cyber-button" type="button">Disconnect</button>
+        </nav>
+    </header>
+
+    <!-- Add CRT scanlines and glitch effects -->
+    <div class="crt-scanlines"></div>
+    <div class="crt-flicker"></div>
+    <div class="digital-noise"></div>
+
+    <div class="container">
+        <div class="cyber-window">
+            <div class="cyber-window-header">
+                <span class="cyber-window-title">system.identity</span>
+                <div class="cyber-window-controls">
+                    <span class="cyber-window-control">_</span>
+                    <span class="cyber-window-control">□</span>
+                    <span class="cyber-window-control">×</span>
+                </div>
+            </div>
+            <div class="cyber-window-content">
+                <div class="profile-container">
+                    <div class="profile-header">
+                        <div class="profile-avatar-container">
+                            <img src="../images/laincore/default-avatar.png" alt="Default Avatar" class="profile-avatar">
+                            <span class="profile-glyph">👁️</span>
+                        </div>
+                        <div class="profile-info">
+                            <h1>Guest_Node</h1>
+                            <div class="profile-stats">
+                                <div class="stat">
+                                    <span class="stat-name">Status</span>
+                                    <span class="stat-value">Unverified</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-name">Connections</span>
+                                    <span class="stat-value">0</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-name">Bandwidth</span>
+                                    <span class="stat-value">Limited</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-main">
+                        <div class="profile-custom-content">
+                            <h2>Identity Not Initialized</h2>
+                            <p>You need to connect to the network to create your digital shell.</p>
+                            <div class="terminal-mode">
+                                <div class="terminal-header">Terminal.exe</div>
+                                <div class="terminal-content">
+                                    <pre>[guest@wirebase]> identity --status
+ERROR: No identity found
+[guest@wirebase]> connect --auth
+Redirecting to authentication portal...
+<span class="cursor">_</span></pre>
+                                </div>
+                            </div>
+                            <div class="connection-actions">
+                                <a href="/users/login" class="cyber-button primary">Initialize Connection</a>
+                                <a href="/users/register" class="cyber-button">Create New Identity</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="../images/wirebase-logo.svg" alt="wirebase.city" class="pixel-image small">
+                <span>wirebase.city</span>
+            </div>
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Terms</a>
+                <a href="#">Privacy</a>
+                <a href="#">Contact</a>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            © 2025 wirebase.city - You don't exist until you're online
+        </div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/laincore.js"></script>
+</body>
+</html>
