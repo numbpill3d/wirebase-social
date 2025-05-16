@@ -3,40 +3,22 @@
  * Provides middleware to handle database query timeouts
  */
 
-// Break circular dependency by removing direct import
+const { knex } = require('../../server');
 const dbMonitor = require('../utils/db-monitor');
 const dbHealth = require('../utils/db-health');
 
-console.log('Query timeout middleware loaded');
-
 /**
  * Create a middleware that adds query timeout handling
- * @param {Object} knexInstance - The knex instance to use
  * @param {number} timeout - Timeout in milliseconds
  * @returns {Function} Express middleware
  */
-const queryTimeoutMiddleware = (knexInstance, timeout = 30000) => {
-  if (!knexInstance) {
-    console.error('ERROR: knexInstance not provided to queryTimeoutMiddleware');
-    // Return a dummy middleware that just calls next()
-    return (req, res, next) => next();
-  }
-  
-  console.log('Creating query timeout middleware with knex:', knexInstance ? 'defined' : 'undefined');
-  console.log('knex.client:', knexInstance?.client ? 'defined' : 'undefined');
-  
+const queryTimeoutMiddleware = (timeout = 30000) => {
   return (req, res, next) => {
-    // Check if knex and knex.client are defined before accessing
-    if (!knexInstance || !knexInstance.client) {
-      console.error('ERROR: knex or knex.client is undefined in query timeout middleware execution');
-      return next();
-    }
-    
     // Store original query method
-    const originalQuery = knexInstance.client.query;
+    const originalQuery = knex.client.query;
     
     // Override query method with timeout
-    knexInstance.client.query = (...args) => {
+    knex.client.query = (...args) => {
       // Create a promise that resolves with the query result
       const queryPromise = originalQuery.apply(knex.client, args);
       
@@ -74,30 +56,23 @@ const queryTimeoutMiddleware = (knexInstance, timeout = 30000) => {
     
     // Restore original query method after request is complete
     res.on('finish', () => {
-      knexInstance.client.query = originalQuery;
+      knex.client.query = originalQuery;
     });
   };
 };
 
 /**
  * Create a middleware that adds transaction timeout handling
- * @param {Object} knexInstance - The knex instance to use
  * @param {number} timeout - Timeout in milliseconds
  * @returns {Function} Express middleware
  */
-const transactionTimeoutMiddleware = (knexInstance, timeout = 60000) => {
-  if (!knexInstance) {
-    console.error('ERROR: knexInstance not provided to transactionTimeoutMiddleware');
-    // Return a dummy middleware that just calls next()
-    return (req, res, next) => next();
-  }
-  
+const transactionTimeoutMiddleware = (timeout = 60000) => {
   return (req, res, next) => {
     // Store original transaction method
-    const originalTransaction = knexInstance.transaction;
+    const originalTransaction = knex.transaction;
     
     // Override transaction method with timeout
-    knexInstance.transaction = (...args) => {
+    knex.transaction = (...args) => {
       // Get transaction options
       const options = args[0] || {};
       
@@ -108,7 +83,7 @@ const transactionTimeoutMiddleware = (knexInstance, timeout = 60000) => {
       };
       
       // Call original transaction method with new options
-      return originalTransaction.call(knexInstance, newOptions);
+      return originalTransaction.call(knex, newOptions);
     };
     
     // Continue to next middleware
@@ -116,7 +91,7 @@ const transactionTimeoutMiddleware = (knexInstance, timeout = 60000) => {
     
     // Restore original transaction method after request is complete
     res.on('finish', () => {
-      knexInstance.transaction = originalTransaction;
+      knex.transaction = originalTransaction;
     });
   };
 };

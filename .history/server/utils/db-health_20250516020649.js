@@ -3,7 +3,7 @@
  * Provides functions to check database connection health and perform maintenance
  */
 
-// Remove direct import of knex to break circular dependency
+const { knex } = require('../../server');
 const dbMonitor = require('./db-monitor');
 
 // Track health check status
@@ -19,23 +19,14 @@ let healthCheckStatus = {
 
 /**
  * Perform a database health check
- * @param {Object} knexInstance - The knex instance to use
  * @returns {Promise<Object>} Health check result
  */
-const checkHealth = async (knexInstance) => {
-  if (!knexInstance) {
-    console.error('ERROR: knexInstance not provided to checkHealth');
-    return {
-      healthy: false,
-      error: 'No knex instance provided'
-    };
-  }
-  
+const checkHealth = async () => {
   const startTime = Date.now();
   
   try {
     // Simple query to check database connectivity
-    await knexInstance.raw('SELECT 1 as health_check');
+    await knex.raw('SELECT 1 as health_check');
     
     const responseTime = Date.now() - startTime;
     
@@ -53,7 +44,7 @@ const checkHealth = async (knexInstance) => {
     return {
       healthy: true,
       responseTime,
-      poolStatus: dbMonitor.getPoolStatus(knexInstance)
+      poolStatus: dbMonitor.getPoolStatus()
     };
   } catch (error) {
     const responseTime = Date.now() - startTime;
@@ -76,57 +67,47 @@ const checkHealth = async (knexInstance) => {
       healthy: false,
       error: error.message,
       responseTime,
-      poolStatus: dbMonitor.getPoolStatus(knexInstance)
+      poolStatus: dbMonitor.getPoolStatus()
     };
   }
 };
 
 /**
  * Get current health status
- * @param {Object} knexInstance - The knex instance to use
  * @returns {Object} Current health status
  */
-const getHealthStatus = (knexInstance) => {
+const getHealthStatus = () => {
   return {
     ...healthCheckStatus,
-    poolStatus: dbMonitor.getPoolStatus(knexInstance)
+    poolStatus: dbMonitor.getPoolStatus()
   };
 };
 
 /**
  * Perform database maintenance
- * @param {Object} knexInstance - The knex instance to use
  * @returns {Promise<Object>} Maintenance result
  */
-const performMaintenance = async (knexInstance) => {
-  if (!knexInstance) {
-    console.error('ERROR: knexInstance not provided to performMaintenance');
-    return {
-      success: false,
-      error: 'No knex instance provided'
-    };
-  }
-  
+const performMaintenance = async () => {
   try {
     // Get pool status before maintenance
-    const beforeStatus = dbMonitor.getPoolStatus(knexInstance);
+    const beforeStatus = dbMonitor.getPoolStatus();
     
     // Force a pool refresh by destroying and recreating the pool
     if (healthCheckStatus.consecutiveFailures >= 3) {
       console.log('Performing database pool reset due to consecutive failures');
       
       // Destroy and recreate the pool
-      await knexInstance.destroy();
-      await knexInstance.initialize();
+      await knex.destroy();
+      await knex.initialize();
       
       // Reset health check status
       healthCheckStatus.consecutiveFailures = 0;
       dbMonitor.resetMetrics();
-      dbMonitor.setupPoolMonitoring(knexInstance);
+      dbMonitor.setupPoolMonitoring();
     }
     
     // Get pool status after maintenance
-    const afterStatus = dbMonitor.getPoolStatus(knexInstance);
+    const afterStatus = dbMonitor.getPoolStatus();
     
     return {
       success: true,
@@ -146,26 +127,20 @@ const performMaintenance = async (knexInstance) => {
 
 /**
  * Start periodic health checks
- * @param {Object} knexInstance - The knex instance to use
  * @param {number} interval - Check interval in milliseconds
  * @returns {Object} Timer object
  */
-const startPeriodicHealthChecks = (knexInstance, interval = 60000) => {
-  if (!knexInstance) {
-    console.error('ERROR: knexInstance not provided to startPeriodicHealthChecks');
-    return null;
-  }
-  
+const startPeriodicHealthChecks = (interval = 60000) => {
   // Perform initial health check
-  checkHealth(knexInstance);
+  checkHealth();
   
   // Schedule periodic health checks
   const timer = setInterval(async () => {
-    const result = await checkHealth(knexInstance);
+    const result = await checkHealth();
     
     // Perform maintenance if needed
     if (!result.healthy || healthCheckStatus.consecutiveFailures >= 3) {
-      await performMaintenance(knexInstance);
+      await performMaintenance();
     }
   }, interval);
   

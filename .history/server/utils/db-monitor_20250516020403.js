@@ -3,6 +3,8 @@
  * Provides functions to monitor and report on database connection pool status
  */
 
+const { knex } = require('../../server');
+
 // Store metrics for connection pool
 let metrics = {
   totalConnections: 0,
@@ -20,17 +22,12 @@ let metrics = {
 
 /**
  * Get current connection pool status
- * @param {Object} knexInstance - The knex instance to use
  * @returns {Object} Current pool status
  */
-const getPoolStatus = (knexInstance) => {
+const getPoolStatus = () => {
   try {
-    if (!knexInstance || !knexInstance.client) {
-      return { error: 'Knex instance not available or invalid' };
-    }
-    
     // Get pool from knex instance
-    const pool = knexInstance.client.pool;
+    const pool = knex.client.pool;
     
     if (!pool) {
       return { error: 'Pool not available' };
@@ -67,17 +64,10 @@ const getPoolStatus = (knexInstance) => {
 
 /**
  * Setup connection pool event listeners to track metrics
- * @param {Object} knexInstance - The knex instance to use
- * @returns {boolean} Success status
  */
-const setupPoolMonitoring = (knexInstance) => {
+const setupPoolMonitoring = () => {
   try {
-    if (!knexInstance || !knexInstance.client) {
-      console.warn('Knex instance not available or invalid for pool monitoring');
-      return false;
-    }
-    
-    const pool = knexInstance.client.pool;
+    const pool = knex.client.pool;
     
     if (!pool || !pool.on) {
       console.warn('Pool monitoring not available');
@@ -121,10 +111,9 @@ const setupPoolMonitoring = (knexInstance) => {
 
 /**
  * Log warning when pool is under pressure
- * @param {Object} knexInstance - The knex instance to use
  */
-const logPoolWarning = (knexInstance) => {
-  const status = getPoolStatus(knexInstance);
+const logPoolWarning = () => {
+  const status = getPoolStatus();
   if (status.error) return;
   
   // Log warning if pool utilization is high
@@ -158,7 +147,8 @@ const resetMetrics = () => {
   };
 };
 
-// Export functions without initializing immediately
+// Initialize monitoring
+setupPoolMonitoring();
 
 // Export functions
 module.exports = {

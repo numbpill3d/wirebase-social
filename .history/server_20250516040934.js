@@ -405,13 +405,10 @@ const server = app.listen(PORT, () => {
   console.log('Starting database monitoring...');
 
   // Start health checks (every 60 seconds)
-  healthCheckTimer = dbHealth.startPeriodicHealthChecks(knex, 60000);
+  healthCheckTimer = dbHealth.startPeriodicHealthChecks(60000);
 
   // Start leak detection (check every 30 seconds, fix every 5 minutes)
-  leakDetectionTimers = dbLeakDetector.startLeakDetection(knex, 30000, 300000);
-  
-  // Initialize pool monitoring
-  dbMonitor.setupPoolMonitoring(knex);
+  leakDetectionTimers = dbLeakDetector.startLeakDetection(30000, 300000);
 });
 
 // Add server timeout to prevent hanging connections
