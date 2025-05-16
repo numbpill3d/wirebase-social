@@ -168,16 +168,6 @@ class MarketItem {
         case 'popular':
           query = query.order('views', { ascending: false });
           break;
-        case 'trending':
-          // For trending, we order by a combination of recent views and downloads
-          query = query.order('views', { ascending: false })
-                       .order('downloads', { ascending: false });
-          break;
-        case 'recommended':
-          // For recommended, we need special handling after fetching the items
-          // We'll use the default sort for now
-          query = query.order('created_at', { ascending: false });
-          break;
         case 'newest':
         default:
           query = query.order('created_at', { ascending: false });
@@ -936,105 +926,6 @@ class MarketItem {
       return data;
     } catch (error) {
       console.error('Error getting top categories:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Get trending items based on recent views, purchases, and downloads
-   * @param {number} limit - Maximum number of items to return
-   * @returns {Array} Array of trending items
-   */
-  static async getTrending(limit = 6) {
-    try {
-      const { data: items, error } = await supabase
-        .from('market_items')
-        .select(`
-          *,
-          creator:creator_id(id, username, display_name, avatar),
-          category:category_id(id, name)
-        `)
-        .eq('marketplace_status', 'available')
-        .order('views', { ascending: false })
-        .limit(limit);
-
-      if (error) throw error;
-
-      // Format the items
-      return items.map(item => this.formatItem(item));
-    } catch (error) {
-      console.error('Error getting trending items:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Get recommended items for a user based on their purchase history
-   * @param {string} userId - The user ID
-   * @param {number} limit - Maximum number of items to return
-   * @returns {Array} Array of recommended items
-   */
-  static async getRecommended(userId, limit = 6) {
-    try {
-      // Get user's purchased items
-      const { data: purchases, error: purchasesError } = await supabase
-        .from('market_purchases')
-        .select('item_id')
-        .eq('user_id', userId);
-
-      if (purchasesError) throw purchasesError;
-
-      // If user has no purchases, return trending items
-      if (!purchases || purchases.length === 0) {
-        return this.getTrending(limit);
-      }
-
-      // Get categories of purchased items
-      const purchasedItemIds = purchases.map(p => p.item_id);
-
-      const { data: purchasedItems, error: itemsError } = await supabase
-        .from('market_items')
-        .select('category_id')
-        .in('id', purchasedItemIds);
-
-      if (itemsError) throw itemsError;
-
-      // Get unique category IDs
-      const categoryIds = [...new Set(purchasedItems.map(item => item.category_id))];
-
-      // Get recommended items from the same categories
-      const { data: recommendedItems, error: recommendedError } = await supabase
-        .from('market_items')
-        .select(`
-          *,
-          creator:creator_id(id, username, display_name, avatar),
-          category:category_id(id, name)
-        `)
-        .eq('marketplace_status', 'available')
-        .in('category_id', categoryIds)
-        .not('id', 'in', purchasedItemIds)
-        .order('created_at', { ascending: false })
-        .limit(limit);
-
-      if (recommendedError) throw recommendedError;
-
-      // If not enough recommended items, fill with trending items
-      if (recommendedItems.length < limit) {
-        const trendingItems = await this.getTrending(limit - recommendedItems.length);
-
-        // Filter out items that are already in recommended items
-        const recommendedItemIds = recommendedItems.map(item => item.id);
-        const filteredTrendingItems = trendingItems.filter(item => !recommendedItemIds.includes(item.id));
-
-        return [
-          ...recommendedItems.map(item => this.formatItem(item)),
-          ...filteredTrendingItems
-        ];
-      }
-
-      return recommendedItems.map(item => this.formatItem(item));
-    } catch (error) {
-      console.error('Error getting recommended items:', error);
       return [];
     }
   }

@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const transferForm = document.getElementById('transfer-form');
   const convertForm = document.getElementById('convert-form');
   const transactionFilter = document.getElementById('transaction-filter');
+  const transactionList = document.querySelector('.transaction-list');
   const transactionItems = document.querySelectorAll('.transaction-item');
 
   // Notification system

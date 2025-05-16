@@ -168,16 +168,6 @@ class MarketItem {
         case 'popular':
           query = query.order('views', { ascending: false });
           break;
-        case 'trending':
-          // For trending, we order by a combination of recent views and downloads
-          query = query.order('views', { ascending: false })
-                       .order('downloads', { ascending: false });
-          break;
-        case 'recommended':
-          // For recommended, we need special handling after fetching the items
-          // We'll use the default sort for now
-          query = query.order('created_at', { ascending: false });
-          break;
         case 'newest':
         default:
           query = query.order('created_at', { ascending: false });

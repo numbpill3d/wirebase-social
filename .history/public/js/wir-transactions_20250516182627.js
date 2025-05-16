@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const transferForm = document.getElementById('transfer-form');
   const convertForm = document.getElementById('convert-form');
   const transactionFilter = document.getElementById('transaction-filter');
+  const transactionList = document.querySelector('.transaction-list');
   const transactionItems = document.querySelectorAll('.transaction-item');
 
   // Notification system
@@ -184,12 +185,6 @@ document.addEventListener('DOMContentLoaded', function() {
       if (newLootBalanceWir) {
         newLootBalanceWir.textContent = `${userLootBalance + amount} Loot`;
       }
-
-      // Disable button if amount is invalid
-      const confirmButton = document.getElementById('confirm-conversion');
-      if (confirmButton) {
-        confirmButton.disabled = (amount <= 0 || amount > userWirBalance);
-      }
     });
   }
 
@@ -228,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
         notes: document.getElementById('transfer-notes').value
       };
 
-      fetch('/market/user/wir/transfer', {
+      fetch('/market/wir/transfer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -274,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function() {
         amount
       };
 
-      fetch('/market/user/wir/convert', {
+      fetch('/market/wir/convert', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

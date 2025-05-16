@@ -16,10 +16,11 @@ document.addEventListener('DOMContentLoaded', function() {
   const transferForm = document.getElementById('transfer-form');
   const convertForm = document.getElementById('convert-form');
   const transactionFilter = document.getElementById('transaction-filter');
+  const transactionList = document.querySelector('.transaction-list');
   const transactionItems = document.querySelectorAll('.transaction-item');
 
   // Notification system
-  const showNotification = function(message, type = 'info') {
+  function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.innerHTML = `
@@ -86,6 +87,21 @@ document.addEventListener('DOMContentLoaded', function() {
       convertModal.style.display = 'block';
     });
   }
+    });
+  }
+
+  if (convertLootButton) {
+    convertLootButton.addEventListener('click', function() {
+      // Set the active tab to Loot to WIR
+      document.querySelector('.conversion-tab[data-direction="lootToWir"]').classList.add('active');
+      document.querySelector('.conversion-tab[data-direction="wirToLoot"]').classList.remove('active');
+      document.getElementById('loot-to-wir-form').style.display = 'block';
+      document.getElementById('wir-to-loot-form').style.display = 'none';
+      document.getElementById('conversion-direction').value = 'lootToWir';
+
+      convertModal.style.display = 'block';
+    });
+  }
 
   closeButtons.forEach(button => {
     button.addEventListener('click', function() {
@@ -102,9 +118,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     if (event.target === convertModal) {
       convertModal.style.display = 'none';
-    }
-    if (event.target === earnModal) {
-      earnModal.style.display = 'none';
     }
   });
 
@@ -142,25 +155,13 @@ document.addEventListener('DOMContentLoaded', function() {
       const newLootBalance = document.getElementById('new-loot-balance');
       const newWirBalanceLoot = document.getElementById('new-wir-balance-loot');
 
-      if (lootToWirResult) {
-        lootToWirResult.textContent = `${amount} WIR`;
-      }
+      if (lootToWirResult) lootToWirResult.textContent = `${amount} WIR`;
 
       const userLootBalance = parseInt(document.getElementById('user-loot-balance').value);
       const userWirBalance = parseInt(document.getElementById('user-wir-balance').value);
 
-      if (newLootBalance) {
-        newLootBalance.textContent = `${userLootBalance - amount} Loot`;
-      }
-      if (newWirBalanceLoot) {
-        newWirBalanceLoot.textContent = `${userWirBalance + amount} WIR`;
-      }
-
-      // Disable button if amount is invalid
-      const confirmButton = document.getElementById('confirm-conversion');
-      if (confirmButton) {
-        confirmButton.disabled = (amount <= 0 || amount > userLootBalance);
-      }
+      if (newLootBalance) newLootBalance.textContent = `${userLootBalance - amount} Loot`;
+      if (newWirBalanceLoot) newWirBalanceLoot.textContent = `${userWirBalance + amount} WIR`;
     });
   }
 
@@ -171,49 +172,13 @@ document.addEventListener('DOMContentLoaded', function() {
       const newWirBalance = document.getElementById('new-wir-balance');
       const newLootBalanceWir = document.getElementById('new-loot-balance-wir');
 
-      if (wirToLootResult) {
-        wirToLootResult.textContent = `${amount} Loot`;
-      }
+      if (wirToLootResult) wirToLootResult.textContent = `${amount} Loot`;
 
       const userLootBalance = parseInt(document.getElementById('user-loot-balance').value);
       const userWirBalance = parseInt(document.getElementById('user-wir-balance').value);
 
-      if (newWirBalance) {
-        newWirBalance.textContent = `${userWirBalance - amount} WIR`;
-      }
-      if (newLootBalanceWir) {
-        newLootBalanceWir.textContent = `${userLootBalance + amount} Loot`;
-      }
-
-      // Disable button if amount is invalid
-      const confirmButton = document.getElementById('confirm-conversion');
-      if (confirmButton) {
-        confirmButton.disabled = (amount <= 0 || amount > userWirBalance);
-      }
-    });
-  }
-
-  // Transfer amount calculation
-  const transferAmount = document.getElementById('transfer-amount');
-  if (transferAmount) {
-    transferAmount.addEventListener('input', function() {
-      const amount = parseInt(this.value) || 0;
-      const summaryAmount = document.getElementById('summary-amount');
-      const summaryBalance = document.getElementById('summary-balance');
-      const userWirBalance = parseInt(document.getElementById('user-wir-balance').value);
-
-      if (summaryAmount) {
-        summaryAmount.textContent = `${amount} WIR`;
-      }
-      if (summaryBalance) {
-        summaryBalance.textContent = `${userWirBalance - amount} WIR`;
-      }
-
-      // Disable button if amount is invalid
-      const confirmButton = document.getElementById('confirm-transfer');
-      if (confirmButton) {
-        confirmButton.disabled = (amount <= 0 || amount > userWirBalance);
-      }
+      if (newWirBalance) newWirBalance.textContent = `${userWirBalance - amount} WIR`;
+      if (newLootBalanceWir) newLootBalanceWir.textContent = `${userLootBalance + amount} Loot`;
     });
   }
 
@@ -228,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
         notes: document.getElementById('transfer-notes').value
       };
 
-      fetch('/market/user/wir/transfer', {
+      fetch('/market/wir/transfer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -274,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
         amount
       };
 
-      fetch('/market/user/wir/convert', {
+      fetch('/market/wir/convert', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

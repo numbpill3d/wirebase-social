@@ -88,32 +88,8 @@ router.get('/browse', async (req, res) => {
       tags: req.query.tags
     };
 
-    // Add user ID to filters if sort is 'recommended' and user is authenticated
-    if (filters.sort === 'recommended' && req.isAuthenticated()) {
-      filters.userId = req.user.id;
-    }
-
     // Get items with filters
     const { items, total } = await MarketItem.getFiltered(filters, limit, offset);
-
-    // If sort is 'recommended' and user is authenticated, we might need to post-process the results
-    if (filters.sort === 'recommended' && req.isAuthenticated() && items.length > 0) {
-      // Get user's purchased items to find similar categories
-      const purchasedItems = await MarketItem.getPurchasedByUser(req.user.id);
-
-      if (purchasedItems.length > 0) {
-        // Extract categories from purchased items
-        const purchasedCategories = [...new Set(purchasedItems.map(item => item.categoryId))];
-
-        // Boost items from the same categories
-        items.sort((a, b) => {
-          const aInPurchasedCategory = purchasedCategories.includes(a.categoryId) ? 1 : 0;
-          const bInPurchasedCategory = purchasedCategories.includes(b.categoryId) ? 1 : 0;
-
-          return bInPurchasedCategory - aInPurchasedCategory;
-        });
-      }
-    }
 
     // Get all categories for filter options
     const categories = await MarketItem.getCategories();

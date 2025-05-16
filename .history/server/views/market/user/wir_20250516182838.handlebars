@@ -800,75 +800,9 @@
   }
 </style>
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Hidden input fields for JavaScript calculations
-    document.write(`
-      <input type="hidden" id="user-wir-balance" value="${{user.wirBalance}}">
-      <input type="hidden" id="user-loot-balance" value="${{user.lootTokens}}">
-    `);
-
-    // Modal functionality
-    const transferButton = document.getElementById('transfer-wir-button');
-    const convertButton = document.getElementById('convert-wir-button');
-    const convertLootButton = document.getElementById('convert-loot-button');
-    const transferModal = document.getElementById('transfer-modal');
-    const convertModal = document.getElementById('convert-modal');
-    const closeButtons = document.querySelectorAll('.close-modal');
-
-    if (transferButton) {
-      transferButton.addEventListener('click', function() {
-        transferModal.style.display = 'block';
-      });
-    }
-
-    if (convertButton) {
-      convertButton.addEventListener('click', function() {
-        convertModal.style.display = 'block';
-      });
-    }
-
-    if (convertLootButton) {
-      convertLootButton.addEventListener('click', function() {
-        document.querySelector('.conversion-tab[data-direction="lootToWir"]').classList.add('active');
-        document.querySelector('.conversion-tab[data-direction="wirToLoot"]').classList.remove('active');
-        document.getElementById('loot-to-wir-form').style.display = 'block';
-        document.getElementById('wir-to-loot-form').style.display = 'none';
-        document.getElementById('conversion-direction').value = 'lootToWir';
-
-        convertModal.style.display = 'block';
-      });
-    }
-
-    closeButtons.forEach(button => {
-      button.addEventListener('click', function() {
-        document.querySelectorAll('.modal').forEach(modal => {
-          modal.style.display = 'none';
-        });
-      });
-    });
-
-    // Conversion tabs
-    const conversionTabs = document.querySelectorAll('.conversion-tab');
-    conversionTabs.forEach(tab => {
-      tab.addEventListener('click', function() {
-        const direction = this.getAttribute('data-direction');
-
-        // Update active tab
-        document.querySelectorAll('.conversion-tab').forEach(t => t.classList.remove('active'));
-        this.classList.add('active');
-
-        // Show/hide appropriate form
-        if (direction === 'lootToWir') {
-          document.getElementById('loot-to-wir-form').style.display = 'block';
-          document.getElementById('wir-to-loot-form').style.display = 'none';
-        } else {
-          document.getElementById('loot-to-wir-form').style.display = 'none';
-          document.getElementById('wir-to-loot-form').style.display = 'block';
-        }
-
-        // Update hidden direction field
-        document.getElementById('conversion-direction').value = direction;
-      });
-    });
-  });
+  // Hidden input fields for JavaScript calculations
+  document.write(`
+    <input type="hidden" id="user-wir-balance" value="${{user.wirBalance}}">
+    <input type="hidden" id="user-loot-balance" value="${{user.lootTokens}}">
+  `);
 </script>
