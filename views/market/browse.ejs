@@ -1,0 +1,137 @@
+<%- include('../partials/header', { title: 'Browse Items - Vivid Market' }) %>
+
+<div class="vivid-market theme-purple">
+  <!-- Breadcrumb Navigation -->
+  <div class="breadcrumb">
+    <a href="/">Home</a> &gt; 
+    <a href="/market">Vivid Market</a> &gt; 
+    <span>Browse Items</span>
+  </div>
+
+  <!-- Market Theme Selector -->
+  <div class="market-theme-selector">
+    <label for="theme-select">Market Theme:</label>
+    <select id="theme-select" class="theme-select">
+      <option value="purple">Neon Purple</option>
+      <option value="blue">Cyber Blue</option>
+      <option value="red">Digital Red</option>
+      <option value="green">Matrix Green</option>
+      <option value="grayscale">Monochrome</option>
+    </select>
+  </div>
+
+  <!-- Filter Section -->
+  <div style="margin-bottom: 20px; padding: 15px; border: 1px solid var(--border-color); background-color: var(--bg-medium);">
+    <h3 style="margin-bottom: 15px; color: var(--secondary-color);">Filter Items</h3>
+    
+    <form id="market-filter-form">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+        <div class="form-group">
+          <label for="filter-category">Category</label>
+          <select id="filter-category" name="category" class="form-control">
+            <option value="">All Categories</option>
+            <% categories.forEach(category => { %>
+              <option value="<%= category %>" <%= selectedFilters.category === category ? 'selected' : '' %>><%= category %></option>
+            <% }); %>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="filter-sort">Sort By</label>
+          <select id="filter-sort" name="sort" class="form-control">
+            <option value="newest" <%= selectedFilters.sort === 'newest' ? 'selected' : '' %>>Newest First</option>
+            <option value="oldest" <%= selectedFilters.sort === 'oldest' ? 'selected' : '' %>>Oldest First</option>
+            <option value="price_low" <%= selectedFilters.sort === 'price_low' ? 'selected' : '' %>>Price: Low to High</option>
+            <option value="price_high" <%= selectedFilters.sort === 'price_high' ? 'selected' : '' %>>Price: High to Low</option>
+            <option value="popular" <%= selectedFilters.sort === 'popular' ? 'selected' : '' %>>Most Popular</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="filter-price-min">Min Price (WIR)</label>
+          <input type="number" id="filter-price-min" name="min_price" min="0" value="<%= selectedFilters.minPrice || '' %>" class="form-control">
+        </div>
+        
+        <div class="form-group">
+          <label for="filter-price-max">Max Price (WIR)</label>
+          <input type="number" id="filter-price-max" name="max_price" min="0" value="<%= selectedFilters.maxPrice || '' %>" class="form-control">
+        </div>
+      </div>
+      
+      <div style="display: flex; justify-content: space-between; margin-top: 15px;">
+        <button type="button" id="reset-filters" class="action-button">Reset Filters</button>
+        <button type="submit" class="action-button purchase-button">Apply Filters</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Results Section -->
+  <div class="section-header">
+    <div class="section-divider"></div>
+    <h2>
+      <% if (selectedFilters.category) { %>
+        <%= selectedFilters.category %> Items
+      <% } else if (selectedFilters.featured) { %>
+        Featured Items
+      <% } else { %>
+        All Items
+      <% } %>
+      <small style="font-size: 0.7em; color: var(--text-muted);"><%= items.length %> results</small>
+    </h2>
+  </div>
+
+  <% if (items && items.length > 0) { %>
+    <div class="items-grid">
+      <% items.forEach(item => { %>
+        <div class="market-item" data-item-id="<%= item.id %>">
+          <div class="item-preview">
+            <img src="<%= item.previewImage %>" alt="<%= item.title %>">
+            <div class="item-category"><%= item.category %></div>
+            <button class="wishlist-button <%= item.inWishlist ? 'in-wishlist' : '' %>" data-item-id="<%= item.id %>">
+              <i class="wishlist-icon outline fa fa-heart-o"></i>
+              <i class="wishlist-icon filled fa fa-heart"></i>
+            </button>
+          </div>
+          <div class="item-details">
+            <h3><a href="/market/item/<%= item.id %>"><%= item.title %></a></h3>
+            <div class="item-creator">
+              <a href="/profile/<%= item.creator.username %>">
+                <img src="<%= item.creator.avatar %>" alt="<%= item.creator.displayName %>" class="creator-avatar">
+                <%= item.creator.displayName %>
+              </a>
+            </div>
+            <div class="item-price">
+              <span class="wir-price"><%= item.wirPrice %> WIR</span>
+            </div>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+    
+    <!-- Pagination -->
+    <% if (pagination.totalPages > 1) { %>
+      <div class="pagination">
+        <% if (pagination.hasPrev) { %>
+          <a href="?page=<%= pagination.page - 1 %><%= paginationQueryString %>" class="pagination-button">Previous</a>
+        <% } %>
+        
+        <span class="pagination-info">Page <%= pagination.page %> of <%= pagination.totalPages %></span>
+        
+        <% if (pagination.hasNext) { %>
+          <a href="?page=<%= pagination.page + 1 %><%= paginationQueryString %>" class="pagination-button">Next</a>
+        <% } %>
+      </div>
+    <% } %>
+  <% } else { %>
+    <div class="empty-state">
+      <div class="empty-state-icon">🔍</div>
+      <h3 class="empty-state-title">No Items Found</h3>
+      <p class="empty-state-message">No items match your current filters. Try adjusting your search criteria.</p>
+    </div>
+  <% } %>
+</div>
+
+<!-- Include the Vivid Market JavaScript -->
+<script src="/js/vivid-market.js"></script>
+
+<%- include('../partials/footer') %>

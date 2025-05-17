@@ -1,0 +1,184 @@
+<%- include('../partials/header', { title: 'Vivid Market - Wirebase' }) %>
+
+<div class="vivid-market theme-purple">
+  <!-- Market Banner -->
+  <div class="crt-banner">
+    <div class="scanlines"></div>
+    <div class="banner-glow"></div>
+    <h1>Vivid Market</h1>
+    <div class="subtitle">Digital Asset Exchange</div>
+  </div>
+
+  <!-- Breadcrumb Navigation -->
+  <div class="breadcrumb">
+    <a href="/">Home</a> &gt; <span>Vivid Market</span>
+  </div>
+
+  <!-- Market Theme Selector -->
+  <div class="market-theme-selector">
+    <label for="theme-select">Market Theme:</label>
+    <select id="theme-select" class="theme-select">
+      <option value="purple">Neon Purple</option>
+      <option value="blue">Cyber Blue</option>
+      <option value="red">Digital Red</option>
+      <option value="green">Matrix Green</option>
+      <option value="grayscale">Monochrome</option>
+    </select>
+  </div>
+
+  <!-- Market Stats -->
+  <div class="market-stats">
+    <div class="stat-box wir-balance">
+      <span class="stat-value"><%= user ? user.wirBalance : 0 %></span>
+      <span class="stat-label">WIR Balance</span>
+      <i class="stat-icon fa fa-coins"></i>
+    </div>
+    <div class="stat-box">
+      <span class="stat-value"><%= stats.totalItems %></span>
+      <span class="stat-label">Items Listed</span>
+      <i class="stat-icon fa fa-tags"></i>
+    </div>
+    <div class="stat-box">
+      <span class="stat-value"><%= stats.totalCollections %></span>
+      <span class="stat-label">Collections</span>
+      <i class="stat-icon fa fa-layer-group"></i>
+    </div>
+    <div class="stat-box">
+      <span class="stat-value"><%= stats.totalSales %></span>
+      <span class="stat-label">Sales</span>
+      <i class="stat-icon fa fa-chart-line"></i>
+    </div>
+  </div>
+
+  <!-- Market Actions -->
+  <div class="market-actions" style="display: flex; gap: 10px; margin-bottom: 20px;">
+    <a href="/market/browse" class="action-button">
+      <i class="button-icon fa fa-search"></i>
+      <span class="button-text">Browse All</span>
+    </a>
+    <a href="/market/collections" class="action-button">
+      <i class="button-icon fa fa-layer-group"></i>
+      <span class="button-text">Collections</span>
+    </a>
+    <% if (user) { %>
+      <a href="/market/wishlist" class="action-button">
+        <i class="button-icon fa fa-heart"></i>
+        <span class="button-text">Wishlist</span>
+      </a>
+      <a href="/market/inventory" class="action-button">
+        <i class="button-icon fa fa-box-open"></i>
+        <span class="button-text">Inventory</span>
+      </a>
+      <a href="/market/sell" class="action-button purchase-button">
+        <i class="button-icon fa fa-plus"></i>
+        <span class="button-text">Sell Item</span>
+      </a>
+    <% } else { %>
+      <a href="/users/login" class="action-button">
+        <i class="button-icon fa fa-sign-in-alt"></i>
+        <span class="button-text">Login to Sell</span>
+      </a>
+    <% } %>
+  </div>
+
+  <!-- Featured Items Section -->
+  <div class="section-header">
+    <div class="section-divider"></div>
+    <h2>Featured Items</h2>
+  </div>
+
+  <% if (featuredItems && featuredItems.length > 0) { %>
+    <div class="items-grid featured-grid">
+      <% featuredItems.forEach(item => { %>
+        <div class="market-item" data-item-id="<%= item.id %>">
+          <div class="item-preview">
+            <img src="<%= item.previewImage %>" alt="<%= item.title %>">
+            <div class="item-category"><%= item.category %></div>
+            <button class="wishlist-button <%= item.inWishlist ? 'in-wishlist' : '' %>" data-item-id="<%= item.id %>">
+              <i class="wishlist-icon outline fa fa-heart-o"></i>
+              <i class="wishlist-icon filled fa fa-heart"></i>
+            </button>
+          </div>
+          <div class="item-details">
+            <h3><a href="/market/item/<%= item.id %>"><%= item.title %></a></h3>
+            <div class="item-creator">
+              <a href="/profile/<%= item.creator.username %>">
+                <img src="<%= item.creator.avatar %>" alt="<%= item.creator.displayName %>" class="creator-avatar">
+                <%= item.creator.displayName %>
+              </a>
+            </div>
+            <div class="item-price">
+              <span class="wir-price"><%= item.wirPrice %> WIR</span>
+            </div>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+    <div style="text-align: center; margin: 20px 0;">
+      <a href="/market/browse?featured=true" class="view-more-button">View All Featured</a>
+    </div>
+  <% } else { %>
+    <div class="empty-state">
+      <div class="empty-state-icon">🔍</div>
+      <h3 class="empty-state-title">No Featured Items</h3>
+      <p class="empty-state-message">There are no featured items at the moment. Check back later!</p>
+    </div>
+  <% } %>
+
+  <!-- Recent Collections Section -->
+  <div class="section-header">
+    <div class="section-divider"></div>
+    <h2>Recent Collections</h2>
+  </div>
+
+  <% if (recentCollections && recentCollections.length > 0) { %>
+    <div class="collections-grid">
+      <% recentCollections.forEach(collection => { %>
+        <div class="collection-card">
+          <a href="/market/collection/<%= collection.id %>">
+            <div class="collection-cover">
+              <img src="<%= collection.coverImage %>" alt="<%= collection.name %>">
+            </div>
+            <div class="collection-details">
+              <h3><%= collection.name %></h3>
+              <div class="collection-creator">
+                <img src="<%= collection.creator.avatar %>" alt="<%= collection.creator.displayName %>" class="creator-avatar">
+                <%= collection.creator.displayName %>
+              </div>
+              <div class="collection-stats">
+                <%= collection.items.length %> items
+              </div>
+            </div>
+          </a>
+        </div>
+      <% }); %>
+    </div>
+    <div style="text-align: center; margin: 20px 0;">
+      <a href="/market/collections" class="view-more-button">View All Collections</a>
+    </div>
+  <% } else { %>
+    <div class="empty-state">
+      <div class="empty-state-icon">📚</div>
+      <h3 class="empty-state-title">No Collections</h3>
+      <p class="empty-state-message">There are no collections available yet. Be the first to create one!</p>
+    </div>
+  <% } %>
+
+  <!-- Purchase Confirmation Modal -->
+  <div id="purchase-confirm-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>Confirm Purchase</h2>
+      <p>Are you sure you want to purchase <span class="confirm-item-name">this item</span> for <span class="confirm-item-price">0</span> WIR?</p>
+      <div class="modal-actions">
+        <button class="cancel-button close-modal">Cancel</button>
+        <button class="submit-button confirm-purchase-button">Confirm Purchase</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Include the Vivid Market JavaScript -->
+<script src="/js/vivid-market.js"></script>
+
+<%- include('../partials/footer') %>
