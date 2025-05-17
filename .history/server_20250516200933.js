@@ -90,12 +90,7 @@ global.knex.on('error', (err) => {
 const verifyDatabaseConnection = async (retries = 5, delay = 5000) => {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      // Try using Supabase first
-      const { data, error } = await supabase.from('users').select('id').limit(1);
-      if (error) {
-        // If Supabase fails, try Knex as fallback
-        await global.knex.raw('SELECT 1');
-      }
+      await global.knex.raw('SELECT 1');
       console.log('Database connection established successfully');
       return true;
     } catch (err) {
@@ -106,10 +101,9 @@ const verifyDatabaseConnection = async (retries = 5, delay = 5000) => {
         await new Promise(resolve => setTimeout(resolve, delay));
       } else {
         console.error('All database connection attempts failed');
-        // Don't exit in production to maintain service availability
+        // Only exit in development to assist with debugging
         if (process.env.NODE_ENV !== 'production') {
-          console.warn('Database connection failed in development mode. Check your database configuration.');
-          // Don't exit to allow for mock data or fallback mechanisms
+          process.exit(-1);
         }
         return false;
       }

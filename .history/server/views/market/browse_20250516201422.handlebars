@@ -260,15 +260,6 @@
 
     // Function to apply all filters
     function applyFilters() {
-      // Show loading animation
-      const itemsContent = document.getElementById('items-content');
-      const loadingContainer = document.getElementById('loading-container');
-
-      if (itemsContent && loadingContainer) {
-        itemsContent.style.display = 'none';
-        loadingContainer.style.display = 'flex';
-      }
-
       const search = document.getElementById('search-input').value;
       const category = '{{filters.category}}';
       const minPrice = document.getElementById('min-price').value;
@@ -296,42 +287,9 @@
 
       url += params.join('&');
 
-      // Add a small delay to show the loading animation
-      setTimeout(() => {
-        // Navigate to the filtered URL
-        window.location.href = url;
-      }, 300);
+      // Navigate to the filtered URL
+      window.location.href = url;
     }
-
-    // Add event listener for the clear filters button in empty state
-    const clearFiltersEmptyState = document.getElementById('clear-filters-empty-state');
-    if (clearFiltersEmptyState) {
-      clearFiltersEmptyState.addEventListener('click', function() {
-        window.location.href = '/market/browse';
-      });
-    }
-
-    // Show loading animation when clicking on pagination links
-    const paginationLinks = document.querySelectorAll('.pagination-button');
-    paginationLinks.forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-
-        // Show loading animation
-        const itemsContent = document.getElementById('items-content');
-        const loadingContainer = document.getElementById('loading-container');
-
-        if (itemsContent && loadingContainer) {
-          itemsContent.style.display = 'none';
-          loadingContainer.style.display = 'flex';
-        }
-
-        // Navigate to the pagination URL after a small delay
-        setTimeout(() => {
-          window.location.href = this.href;
-        }, 300);
-      });
-    });
   });
 </script>
 

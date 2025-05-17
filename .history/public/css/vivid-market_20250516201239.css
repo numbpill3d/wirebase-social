@@ -796,37 +796,20 @@
 .stat-box {
   background-color: var(--bg-medium);
   border: 1px solid var(--border-color);
-  padding: 15px 20px;
+  padding: 10px 20px;
   text-align: center;
   min-width: 100px;
-  position: relative;
-  overflow: hidden;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-}
-
-.stat-box:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  border-color: var(--primary-color);
 }
 
 .wir-balance {
   border-color: var(--secondary-color);
 }
 
-.wir-balance:hover {
-  border-color: var(--secondary-color);
-  box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
-}
-
 .stat-value {
   display: block;
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: bold;
   color: #fff;
-  margin-bottom: 5px;
-  text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
 .stat-label {
@@ -834,80 +817,6 @@
   font-size: 0.8rem;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.stat-icon {
-  position: absolute;
-  bottom: 5px;
-  right: 5px;
-  font-size: 1.5rem;
-  opacity: 0.2;
-  transition: all 0.3s ease;
-}
-
-.stat-box:hover .stat-icon {
-  opacity: 0.5;
-  transform: scale(1.2);
-}
-
-/* Loading Animation */
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 40px 0;
-  flex-direction: column;
-}
-
-.loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 3px solid var(--bg-medium);
-  border-top: 3px solid var(--primary-color);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 15px;
-}
-
-.loading-text {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  letter-spacing: 1px;
-  animation: pulse 1.5s infinite alternate;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Empty State */
-.empty-state {
-  text-align: center;
-  padding: 40px 20px;
-  background-color: var(--bg-medium);
-  border: 1px dashed var(--border-color);
-  border-radius: 4px;
-  margin: 20px 0;
-}
-
-.empty-state-icon {
-  font-size: 3rem;
-  color: var(--text-dark);
-  margin-bottom: 15px;
-  opacity: 0.5;
-}
-
-.empty-state-title {
-  font-size: 1.2rem;
-  color: var(--text-light);
-  margin-bottom: 10px;
-}
-
-.empty-state-message {
-  color: var(--text-muted);
-  margin-bottom: 20px;
 }
 
 /* Responsive Adjustments */
@@ -953,15 +862,6 @@
     width: 90%;
     margin: 15% auto;
   }
-
-  .market-theme-selector {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .theme-select {
-    width: 100%;
-  }
 }
 
 @media (max-width: 480px) {
@@ -1005,10 +905,6 @@
   .submit-button, .browse-button {
     flex: 1 0 100%;
   }
-
-  .button-text {
-    font-size: 0.8rem;
-  }
 }
 
 /* Color Themes */
@@ -1016,71 +912,6 @@
   --primary-color: #888;
   --primary-hover: #aaa;
   --secondary-color: #ddd;
-}
-
-.vivid-market.theme-blue {
-  --primary-color: #1e88e5;
-  --primary-hover: #2196f3;
-  --secondary-color: #64b5f6;
-  --bg-dark: #0d2b45;
-  --bg-medium: #1a3c5a;
-  --bg-light: #2a4c6a;
-  --border-color: #2a5a8a;
-}
-
-.vivid-market.theme-red {
-  --primary-color: #d32f2f;
-  --primary-hover: #e53935;
-  --secondary-color: #ff5252;
-  --bg-dark: #3e2723;
-  --bg-medium: #4e342e;
-  --bg-light: #5d4037;
-  --border-color: #6d4c41;
-}
-
-.vivid-market.theme-green {
-  --primary-color: #388e3c;
-  --primary-hover: #43a047;
-  --secondary-color: #66bb6a;
-  --bg-dark: #1b5e20;
-  --bg-medium: #2e7d32;
-  --bg-light: #388e3c;
-  --border-color: #43a047;
-}
-
-/* Notification */
-.notification {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  padding: 15px 20px;
-  border-radius: 4px;
-  color: #fff;
-  font-size: 0.9rem;
-  z-index: 1000;
-  transform: translateY(100px);
-  opacity: 0;
-  transition: all 0.3s ease;
-}
-
-.notification.show {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-.notification.success {
-  background-color: var(--primary-color);
-  border-left: 4px solid var(--secondary-color);
-}
-
-.notification.error {
-  background-color: #d32f2f;
-  border-left: 4px solid #ff5252;
-}
-
-.notification.info {
-  background-color: #1976d2;
-  border-left: 4px solid #42a5f5;
 }
 
 .vivid-market.theme-purple {
