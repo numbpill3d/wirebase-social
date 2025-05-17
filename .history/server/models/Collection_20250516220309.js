@@ -528,9 +528,6 @@ class Collection {
 
       if (error) throw error;
 
-      // Clear cache since we've deleted a collection
-      this.clearCache();
-
       return true;
     } catch (error) {
       console.error('Error deleting collection:', error);

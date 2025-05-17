@@ -733,9 +733,6 @@ class MarketItem {
         };
       }
 
-      // Clear cache since we've added a new item
-      this.clearCache();
-
       return {
         success: true,
         itemId: item.id,
@@ -835,9 +832,6 @@ class MarketItem {
 
       if (updateError) throw updateError;
 
-      // Clear cache since we've updated an item
-      this.clearCache();
-
       return {
         success: true,
         newBalance
@@ -865,9 +859,6 @@ class MarketItem {
         .eq('id', itemId);
 
       if (error) throw error;
-
-      // Clear cache since we've deleted an item
-      this.clearCache();
 
       return true;
     } catch (error) {

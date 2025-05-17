@@ -1,0 +1,309 @@
+<div class="vivid-market wishlist-page">
+  <header class="market-header">
+    <div class="crt-banner">
+      <h1>My Wishlist</h1>
+      <p class="subtitle">items you've saved for later</p>
+      <div class="banner-glow"></div>
+    </div>
+
+    <div class="market-actions">
+      <a href="/market" class="action-button">
+        <span class="button-icon">🏠</span>
+        <span class="button-text">Market Home</span>
+      </a>
+      <a href="/market/browse" class="action-button browse-button">
+        <span class="button-icon">🔍</span>
+        <span class="button-text">Browse All</span>
+      </a>
+      <a href="/market/submit" class="action-button submit-button">
+        <span class="button-icon">+</span>
+        <span class="button-text">Submit Item</span>
+      </a>
+    </div>
+  </header>
+
+  <div class="wishlist-container">
+    {{#if items.length}}
+      <div class="items-grid">
+        {{#each items}}
+          <div class="market-item">
+            <div class="item-preview">
+              <a href="/market/item/{{this.id}}">
+                <img src="{{this.previewImage}}" alt="{{this.title}}" loading="lazy">
+              </a>
+              <div class="item-category">{{this.categoryName}}</div>
+              <button class="wishlist-button in-wishlist" data-item-id="{{this.id}}">
+                <span class="wishlist-icon outline">☆</span>
+                <span class="wishlist-icon filled">★</span>
+              </button>
+            </div>
+            <div class="item-details">
+              <h3><a href="/market/item/{{this.id}}">{{this.title}}</a></h3>
+              <div class="item-creator">
+                <a href="/profile/{{this.creator.username}}">
+                  <img src="{{this.creator.avatar}}" alt="{{this.creator.username}}" class="creator-avatar">
+                  <span>{{this.creator.displayName}}</span>
+                </a>
+              </div>
+              <div class="item-price">
+                <span class="wir-price">{{this.wirPrice}} WIR</span>
+              </div>
+              <div class="item-actions">
+                <a href="/market/item/{{this.id}}" class="view-item-button">View Details</a>
+                {{#if ../user}}
+                  {{#if (gte ../user.wirBalance this.wirPrice)}}
+                    <button class="purchase-button" data-item-id="{{this.id}}" data-price="{{this.wirPrice}}">Purchase</button>
+                  {{else}}
+                    <button class="purchase-button" disabled title="Insufficient WIR balance">Purchase</button>
+                  {{/if}}
+                {{/if}}
+              </div>
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    {{else}}
+      <div class="empty-state">
+        <div class="empty-state-icon">⭐</div>
+        <h3 class="empty-state-title">Your wishlist is empty</h3>
+        <p class="empty-state-message">Browse the marketplace and click the star icon to add items to your wishlist.</p>
+        <a href="/market/browse" class="action-button browse-button">Browse Marketplace</a>
+      </div>
+    {{/if}}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize wishlist buttons
+    const wishlistButtons = document.querySelectorAll('.wishlist-button');
+    
+    wishlistButtons.forEach(button => {
+      const itemId = button.getAttribute('data-item-id');
+      
+      // Add click event listener
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        removeFromWishlist(this, itemId);
+      });
+    });
+    
+    // Function to remove from wishlist
+    function removeFromWishlist(button, itemId) {
+      // Disable button during request
+      button.disabled = true;
+      
+      fetch(`/market/user/wishlist/remove/${itemId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success) {
+            // Remove the item from the DOM with animation
+            const itemCard = button.closest('.market-item');
+            itemCard.style.opacity = '0';
+            itemCard.style.transform = 'scale(0.8)';
+            
+            setTimeout(() => {
+              itemCard.remove();
+              
+              // Check if there are any items left
+              const remainingItems = document.querySelectorAll('.market-item');
+              if (remainingItems.length === 0) {
+                // Show empty state
+                const itemsGrid = document.querySelector('.items-grid');
+                const wishlistContainer = document.querySelector('.wishlist-container');
+                
+                if (itemsGrid && wishlistContainer) {
+                  itemsGrid.remove();
+                  
+                  const emptyState = document.createElement('div');
+                  emptyState.className = 'empty-state';
+                  emptyState.innerHTML = `
+                    <div class="empty-state-icon">⭐</div>
+                    <h3 class="empty-state-title">Your wishlist is empty</h3>
+                    <p class="empty-state-message">Browse the marketplace and click the star icon to add items to your wishlist.</p>
+                    <a href="/market/browse" class="action-button browse-button">Browse Marketplace</a>
+                  `;
+                  
+                  wishlistContainer.appendChild(emptyState);
+                }
+              }
+              
+              // Show notification
+              showNotification('Item removed from wishlist', 'success');
+            }, 300);
+          } else {
+            showNotification(data.message || 'An error occurred', 'error');
+            button.disabled = false;
+          }
+        })
+        .catch(error => {
+          console.error('Error removing from wishlist:', error);
+          showNotification('An error occurred while updating your wishlist', 'error');
+          button.disabled = false;
+        });
+    }
+    
+    // Function to show a notification
+    function showNotification(message, type = 'info') {
+      // Create notification element
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      
+      // Add to the DOM
+      document.body.appendChild(notification);
+      
+      // Show notification
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 100);
+      
+      // Hide notification after 3 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          notification.remove();
+        }, 300);
+      }, 3000);
+    }
+    
+    // Initialize purchase buttons
+    const purchaseButtons = document.querySelectorAll('.purchase-button:not([disabled])');
+    
+    purchaseButtons.forEach(button => {
+      const itemId = button.getAttribute('data-item-id');
+      const price = button.getAttribute('data-price');
+      
+      button.addEventListener('click', function() {
+        if (confirm(`Are you sure you want to purchase this item for ${price} WIR?`)) {
+          purchaseItem(itemId, this);
+        }
+      });
+    });
+    
+    // Function to purchase an item
+    function purchaseItem(itemId, button) {
+      // Disable button during request
+      button.disabled = true;
+      button.textContent = 'Processing...';
+      
+      fetch(`/market/item/${itemId}/purchase`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success) {
+            // Remove the item from the wishlist
+            const itemCard = button.closest('.market-item');
+            itemCard.style.opacity = '0';
+            itemCard.style.transform = 'scale(0.8)';
+            
+            setTimeout(() => {
+              itemCard.remove();
+              
+              // Check if there are any items left
+              const remainingItems = document.querySelectorAll('.market-item');
+              if (remainingItems.length === 0) {
+                // Show empty state
+                const itemsGrid = document.querySelector('.items-grid');
+                const wishlistContainer = document.querySelector('.wishlist-container');
+                
+                if (itemsGrid && wishlistContainer) {
+                  itemsGrid.remove();
+                  
+                  const emptyState = document.createElement('div');
+                  emptyState.className = 'empty-state';
+                  emptyState.innerHTML = `
+                    <div class="empty-state-icon">⭐</div>
+                    <h3 class="empty-state-title">Your wishlist is empty</h3>
+                    <p class="empty-state-message">Browse the marketplace and click the star icon to add items to your wishlist.</p>
+                    <a href="/market/browse" class="action-button browse-button">Browse Marketplace</a>
+                  `;
+                  
+                  wishlistContainer.appendChild(emptyState);
+                }
+              }
+              
+              // Show notification
+              showNotification('Purchase successful! Item has been added to your library.', 'success');
+            }, 300);
+          } else {
+            showNotification(data.message || 'Purchase failed', 'error');
+            button.disabled = false;
+            button.textContent = 'Purchase';
+          }
+        })
+        .catch(error => {
+          console.error('Error purchasing item:', error);
+          showNotification('An error occurred during purchase', 'error');
+          button.disabled = false;
+          button.textContent = 'Purchase';
+        });
+    }
+  });
+</script>
+
+<style>
+  .wishlist-page .item-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .wishlist-page .view-item-button {
+    flex: 1;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    text-align: center;
+    background-color: var(--bg-light);
+    color: var(--text-light);
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+  }
+  
+  .wishlist-page .view-item-button:hover {
+    background-color: var(--bg-medium);
+  }
+  
+  .wishlist-page .purchase-button {
+    flex: 1;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .wishlist-page .purchase-button:hover:not([disabled]) {
+    background-color: var(--primary-hover);
+  }
+  
+  .wishlist-page .purchase-button[disabled] {
+    background-color: var(--bg-medium);
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+</style>

@@ -445,9 +445,6 @@ class Collection {
 
       if (collectionError) throw collectionError;
 
-      // Clear cache since we've added a new collection
-      this.clearCache();
-
       return {
         success: true,
         collectionId: collection.id
@@ -490,9 +487,6 @@ class Collection {
 
       if (error) throw error;
 
-      // Clear cache since we've updated a collection
-      this.clearCache();
-
       return {
         success: true
       };
@@ -527,9 +521,6 @@ class Collection {
         .eq('id', collectionId);
 
       if (error) throw error;
-
-      // Clear cache since we've deleted a collection
-      this.clearCache();
 
       return true;
     } catch (error) {
@@ -798,25 +789,6 @@ class Collection {
         avatar: collection.creator.avatar || '/images/default-avatar.png'
       }
     };
-  }
-
-  /**
-   * Clear all collection caches
-   * This should be called when collections are created, updated, or deleted
-   */
-  static clearCache() {
-    // Get all cache keys
-    const keys = cache.keys();
-
-    // Filter for collection-related keys
-    const collectionKeys = keys.filter(key => key.startsWith('collection:'));
-
-    // Delete each key
-    collectionKeys.forEach(key => {
-      cache.del(key);
-    });
-
-    console.log(`Cleared ${collectionKeys.length} collection cache entries`);
   }
 }
 

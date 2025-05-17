@@ -141,7 +141,7 @@ router.get('/tags', apiCache(600), async (req, res) => {
  * GET /api/market/collections
  * Get collections with filters
  */
-router.get('/collections', apiCache(60), async (req, res) => {
+router.get('/collections', async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 12;

@@ -866,9 +866,6 @@ class MarketItem {
 
       if (error) throw error;
 
-      // Clear cache since we've deleted an item
-      this.clearCache();
-
       return true;
     } catch (error) {
       console.error('Error deleting market item:', error);

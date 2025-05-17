@@ -241,14 +241,6 @@ class Collection {
    */
   static async getFeatured(limit = 3) {
     try {
-      // Check cache first
-      const cacheKey = `collection:featured:${limit}`;
-      const cachedCollections = cache.get(cacheKey);
-
-      if (cachedCollections) {
-        return cachedCollections;
-      }
-
       const { data: collections, error } = await supabase
         .from('market_collections')
         .select(`
@@ -289,16 +281,11 @@ class Collection {
       });
 
       // Format the collections and add item counts
-      const formattedCollections = collections.map(collection => {
+      return collections.map(collection => {
         const formattedCollection = this.formatCollection(collection);
         formattedCollection.itemCount = countMap[collection.id] || 0;
         return formattedCollection;
       });
-
-      // Cache the results for 10 minutes
-      cache.set(cacheKey, formattedCollections, 600);
-
-      return formattedCollections;
     } catch (error) {
       console.error('Error getting featured collections:', error);
       return [];
@@ -312,14 +299,6 @@ class Collection {
    */
   static async getPopular(limit = 4) {
     try {
-      // Check cache first
-      const cacheKey = `collection:popular:${limit}`;
-      const cachedCollections = cache.get(cacheKey);
-
-      if (cachedCollections) {
-        return cachedCollections;
-      }
-
       const { data: collections, error } = await supabase
         .from('market_collections')
         .select(`
@@ -359,16 +338,11 @@ class Collection {
       });
 
       // Format the collections and add item counts
-      const formattedCollections = collections.map(collection => {
+      return collections.map(collection => {
         const formattedCollection = this.formatCollection(collection);
         formattedCollection.itemCount = countMap[collection.id] || 0;
         return formattedCollection;
       });
-
-      // Cache the results for 5 minutes
-      cache.set(cacheKey, formattedCollections, 300);
-
-      return formattedCollections;
     } catch (error) {
       console.error('Error getting popular collections:', error);
       return [];
@@ -445,9 +419,6 @@ class Collection {
 
       if (collectionError) throw collectionError;
 
-      // Clear cache since we've added a new collection
-      this.clearCache();
-
       return {
         success: true,
         collectionId: collection.id
@@ -490,9 +461,6 @@ class Collection {
 
       if (error) throw error;
 
-      // Clear cache since we've updated a collection
-      this.clearCache();
-
       return {
         success: true
       };
@@ -527,9 +495,6 @@ class Collection {
         .eq('id', collectionId);
 
       if (error) throw error;
-
-      // Clear cache since we've deleted a collection
-      this.clearCache();
 
       return true;
     } catch (error) {
@@ -798,25 +763,6 @@ class Collection {
         avatar: collection.creator.avatar || '/images/default-avatar.png'
       }
     };
-  }
-
-  /**
-   * Clear all collection caches
-   * This should be called when collections are created, updated, or deleted
-   */
-  static clearCache() {
-    // Get all cache keys
-    const keys = cache.keys();
-
-    // Filter for collection-related keys
-    const collectionKeys = keys.filter(key => key.startsWith('collection:'));
-
-    // Delete each key
-    collectionKeys.forEach(key => {
-      cache.del(key);
-    });
-
-    console.log(`Cleared ${collectionKeys.length} collection cache entries`);
   }
 }
 

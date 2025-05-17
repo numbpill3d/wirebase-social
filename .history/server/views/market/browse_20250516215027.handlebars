@@ -119,12 +119,6 @@
                   <img src="{{this.previewImage}}" alt="{{this.title}}" loading="lazy">
                 </a>
                 <div class="item-category">{{this.categoryName}}</div>
-                {{#if ../user}}
-                <button class="wishlist-button" data-item-id="{{this.id}}">
-                  <span class="wishlist-icon outline">☆</span>
-                  <span class="wishlist-icon filled">★</span>
-                </button>
-                {{/if}}
               </div>
               <div class="item-details">
                 <h3><a href="/market/item/{{this.id}}">{{this.title}}</a></h3>
@@ -477,24 +471,12 @@
       const itemElement = document.createElement('div');
       itemElement.className = 'market-item';
 
-      // Check if user is logged in
-      const isLoggedIn = {{#if user}}true{{else}}false{{/if}};
-
-      // Create wishlist button HTML if user is logged in
-      const wishlistButtonHtml = isLoggedIn ? `
-        <button class="wishlist-button" data-item-id="${item.id}">
-          <span class="wishlist-icon outline">☆</span>
-          <span class="wishlist-icon filled">★</span>
-        </button>
-      ` : '';
-
       itemElement.innerHTML = `
         <div class="item-preview">
           <a href="/market/item/${item.id}">
             <img src="${item.previewImage}" alt="${item.title}" loading="lazy">
           </a>
           <div class="item-category">${item.categoryName}</div>
-          ${wishlistButtonHtml}
         </div>
         <div class="item-details">
           <h3><a href="/market/item/${item.id}">${item.title}</a></h3>
@@ -509,22 +491,6 @@
           </div>
         </div>
       `;
-
-      // Add wishlist button event listener if user is logged in
-      if (isLoggedIn) {
-        const wishlistButton = itemElement.querySelector('.wishlist-button');
-        if (wishlistButton) {
-          // Check if item is in wishlist
-          checkWishlistStatus(item.id, wishlistButton);
-
-          // Add click event listener
-          wishlistButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleWishlist(this, item.id);
-          });
-        }
-      }
 
       return itemElement;
     }
@@ -615,107 +581,6 @@
         loadMoreItems();
       }
     });
-
-    // Initialize wishlist buttons
-    initWishlistButtons();
-
-    // Function to initialize wishlist buttons
-    function initWishlistButtons() {
-      const wishlistButtons = document.querySelectorAll('.wishlist-button');
-
-      wishlistButtons.forEach(button => {
-        const itemId = button.getAttribute('data-item-id');
-
-        // Check if item is in wishlist
-        checkWishlistStatus(itemId, button);
-
-        // Add click event listener
-        button.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          toggleWishlist(this, itemId);
-        });
-      });
-    }
-
-    // Function to check if an item is in the user's wishlist
-    function checkWishlistStatus(itemId, button) {
-      // Only proceed if user is logged in
-      if (!{{#if user}}true{{else}}false{{/if}}) return;
-
-      fetch(`/api/market/items/${itemId}`)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
-        .then(data => {
-          // Check if the item is in the user's wishlist
-          if (data.isInWishlist) {
-            button.classList.add('in-wishlist');
-          } else {
-            button.classList.remove('in-wishlist');
-          }
-        })
-        .catch(error => {
-          console.error('Error checking wishlist status:', error);
-        });
-    }
-
-    // Function to toggle wishlist status
-    function toggleWishlist(button, itemId) {
-      // Only proceed if user is logged in
-      if (!{{#if user}}true{{else}}false{{/if}}) {
-        // Redirect to login page
-        window.location.href = '/users/login?redirect=' + encodeURIComponent(window.location.pathname);
-        return;
-      }
-
-      const isInWishlist = button.classList.contains('in-wishlist');
-      const url = isInWishlist
-        ? `/market/user/wishlist/remove/${itemId}`
-        : `/market/user/wishlist/add/${itemId}`;
-      const method = isInWishlist ? 'DELETE' : 'POST';
-
-      // Disable button during request
-      button.disabled = true;
-
-      fetch(url, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
-        .then(data => {
-          if (data.success) {
-            // Toggle wishlist status
-            if (isInWishlist) {
-              button.classList.remove('in-wishlist');
-              showNotification('Item removed from wishlist', 'success');
-            } else {
-              button.classList.add('in-wishlist');
-              showNotification('Item added to wishlist', 'success');
-            }
-          } else {
-            showNotification(data.message || 'An error occurred', 'error');
-          }
-        })
-        .catch(error => {
-          console.error('Error toggling wishlist:', error);
-          showNotification('An error occurred while updating your wishlist', 'error');
-        })
-        .finally(() => {
-          // Re-enable button
-          button.disabled = false;
-        });
-    }
   });
 </script>
 

@@ -733,9 +733,6 @@ class MarketItem {
         };
       }
 
-      // Clear cache since we've added a new item
-      this.clearCache();
-
       return {
         success: true,
         itemId: item.id,
@@ -835,9 +832,6 @@ class MarketItem {
 
       if (updateError) throw updateError;
 
-      // Clear cache since we've updated an item
-      this.clearCache();
-
       return {
         success: true,
         newBalance
@@ -865,9 +859,6 @@ class MarketItem {
         .eq('id', itemId);
 
       if (error) throw error;
-
-      // Clear cache since we've deleted an item
-      this.clearCache();
 
       return true;
     } catch (error) {
@@ -1174,25 +1165,6 @@ class MarketItem {
         avatar: item.creator.avatar || '/images/default-avatar.png'
       }
     };
-  }
-
-  /**
-   * Clear all market item caches
-   * This should be called when items are created, updated, or deleted
-   */
-  static clearCache() {
-    // Get all cache keys
-    const keys = cache.keys();
-
-    // Filter for market-related keys
-    const marketKeys = keys.filter(key => key.startsWith('market:'));
-
-    // Delete each key
-    marketKeys.forEach(key => {
-      cache.del(key);
-    });
-
-    console.log(`Cleared ${marketKeys.length} market cache entries`);
   }
 }
 

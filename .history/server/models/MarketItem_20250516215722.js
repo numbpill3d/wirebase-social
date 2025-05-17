@@ -92,14 +92,6 @@ class MarketItem {
    */
   static async getFeatured(limit = 6) {
     try {
-      // Check cache first
-      const cacheKey = `market:featured:${limit}`;
-      const cachedItems = cache.get(cacheKey);
-
-      if (cachedItems) {
-        return cachedItems;
-      }
-
       const { data: items, error } = await supabase
         .from('market_items')
         .select(`
@@ -119,12 +111,7 @@ class MarketItem {
       if (error) throw error;
 
       // Format the items
-      const formattedItems = items.map(item => this.formatItem(item));
-
-      // Cache the results for 10 minutes (featured items change less frequently)
-      cache.set(cacheKey, formattedItems, 600);
-
-      return formattedItems;
+      return items.map(item => this.formatItem(item));
     } catch (error) {
       console.error('Error getting featured market items:', error);
       return [];
@@ -733,9 +720,6 @@ class MarketItem {
         };
       }
 
-      // Clear cache since we've added a new item
-      this.clearCache();
-
       return {
         success: true,
         itemId: item.id,
@@ -835,9 +819,6 @@ class MarketItem {
 
       if (updateError) throw updateError;
 
-      // Clear cache since we've updated an item
-      this.clearCache();
-
       return {
         success: true,
         newBalance
@@ -865,9 +846,6 @@ class MarketItem {
         .eq('id', itemId);
 
       if (error) throw error;
-
-      // Clear cache since we've deleted an item
-      this.clearCache();
 
       return true;
     } catch (error) {
@@ -983,14 +961,6 @@ class MarketItem {
    */
   static async getTrending(limit = 6) {
     try {
-      // Check cache first
-      const cacheKey = `market:trending:${limit}`;
-      const cachedItems = cache.get(cacheKey);
-
-      if (cachedItems) {
-        return cachedItems;
-      }
-
       const { data: items, error } = await supabase
         .from('market_items')
         .select(`
@@ -1005,12 +975,7 @@ class MarketItem {
       if (error) throw error;
 
       // Format the items
-      const formattedItems = items.map(item => this.formatItem(item));
-
-      // Cache the results for 5 minutes
-      cache.set(cacheKey, formattedItems, 300);
-
-      return formattedItems;
+      return items.map(item => this.formatItem(item));
     } catch (error) {
       console.error('Error getting trending items:', error);
       return [];
@@ -1174,25 +1139,6 @@ class MarketItem {
         avatar: item.creator.avatar || '/images/default-avatar.png'
       }
     };
-  }
-
-  /**
-   * Clear all market item caches
-   * This should be called when items are created, updated, or deleted
-   */
-  static clearCache() {
-    // Get all cache keys
-    const keys = cache.keys();
-
-    // Filter for market-related keys
-    const marketKeys = keys.filter(key => key.startsWith('market:'));
-
-    // Delete each key
-    marketKeys.forEach(key => {
-      cache.del(key);
-    });
-
-    console.log(`Cleared ${marketKeys.length} market cache entries`);
   }
 }
 

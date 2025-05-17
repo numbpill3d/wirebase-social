@@ -98,7 +98,7 @@ router.get('/items/:id', async (req, res) => {
  * GET /api/market/categories
  * Get all marketplace categories
  */
-router.get('/categories', apiCache(600), async (req, res) => {
+router.get('/categories', async (req, res) => {
   try {
     const categories = await MarketItem.getCategories();
 
@@ -141,7 +141,7 @@ router.get('/tags', apiCache(600), async (req, res) => {
  * GET /api/market/collections
  * Get collections with filters
  */
-router.get('/collections', apiCache(60), async (req, res) => {
+router.get('/collections', async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 12;
@@ -251,7 +251,7 @@ router.get('/featured', apiCache(300), async (req, res) => {
  * GET /api/market/stats
  * Get marketplace statistics
  */
-router.get('/stats', apiCache(300), async (req, res) => {
+router.get('/stats', async (req, res) => {
   try {
     // Get market stats
     const itemCount = await MarketItem.getCount();
