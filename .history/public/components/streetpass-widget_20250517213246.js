@@ -208,48 +208,47 @@ class StreetpassWidget extends HTMLElement {
         });
     }
 
-    async leaveEmote(emote) {
-        try {
-            if (!this.profileId) {
-                this.showErrorNotification('Cannot leave emote: No profile ID provided');
-                return;
-            }
+    leaveEmote(emote) {
+        // Get current user
+        const currentUser = localStorage.getItem('wirebase_username') || 'Guest';
+        const currentGlyph = localStorage.getItem('wirebase_glyph') || '👤';
 
-            // Show loading state
-            this.showEmoteConfirmation('⏳');
+        // Check if user has already visited
+        const existingVisitorIndex = this.visitors.findIndex(
+            v => v.username === currentUser
+        );
 
-            // Send to server
-            const response = await fetch('/api/streetpass/visit', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    profileId: this.profileId,
-                    emote: emote
-                })
+        if (existingVisitorIndex !== -1) {
+            // Update existing visit
+            this.visitors[existingVisitorIndex].emote = emote;
+            this.visitors[existingVisitorIndex].timestamp = Date.now();
+        } else {
+            // Add new visit
+            this.visitors.unshift({
+                username: currentUser,
+                glyph: currentGlyph,
+                timestamp: Date.now(),
+                emote: emote,
+                profileId: this.profileId // Include profile ID
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to record visit');
+            // Maintain max length
+            if (this.visitors.length > this.maxVisitors) {
+                this.visitors.pop();
             }
+        }
 
-            const result = await response.json();
+        try {
+            // In a real app, send to server
+            // For demo, store in localStorage
+            localStorage.setItem(`streetpass_${this.username}`, JSON.stringify(this.visitors));
 
-            if (result.success) {
-                // Reload visitors to get updated list
-                await this.loadVisitors();
+            // Re-render
+            this.render();
+            this.attachEventListeners();
 
-                // Re-render
-                this.render();
-                this.attachEventListeners();
-
-                // Show confirmation
-                this.showEmoteConfirmation(emote);
-            } else {
-                throw new Error(result.message || 'Failed to record visit');
-            }
+            // Show confirmation
+            this.showEmoteConfirmation(emote);
         } catch (error) {
             console.error('Error saving streetpass data:', error);
             this.showErrorNotification('Failed to save your emote. Please try again.');

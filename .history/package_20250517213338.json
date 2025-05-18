@@ -13,8 +13,7 @@
     "test:coverage": "jest --coverage",
     "migrate:market": "node scripts/run-vivid-market-migration.js",
     "migrate": "node scripts/run-migrations.js",
-    "migrate:streetpass": "node scripts/migrations/create-streetpass-table.js",
-    "migrate:forum": "node scripts/migrations/create-forum-tables.js"
+    "migrate:streetpass": "node scripts/migrations/create-streetpass-table.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.7",
