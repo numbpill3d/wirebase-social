@@ -701,9 +701,7 @@ router.get('/wir/transactions', ensureApiAuth, async (req, res) => {
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
     // Format the transactions
     const formattedTransactions = transactions.map(transaction => ({
@@ -726,117 +724,6 @@ router.get('/wir/transactions', ensureApiAuth, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'An error occurred while fetching transactions'
-    });
-  }
-});
-
-/**
- * POST /api/market/wir/convert
- * Convert between WIR and Loot tokens
- */
-router.post('/wir/convert', ensureApiAuth, async (req, res) => {
-  try {
-    const { direction, amount } = req.body;
-    const userId = req.user.id;
-
-    // Validate input
-    if (!direction || !amount) {
-      return res.status(400).json({
-        success: false,
-        message: 'Direction and amount are required'
-      });
-    }
-
-    if (direction !== 'lootToWir' && direction !== 'wirToLoot') {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid direction'
-      });
-    }
-
-    if (isNaN(amount) || amount < 1) {
-      return res.status(400).json({
-        success: false,
-        message: 'Amount must be a positive number'
-      });
-    }
-
-    // Process conversion
-    const result = await WIRTransaction.convert(userId, direction, parseInt(amount));
-
-    if (result.success) {
-      // Update user's balances in session
-      req.user.wirBalance = result.newWirBalance;
-      req.user.lootTokens = result.newLootBalance;
-
-      return res.json({
-        success: true,
-        message: 'Conversion successful',
-        newWirBalance: result.newWirBalance,
-        newLootBalance: result.newLootBalance
-      });
-    } else {
-      return res.status(400).json({
-        success: false,
-        message: result.message || 'Conversion failed'
-      });
-    }
-  } catch (error) {
-    console.error('API Error - Convert currency:', error);
-    res.status(500).json({
-      success: false,
-      message: 'An error occurred during conversion'
-    });
-  }
-});
-
-/**
- * POST /api/market/wir/transfer
- * Transfer WIR to another user
- */
-router.post('/wir/transfer', ensureApiAuth, async (req, res) => {
-  try {
-    const { receiverUsername, amount, notes } = req.body;
-    const senderId = req.user.id;
-
-    // Validate input
-    if (!receiverUsername || !amount) {
-      return res.status(400).json({
-        success: false,
-        message: 'Receiver username and amount are required'
-      });
-    }
-
-    if (isNaN(amount) || amount < 1) {
-      return res.status(400).json({
-        success: false,
-        message: 'Amount must be a positive number'
-      });
-    }
-
-    // Process transfer
-    const result = await WIRTransaction.transfer(senderId, receiverUsername, parseInt(amount), notes);
-
-    if (result.success) {
-      // Update user's WIR balance in session
-      req.user.wirBalance = result.newBalance;
-
-      return res.json({
-        success: true,
-        message: result.message || 'Transfer successful',
-        newBalance: result.newBalance
-      });
-    } else {
-      return res.status(400).json({
-        success: false,
-        message: result.message || 'Transfer failed'
-      });
-    }
-  } catch (error) {
-    console.error('API Error - Transfer WIR:', error);
-    res.status(500).json({
-      success: false,
-      message: 'An error occurred during transfer'
     });
   }
 });
