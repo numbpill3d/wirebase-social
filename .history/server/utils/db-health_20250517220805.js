@@ -159,29 +159,22 @@ const performMaintenance = async (knex = null) => {
  * @param {number} interval - Check interval in milliseconds
  * @returns {Object} Timer object
  */
-const startPeriodicHealthChecks = (knex = null, interval = 60000) => {
-  const kInstance = knex || knexInstance || global.knex;
-
-  if (!kInstance) {
-    console.error('ERROR: No knex instance available for health checks');
+const startPeriodicHealthChecks = (knexInstance, interval = 60000) => {
+  if (!knexInstance) {
+    console.error('ERROR: knexInstance not provided to startPeriodicHealthChecks');
     return null;
   }
 
-  // Store the instance for future use
-  if (knex && !knexInstance) {
-    knexInstance = knex;
-  }
-
   // Perform initial health check
-  checkHealth(kInstance);
+  checkHealth(knexInstance);
 
   // Schedule periodic health checks
   const timer = setInterval(async () => {
-    const result = await checkHealth(kInstance);
+    const result = await checkHealth(knexInstance);
 
     // Perform maintenance if needed
     if (!result.healthy || healthCheckStatus.consecutiveFailures >= 3) {
-      await performMaintenance(kInstance);
+      await performMaintenance(knexInstance);
     }
   }, interval);
 
@@ -190,22 +183,10 @@ const startPeriodicHealthChecks = (knex = null, interval = 60000) => {
   return timer;
 };
 
-/**
- * Initialize the health check utility with a knex instance
- * @param {Object} knex - The knex instance to use
- */
-const initialize = (knex) => {
-  if (knex) {
-    knexInstance = knex;
-    console.log('Database health check utility initialized with knex instance');
-  }
-};
-
 // Export functions
 module.exports = {
   checkHealth,
   getHealthStatus,
   performMaintenance,
-  startPeriodicHealthChecks,
-  initialize
+  startPeriodicHealthChecks
 };

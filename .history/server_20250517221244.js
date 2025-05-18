@@ -308,13 +308,10 @@ const dbLeakDetector = require('./server/utils/db-leak-detector');
 const { queryTimeoutMiddleware, transactionTimeoutMiddleware } = require('./server/middleware/query-timeout');
 
 // Initialize database utilities with knex instance
-dbMonitor.initialize(global.knex);
+dbMonitor.setupPoolMonitoring(global.knex);
 dbHealth.initialize(global.knex);
 dbErrorHandler.initialize(global.knex);
 dbLeakDetector.initialize(global.knex);
-
-// Setup pool monitoring after initialization
-dbMonitor.setupPoolMonitoring();
 
 // Apply database middleware with knex instance
 app.use(queryTimeoutMiddleware(global.knex, 30000)); // 30 second query timeout

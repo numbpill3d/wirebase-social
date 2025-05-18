@@ -308,13 +308,10 @@ const dbLeakDetector = require('./server/utils/db-leak-detector');
 const { queryTimeoutMiddleware, transactionTimeoutMiddleware } = require('./server/middleware/query-timeout');
 
 // Initialize database utilities with knex instance
-dbMonitor.initialize(global.knex);
+dbMonitor.setupPoolMonitoring(global.knex);
 dbHealth.initialize(global.knex);
 dbErrorHandler.initialize(global.knex);
 dbLeakDetector.initialize(global.knex);
-
-// Setup pool monitoring after initialization
-dbMonitor.setupPoolMonitoring();
 
 // Apply database middleware with knex instance
 app.use(queryTimeoutMiddleware(global.knex, 30000)); // 30 second query timeout
@@ -438,10 +435,13 @@ const server = app.listen(PORT, () => {
   console.log('Starting database monitoring...');
 
   // Start health checks (every 60 seconds)
-  healthCheckTimer = dbHealth.startPeriodicHealthChecks(60000);
+  healthCheckTimer = dbHealth.startPeriodicHealthChecks(global.knex, 60000);
 
   // Start leak detection (check every 30 seconds, fix every 5 minutes)
-  leakDetectionTimers = dbLeakDetector.startLeakDetection(null, 30000, 300000);
+  leakDetectionTimers = dbLeakDetector.startLeakDetection(global.knex, 30000, 300000);
+
+  // Initialize pool monitoring
+  dbMonitor.setupPoolMonitoring(global.knex);
 });
 
 // Add server timeout to prevent hanging connections

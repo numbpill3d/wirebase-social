@@ -26,8 +26,8 @@ const ensureAdmin = (req, res, next) => {
 // Get database status
 router.get('/db/status', ensureAdmin, (req, res) => {
   try {
-    // Use destructuring for cleaner code
-    const { knex } = global;
+    // Use global.knex as a fallback if needed
+    const knex = global.knex;
     const poolStatus = dbMonitor.getPoolStatus(knex);
     const healthStatus = dbHealth.getHealthStatus(knex);
     const errorStats = dbErrorHandler.getErrorStats(knex);
@@ -76,8 +76,7 @@ router.post('/db/maintenance', ensureAdmin, async (req, res) => {
 // Check for connection leaks
 router.get('/db/leaks', ensureAdmin, (req, res) => {
   try {
-    const { knex } = global;
-    const result = dbLeakDetector.checkForLeaks(knex);
+    const result = dbLeakDetector.checkForLeaks();
     res.json(result);
   } catch (error) {
     console.error('Error checking for leaks:', error);
@@ -88,9 +87,8 @@ router.get('/db/leaks', ensureAdmin, (req, res) => {
 // Fix connection leaks
 router.post('/db/fix-leaks', ensureAdmin, async (req, res) => {
   try {
-    const { knex } = global;
     const force = req.body.force === true;
-    const result = await dbLeakDetector.fixLeaks(knex, force);
+    const result = await dbLeakDetector.fixLeaks(force);
     res.json(result);
   } catch (error) {
     console.error('Error fixing leaks:', error);

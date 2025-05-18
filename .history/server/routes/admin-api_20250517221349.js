@@ -26,8 +26,8 @@ const ensureAdmin = (req, res, next) => {
 // Get database status
 router.get('/db/status', ensureAdmin, (req, res) => {
   try {
-    // Use destructuring for cleaner code
-    const { knex } = global;
+    // Use global.knex as a fallback if needed
+    const knex = global.knex;
     const poolStatus = dbMonitor.getPoolStatus(knex);
     const healthStatus = dbHealth.getHealthStatus(knex);
     const errorStats = dbErrorHandler.getErrorStats(knex);

@@ -140,21 +140,9 @@ const errorHandlerMiddleware = () => {
   };
 };
 
-/**
- * Initialize the error handler with a knex instance
- * @param {Object} knex - The knex instance to use
- */
-const initialize = (knex) => {
-  if (knex) {
-    knexInstance = knex;
-    console.log('Database error handler initialized with knex instance');
-  }
-};
-
 module.exports = {
   handleError,
   getErrorStats,
   resetErrorStats,
-  errorHandlerMiddleware,
-  initialize
+  errorHandlerMiddleware
 };

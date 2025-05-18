@@ -15,27 +15,25 @@ const ensureAdmin = (req, res, next) => {
   if (!req.isAuthenticated()) {
     return res.status(401).json({ error: 'Not authenticated' });
   }
-
+  
   if (!req.user.role || req.user.role !== 'admin') {
     return res.status(403).json({ error: 'Not authorized' });
   }
-
+  
   next();
 };
 
 // Get database status
 router.get('/db/status', ensureAdmin, (req, res) => {
   try {
-    // Use destructuring for cleaner code
-    const { knex } = global;
-    const poolStatus = dbMonitor.getPoolStatus(knex);
-    const healthStatus = dbHealth.getHealthStatus(knex);
-    const errorStats = dbErrorHandler.getErrorStats(knex);
+    const poolStatus = dbMonitor.getPoolStatus();
+    const healthStatus = dbHealth.getHealthStatus();
+    const errorStats = dbErrorHandler.getErrorStats();
     const leakStatus = {
       history: dbLeakDetector.getConnectionHistory(),
       potentialLeaks: dbLeakDetector.getPotentialLeaks()
     };
-
+    
     res.json({
       pool: poolStatus,
       health: healthStatus,
@@ -52,8 +50,7 @@ router.get('/db/status', ensureAdmin, (req, res) => {
 // Perform database health check
 router.post('/db/health-check', ensureAdmin, async (req, res) => {
   try {
-    const { knex } = global;
-    const result = await dbHealth.checkHealth(knex);
+    const result = await dbHealth.checkHealth();
     res.json(result);
   } catch (error) {
     console.error('Error performing health check:', error);
@@ -64,8 +61,7 @@ router.post('/db/health-check', ensureAdmin, async (req, res) => {
 // Perform database maintenance
 router.post('/db/maintenance', ensureAdmin, async (req, res) => {
   try {
-    const { knex } = global;
-    const result = await dbHealth.performMaintenance(knex);
+    const result = await dbHealth.performMaintenance();
     res.json(result);
   } catch (error) {
     console.error('Error performing maintenance:', error);
@@ -76,8 +72,7 @@ router.post('/db/maintenance', ensureAdmin, async (req, res) => {
 // Check for connection leaks
 router.get('/db/leaks', ensureAdmin, (req, res) => {
   try {
-    const { knex } = global;
-    const result = dbLeakDetector.checkForLeaks(knex);
+    const result = dbLeakDetector.checkForLeaks();
     res.json(result);
   } catch (error) {
     console.error('Error checking for leaks:', error);
@@ -88,9 +83,8 @@ router.get('/db/leaks', ensureAdmin, (req, res) => {
 // Fix connection leaks
 router.post('/db/fix-leaks', ensureAdmin, async (req, res) => {
   try {
-    const { knex } = global;
     const force = req.body.force === true;
-    const result = await dbLeakDetector.fixLeaks(knex, force);
+    const result = await dbLeakDetector.fixLeaks(force);
     res.json(result);
   } catch (error) {
     console.error('Error fixing leaks:', error);

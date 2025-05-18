@@ -215,22 +215,10 @@ const startLeakDetection = (knex = null, checkInterval = 30000, fixInterval = 30
   return { checkTimer, fixTimer };
 };
 
-/**
- * Initialize the leak detector with a knex instance
- * @param {Object} knex - The knex instance to use
- */
-const initialize = (knex) => {
-  if (knex) {
-    knexInstance = knex;
-    console.log('Database leak detector initialized with knex instance');
-  }
-};
-
 module.exports = {
   checkForLeaks,
   fixLeaks,
   startLeakDetection,
   getConnectionHistory: () => connectionHistory,
-  getPotentialLeaks: () => potentialLeaks,
-  initialize
+  getPotentialLeaks: () => potentialLeaks
 };

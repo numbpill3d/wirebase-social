@@ -80,11 +80,10 @@ const handleError = async (error, context = 'unknown') => {
  * Get error statistics
  * @returns {Object} Error statistics
  */
-const getErrorStats = (knex = null) => {
-  const kInstance = knex || knexInstance || global.knex;
+const getErrorStats = () => {
   return {
     ...errorStats,
-    poolStatus: dbMonitor.getPoolStatus(kInstance)
+    poolStatus: dbMonitor.getPoolStatus(global.knex)
   };
 };
 
@@ -140,21 +139,9 @@ const errorHandlerMiddleware = () => {
   };
 };
 
-/**
- * Initialize the error handler with a knex instance
- * @param {Object} knex - The knex instance to use
- */
-const initialize = (knex) => {
-  if (knex) {
-    knexInstance = knex;
-    console.log('Database error handler initialized with knex instance');
-  }
-};
-
 module.exports = {
   handleError,
   getErrorStats,
   resetErrorStats,
-  errorHandlerMiddleware,
-  initialize
+  errorHandlerMiddleware
 };

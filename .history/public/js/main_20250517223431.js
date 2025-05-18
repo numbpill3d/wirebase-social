@@ -781,26 +781,43 @@ function showLoadingScreen() {
 
     document.body.appendChild(loadingScreen);
 
-    // Add animated glitch effect using CSS animations for better performance
-    const glitches = document.querySelectorAll('.ambient-glitch');
-    glitches.forEach(glitch => {
-        // Add CSS class for animation instead of JS-based animation
-        glitch.classList.add('glitch-animate');
+    // Add animated glitch effect
+    const animateGlitches = () => {
+        document.querySelectorAll('.ambient-glitch').forEach(glitch => {
+            const intensity = 0.8 + (Math.random() * 0.4);
+            const hueRotate = Math.random() * 20 - 10;
+            glitch.style.filter = `brightness(${intensity}) hue-rotate(${hueRotate}deg)`;
+        });
 
-        // Set random animation duration for each glitch
-        const duration = 0.5 + (Math.random() * 1);
-        glitch.style.animationDuration = `${duration}s`;
+        // Randomize the timing for natural flicker
+        setTimeout(animateGlitches, 100 + Math.random() * 200);
+    };
 
-        // Set random delay for each glitch
-        const delay = Math.random() * 0.5;
-        glitch.style.animationDelay = `${delay}s`;
-    });
+    animateGlitches();
 
-    // Add pulsing effect to logo using CSS animation for better performance
+    // Add pulsing effect to logo
     const loadingLogo = loadingScreen.querySelector('.loading-logo');
-    if (loadingLogo) {
-        loadingLogo.classList.add('pulse-animation');
-    }
+    let pulseDirection = 1;
+    let pulseValue = 1;
+
+    const animateLogo = () => {
+        pulseValue += 0.01 * pulseDirection;
+
+        if (pulseValue >= 1.1) {
+            pulseDirection = -1;
+        }
+        if (pulseValue <= 0.9) {
+            pulseDirection = 1;
+        }
+
+        loadingLogo.style.transform = `scale(${pulseValue})`;
+
+        if (document.body.contains(loadingLogo)) {
+            requestAnimationFrame(animateLogo);
+        }
+    };
+
+    requestAnimationFrame(animateLogo);
 
     // Update loading messages with typewriter effect
     const statusMessages = [

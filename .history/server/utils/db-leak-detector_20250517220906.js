@@ -36,7 +36,7 @@ const checkForLeaks = (knex = null) => {
 
   try {
     // Get current pool status
-    const status = dbMonitor.getPoolStatus(kInstance);
+    const status = dbMonitor.getPoolStatus(knexInstance);
 
     if (status.error) {
       return { error: status.error };
@@ -116,17 +116,14 @@ const checkForLeaks = (knex = null) => {
  * @param {boolean} force - Force fix even if no leak is detected
  * @returns {Promise<Object>} Fix result
  */
-const fixLeaks = async (knex = null, force = false) => {
-  // Use provided knex instance, stored instance, or global
-  const kInstance = knex || knexInstance || global.knex;
-
-  if (!kInstance) {
-    return { error: 'No knex instance available' };
+const fixLeaks = async (knexInstance, force = false) => {
+  if (!knexInstance) {
+    return { error: 'No knex instance provided' };
   }
 
   try {
     // Check for leaks first
-    const leakCheck = checkForLeaks(kInstance);
+    const leakCheck = checkForLeaks(knexInstance);
 
     if (leakCheck.error) {
       return { error: leakCheck.error };
@@ -144,7 +141,7 @@ const fixLeaks = async (knex = null, force = false) => {
     console.log('Attempting to fix database connection leaks');
 
     // Get pool
-    const { client: { pool } } = kInstance;
+    const pool = knexInstance.client.pool;
 
     // Force pool to release idle connections
     if (pool && typeof pool.drain === 'function') {
@@ -157,7 +154,7 @@ const fixLeaks = async (knex = null, force = false) => {
     potentialLeaks.lastAutoFix = new Date();
 
     // Get new status
-    const newStatus = dbMonitor.getPoolStatus(kInstance);
+    const newStatus = dbMonitor.getPoolStatus(knexInstance);
 
     return {
       fixed: true,
@@ -178,35 +175,27 @@ const fixLeaks = async (knex = null, force = false) => {
  * @param {number} fixInterval - Fix interval in milliseconds
  * @returns {Object} Timer objects
  */
-const startLeakDetection = (knex = null, checkInterval = 30000, fixInterval = 300000) => {
-  // Use provided knex instance, stored instance, or global
-  const kInstance = knex || knexInstance || global.knex;
-
-  if (!kInstance) {
-    console.error('ERROR: No knex instance available for leak detection');
+const startLeakDetection = (knexInstance, checkInterval = 30000, fixInterval = 300000) => {
+  if (!knexInstance) {
+    console.error('ERROR: knexInstance not provided to startLeakDetection');
     return { checkTimer: null, fixTimer: null };
   }
 
-  // Store the instance for future use
-  if (knex && !knexInstance) {
-    knexInstance = knex;
-  }
-
   // Perform initial check
-  checkForLeaks(kInstance);
+  checkForLeaks(knexInstance);
 
   // Schedule periodic checks
   const checkTimer = setInterval(() => {
-    checkForLeaks(kInstance);
+    checkForLeaks(knexInstance);
   }, checkInterval);
 
   // Schedule periodic fixes if leaks detected
   const fixTimer = setInterval(async () => {
-    const leakCheck = checkForLeaks(kInstance);
+    const leakCheck = checkForLeaks(knexInstance);
 
     // Auto-fix if persistent leaks detected
     if (leakCheck.leakDetected && potentialLeaks.count >= 3) {
-      await fixLeaks(kInstance);
+      await fixLeaks(knexInstance);
     }
   }, fixInterval);
 
@@ -215,22 +204,10 @@ const startLeakDetection = (knex = null, checkInterval = 30000, fixInterval = 30
   return { checkTimer, fixTimer };
 };
 
-/**
- * Initialize the leak detector with a knex instance
- * @param {Object} knex - The knex instance to use
- */
-const initialize = (knex) => {
-  if (knex) {
-    knexInstance = knex;
-    console.log('Database leak detector initialized with knex instance');
-  }
-};
-
 module.exports = {
   checkForLeaks,
   fixLeaks,
   startLeakDetection,
   getConnectionHistory: () => connectionHistory,
-  getPotentialLeaks: () => potentialLeaks,
-  initialize
+  getPotentialLeaks: () => potentialLeaks
 };

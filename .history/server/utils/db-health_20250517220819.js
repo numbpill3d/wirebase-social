@@ -190,22 +190,10 @@ const startPeriodicHealthChecks = (knex = null, interval = 60000) => {
   return timer;
 };
 
-/**
- * Initialize the health check utility with a knex instance
- * @param {Object} knex - The knex instance to use
- */
-const initialize = (knex) => {
-  if (knex) {
-    knexInstance = knex;
-    console.log('Database health check utility initialized with knex instance');
-  }
-};
-
 // Export functions
 module.exports = {
   checkHealth,
   getHealthStatus,
   performMaintenance,
-  startPeriodicHealthChecks,
-  initialize
+  startPeriodicHealthChecks
 };

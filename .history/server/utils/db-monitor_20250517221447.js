@@ -174,21 +174,11 @@ const resetMetrics = () => {
   };
 };
 
-/**
- * Initialize the monitor with a knex instance
- * @param {Object} knex - The knex instance to use
- */
-const initialize = (knex) => {
-  if (knex) {
-    knexInstance = knex;
-    console.log('Database monitor initialized with knex instance');
-  }
-};
+// Export functions without initializing immediately
 
 // Export functions
 module.exports = {
   getPoolStatus,
   resetMetrics,
-  setupPoolMonitoring,
-  initialize
+  setupPoolMonitoring
 };

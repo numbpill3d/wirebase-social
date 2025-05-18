@@ -1,0 +1,129 @@
+/**
+ * Performance optimizations for wirebase.city
+ * This file contains CSS optimizations to improve rendering performance
+ */
+
+/* Add will-change hints for elements that animate frequently */
+.crt-scanlines,
+.crt-flicker,
+.digital-noise {
+    will-change: opacity;
+    transform: translateZ(0); /* Force GPU acceleration */
+}
+
+/* Optimize animations with transform instead of opacity/filter when possible */
+.crt-boot {
+    will-change: transform, opacity;
+    animation: crt-boot 0.5s ease-out;
+}
+
+/* Pulse animation for loading logo */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.pulse-animation {
+    animation: pulse 1.5s infinite ease-in-out;
+    will-change: transform;
+}
+
+/* Glitch animation for ambient effects */
+@keyframes glitch-animate {
+    0% { 
+        filter: brightness(0.8) hue-rotate(-10deg);
+        transform: translateX(-1px);
+    }
+    25% { 
+        filter: brightness(1.2) hue-rotate(5deg);
+        transform: translateX(1px);
+    }
+    50% { 
+        filter: brightness(0.9) hue-rotate(10deg);
+        transform: translateX(0);
+    }
+    75% { 
+        filter: brightness(1.1) hue-rotate(-5deg);
+        transform: translateX(-1px);
+    }
+    100% { 
+        filter: brightness(0.8) hue-rotate(-10deg);
+        transform: translateX(0);
+    }
+}
+
+.glitch-animate {
+    animation: glitch-animate 0.8s infinite;
+    animation-timing-function: steps(2);
+    will-change: filter, transform;
+}
+
+/* Optimize parallax scrolling */
+.parallax {
+    will-change: transform;
+    transform: translateZ(0); /* Force GPU acceleration */
+}
+
+/* Optimize modal animations */
+.modal[aria-modal="true"] {
+    will-change: transform, opacity;
+}
+
+/* Optimize fade-in animations */
+.fade-in {
+    will-change: opacity, transform;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* Optimize notification animations */
+.system-notification,
+.error-toast,
+.emote-toast {
+    will-change: transform, opacity;
+}
+
+/* Optimize connection trace animations */
+.connection-trace {
+    will-change: opacity;
+    transition: opacity 0.5s ease;
+}
+
+/* Reduce repaints for fixed elements */
+.toast-container,
+.connection-traces,
+.crt-effect {
+    transform: translateZ(0); /* Force GPU acceleration */
+}
+
+/* Optimize loading bar animation */
+.loading-bar {
+    will-change: width;
+    transition: width 0.3s linear;
+}
+
+/* Optimize theme transitions */
+body.light-theme,
+body.classic-theme {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Optimize focus states */
+.focus-visible {
+    transition: outline 0.2s ease;
+}
+
+/* Optimize scrolling performance */
+html, body {
+    scroll-behavior: smooth;
+}
+
+/* Optimize image rendering */
+.pixel-image {
+    image-rendering: pixelated;
+}
+
+/* Optimize font rendering */
+body {
+    text-rendering: optimizeSpeed;
+}

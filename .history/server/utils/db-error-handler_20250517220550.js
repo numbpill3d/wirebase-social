@@ -51,9 +51,8 @@ const handleError = async (error, context = 'unknown') => {
   const errorCode = error.code || 'UNKNOWN';
   errorStats.errorsByCode[errorCode] = (errorStats.errorsByCode[errorCode] || 0) + 1;
 
-  // Get pool status - use stored knex instance or fallback to global
-  const kInstance = knexInstance || global.knex;
-  const poolStatus = dbMonitor.getPoolStatus(kInstance);
+  // Get pool status - use global knex instance from server.js
+  const poolStatus = dbMonitor.getPoolStatus(global.knex);
 
   // Log error with context and pool status
   console.error(`Database error in ${context}:`, {
@@ -66,7 +65,7 @@ const handleError = async (error, context = 'unknown') => {
   // Check database health on connection errors
   if (errorStats.connectionErrors > 0 && errorStats.connectionErrors % 5 === 0) {
     console.log('Triggering health check due to connection errors');
-    dbHealth.checkHealth(kInstance).catch(console.error);
+    dbHealth.checkHealth(global.knex).catch(console.error);
   }
 
   // Add context to error
@@ -80,11 +79,10 @@ const handleError = async (error, context = 'unknown') => {
  * Get error statistics
  * @returns {Object} Error statistics
  */
-const getErrorStats = (knex = null) => {
-  const kInstance = knex || knexInstance || global.knex;
+const getErrorStats = () => {
   return {
     ...errorStats,
-    poolStatus: dbMonitor.getPoolStatus(kInstance)
+    poolStatus: dbMonitor.getPoolStatus(global.knex)
   };
 };
 
@@ -140,21 +138,9 @@ const errorHandlerMiddleware = () => {
   };
 };
 
-/**
- * Initialize the error handler with a knex instance
- * @param {Object} knex - The knex instance to use
- */
-const initialize = (knex) => {
-  if (knex) {
-    knexInstance = knex;
-    console.log('Database error handler initialized with knex instance');
-  }
-};
-
 module.exports = {
   handleError,
   getErrorStats,
   resetErrorStats,
-  errorHandlerMiddleware,
-  initialize
+  errorHandlerMiddleware
 };

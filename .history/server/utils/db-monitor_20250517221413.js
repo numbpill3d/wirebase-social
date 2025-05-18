@@ -26,17 +26,14 @@ let metrics = {
  * @param {Object} knexInstance - The knex instance to use
  * @returns {Object} Current pool status
  */
-const getPoolStatus = (knex = null) => {
+const getPoolStatus = (knexInstance) => {
   try {
-    // Use provided knex instance, stored instance, or global
-    const kInstance = knex || knexInstance || global.knex;
-
-    if (!kInstance || !kInstance.client) {
+    if (!knexInstance || !knexInstance.client) {
       return { error: 'Knex instance not available or invalid' };
     }
 
     // Get pool from knex instance
-    const { client: { pool } } = kInstance;
+    const pool = knexInstance.client.pool;
 
     if (!pool) {
       return { error: 'Pool not available' };
@@ -76,22 +73,14 @@ const getPoolStatus = (knex = null) => {
  * @param {Object} knexInstance - The knex instance to use
  * @returns {boolean} Success status
  */
-const setupPoolMonitoring = (knex = null) => {
+const setupPoolMonitoring = (knexInstance) => {
   try {
-    // Use provided knex instance, stored instance, or global
-    const kInstance = knex || knexInstance || global.knex;
-
-    // Store the instance for future use
-    if (knex && !knexInstance) {
-      knexInstance = knex;
-    }
-
-    if (!kInstance || !kInstance.client) {
+    if (!knexInstance || !knexInstance.client) {
       console.warn('Knex instance not available or invalid for pool monitoring');
       return false;
     }
 
-    const { client: { pool } } = kInstance;
+    const pool = knexInstance.client.pool;
 
     if (!pool || !pool.on) {
       console.warn('Pool monitoring not available');
@@ -135,13 +124,11 @@ const setupPoolMonitoring = (knex = null) => {
 
 /**
  * Log warning when pool is under pressure
- * @param {Object} knex - The knex instance to use
+ * @param {Object} knexInstance - The knex instance to use
  */
-const logPoolWarning = (knex = null) => {
-  const status = getPoolStatus(knex);
-  if (status.error) {
-    return;
-  }
+const logPoolWarning = (knexInstance) => {
+  const status = getPoolStatus(knexInstance);
+  if (status.error) return;
 
   // Log warning if pool utilization is high
   if (status.used / status.max > 0.7) {
@@ -174,21 +161,11 @@ const resetMetrics = () => {
   };
 };
 
-/**
- * Initialize the monitor with a knex instance
- * @param {Object} knex - The knex instance to use
- */
-const initialize = (knex) => {
-  if (knex) {
-    knexInstance = knex;
-    console.log('Database monitor initialized with knex instance');
-  }
-};
+// Export functions without initializing immediately
 
 // Export functions
 module.exports = {
   getPoolStatus,
   resetMetrics,
-  setupPoolMonitoring,
-  initialize
+  setupPoolMonitoring
 };
