@@ -138,11 +138,7 @@
                   {{else if (eq this.transactionType "sale")}}
                     💵
                   {{else if (eq this.transactionType "transfer")}}
-                    {{#if (eq this.direction "outgoing")}}
-                      ↗️
-                    {{else}}
-                      ↘️
-                    {{/if}}
+                    ↔️
                   {{else if (eq this.transactionType "loot_to_wir_conversion")}}
                     🔄
                   {{else if (eq this.transactionType "wir_to_loot_conversion")}}
@@ -157,25 +153,23 @@
                 <div class="transaction-details">
                   <div class="transaction-title">
                     {{#if (eq this.transactionType "purchase")}}
-                      <span class="transaction-type-badge purchase">Purchase</span> Purchased item
+                      Purchased item
                     {{else if (eq this.transactionType "sale")}}
-                      <span class="transaction-type-badge sale">Sale</span> Sold item
+                      Sold item
                     {{else if (eq this.transactionType "transfer")}}
-                      {{#if (eq this.direction "outgoing")}}
-                        <span class="transaction-type-badge transfer-out">Transfer Out</span> Sent WIR to
-                        <span class="user-reference">{{this.receiver.displayName}}</span>
+                      {{#if (eq this.senderId user.id)}}
+                        Sent WIR to {{this.receiver.displayName}}
                       {{else}}
-                        <span class="transaction-type-badge transfer-in">Transfer In</span> Received WIR from
-                        <span class="user-reference">{{this.sender.displayName}}</span>
+                        Received WIR from {{this.sender.displayName}}
                       {{/if}}
                     {{else if (eq this.transactionType "loot_to_wir_conversion")}}
-                      <span class="transaction-type-badge conversion">Conversion</span> Converted Loot to WIR
+                      Converted Loot to WIR
                     {{else if (eq this.transactionType "wir_to_loot_conversion")}}
-                      <span class="transaction-type-badge conversion">Conversion</span> Converted WIR to Loot
+                      Converted WIR to Loot
                     {{else if (eq this.transactionType "listing_fee")}}
-                      <span class="transaction-type-badge fee">Fee</span> Listing fee
+                      Listing fee
                     {{else}}
-                      <span class="transaction-type-badge">{{this.transactionType}}</span>
+                      {{this.transactionType}}
                     {{/if}}
                   </div>
 
@@ -183,10 +177,6 @@
                     <div class="transaction-item-name">
                       <a href="/market/item/{{this.item.id}}">{{this.item.title}}</a>
                     </div>
-                  {{/if}}
-
-                  {{#if this.notes}}
-                    <div class="transaction-notes">{{this.notes}}</div>
                   {{/if}}
 
                   <div class="transaction-date">{{formatDate this.createdAt}}</div>

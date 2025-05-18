@@ -123,24 +123,10 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('loot-to-wir-form').style.display = 'block';
         document.getElementById('wir-to-loot-form').style.display = 'none';
         document.getElementById('conversion-direction').value = 'lootToWir';
-
-        // Reset the loot amount input and update calculations
-        const lootAmount = document.getElementById('loot-amount');
-        if (lootAmount) {
-          lootAmount.value = '';
-          lootAmount.dispatchEvent(new Event('input'));
-        }
       } else {
         document.getElementById('loot-to-wir-form').style.display = 'none';
         document.getElementById('wir-to-loot-form').style.display = 'block';
         document.getElementById('conversion-direction').value = 'wirToLoot';
-
-        // Reset the WIR amount input and update calculations
-        const wirAmount = document.getElementById('wir-amount');
-        if (wirAmount) {
-          wirAmount.value = '';
-          wirAmount.dispatchEvent(new Event('input'));
-        }
       }
     });
   });
@@ -204,9 +190,6 @@ document.addEventListener('DOMContentLoaded', function() {
       if (confirmButton) {
         confirmButton.disabled = (amount <= 0 || amount > userWirBalance);
       }
-
-      // Update the conversion direction value
-      document.getElementById('conversion-direction').value = 'wirToLoot';
     });
   }
 

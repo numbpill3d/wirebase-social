@@ -62,29 +62,13 @@ class Collection {
           addedAt: ci.added_at
         };
 
-        // Handle category which can be either a string or an object
-        let categoryName = '';
-        let categoryId = null;
-
-        if (formattedItem.category) {
-          if (typeof formattedItem.category === 'string') {
-            // Direct category string
-            categoryName = formattedItem.category.charAt(0).toUpperCase() + formattedItem.category.slice(1);
-          } else if (typeof formattedItem.category === 'object') {
-            // Category object from join
-            categoryName = formattedItem.category.name;
-            categoryId = formattedItem.category.id;
-          }
-        }
-
         // Format the item
         return {
           id: formattedItem.id,
           title: formattedItem.title,
           description: formattedItem.description,
-          category: typeof formattedItem.category === 'object' ? formattedItem.category.name : formattedItem.category,
-          categoryId: categoryId || formattedItem.category_id,
-          categoryName: categoryName,
+          category: formattedItem.category,
+          categoryName: formattedItem.category.charAt(0).toUpperCase() + formattedItem.category.slice(1),
           wirPrice: formattedItem.wir_price,
           previewImage: formattedItem.preview_image || '/images/market/default-preview.png',
           addedAt: formattedItem.addedAt,

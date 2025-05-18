@@ -357,33 +357,18 @@ class WIRTransaction {
       title: transaction.item.title
     } : null;
 
-    // Determine the sender ID based on transaction type and amount
-    // For transfers, if amount is negative, the current user is the sender
-    // If amount is positive, the reference_id points to the sender
-    const senderId = transaction.amount < 0 ? transaction.user_id :
-                    (transaction.transaction_type === 'transfer' ? transaction.reference_id : null);
-
-    // Determine the receiver ID based on transaction type and amount
-    // For transfers, if amount is positive, the current user is the receiver
-    // If amount is negative, the reference_id points to the receiver
-    const receiverId = transaction.amount > 0 ? transaction.user_id :
-                      (transaction.transaction_type === 'transfer' ? transaction.reference_id : null);
-
     return {
       id: transaction.id,
       userId: transaction.user_id,
-      senderId: senderId,
-      receiverId: receiverId,
-      amount: Math.abs(transaction.amount), // Use absolute value for display
+      receiverId: transaction.receiver_id,
+      amount: transaction.amount,
       transactionType: transaction.transaction_type,
       referenceId: transaction.reference_id,
       notes: transaction.notes,
       createdAt: transaction.created_at,
       sender,
       receiver,
-      item,
-      // Add a direction property for easier UI handling
-      direction: transaction.amount < 0 ? 'outgoing' : 'incoming'
+      item
     };
   }
 }

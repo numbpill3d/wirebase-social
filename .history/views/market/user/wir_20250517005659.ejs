@@ -1,11 +1,10 @@
 <%- include('../../partials/header', { title: 'WIR Balance - Vivid Market' }) %>
-<link rel="stylesheet" href="/css/transaction-styles.css">
 
 <div class="vivid-market theme-purple">
   <!-- Breadcrumb Navigation -->
   <div class="breadcrumb">
-    <a href="/">Home</a> &gt;
-    <a href="/market">Vivid Market</a> &gt;
+    <a href="/">Home</a> &gt; 
+    <a href="/market">Vivid Market</a> &gt; 
     <span>WIR Balance</span>
   </div>
 
@@ -48,80 +47,62 @@
   <!-- WIR Balance Section -->
   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
     <!-- Balance Card -->
-    <div class="balance-card">
-      <div class="balance-header">
-        <h2>Your WIR Balance</h2>
-        <div class="balance-icon">
+    <div style="background-color: var(--bg-medium); border: 1px solid var(--border-color); padding: 20px; border-radius: 4px;">
+      <h2 style="color: var(--secondary-color); margin-bottom: 15px;">Your WIR Balance</h2>
+      
+      <div style="display: flex; align-items: center; margin-bottom: 20px;">
+        <div style="font-size: 3rem; color: var(--secondary-color); margin-right: 15px;">
           <i class="fa fa-coins"></i>
         </div>
-      </div>
-
-      <div class="balance-amount">
-        <div class="amount-value"><%= user.wirBalance %> <span class="currency">WIR</span></div>
-        <div class="amount-description">Available for purchases and transfers</div>
-      </div>
-
-      <div class="transaction-stats">
-        <div class="stat-item">
-          <div class="stat-label">30-Day Activity</div>
-          <div class="stat-value">
-            <i class="fa fa-arrow-up" style="color: var(--success-color);"></i> +<%= Math.floor(Math.random() * 500) %> WIR
-            <i class="fa fa-arrow-down" style="color: var(--error-color);"></i> -<%= Math.floor(Math.random() * 300) %> WIR
-          </div>
+        <div>
+          <div style="font-size: 2.5rem; color: var(--secondary-color);"><%= user.wirBalance %> WIR</div>
+          <div style="color: var(--text-muted); font-size: 0.9rem;">Available for purchases and transfers</div>
         </div>
       </div>
-
-      <div class="balance-actions">
+      
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
         <button id="transfer-wir-btn" class="action-button">
           <i class="button-icon fa fa-exchange-alt"></i>
           <span class="button-text">Transfer WIR</span>
         </button>
-
+        
         <button id="convert-wir-btn" class="action-button">
           <i class="button-icon fa fa-sync"></i>
           <span class="button-text">Convert Currency</span>
         </button>
       </div>
     </div>
-
+    
     <!-- WIR Info Card -->
-    <div class="info-card">
-      <div class="info-header">
-        <h2>About WIR</h2>
-        <div class="info-icon">
-          <i class="fa fa-info-circle"></i>
-        </div>
-      </div>
-
-      <div class="info-content">
-        <p class="info-description">
-          <strong>WIR (Wirebase Internal Resource)</strong> is the digital currency used in the Vivid Market.
-        </p>
-
-        <div class="feature-list">
-          <div class="feature-item">
-            <div class="feature-icon">🛒</div>
-            <div class="feature-text">Purchase digital assets in the marketplace</div>
-          </div>
-          <div class="feature-item">
-            <div class="feature-icon">💰</div>
-            <div class="feature-text">Sell your creations to earn WIR</div>
-          </div>
-          <div class="feature-item">
-            <div class="feature-icon">↔️</div>
-            <div class="feature-text">Transfer WIR to other users</div>
-          </div>
-          <div class="feature-item">
-            <div class="feature-icon">🔄</div>
-            <div class="feature-text">Convert between WIR and Loot Tokens</div>
-          </div>
-        </div>
-
-        <div class="info-note">
-          <i class="fa fa-lightbulb"></i>
-          <span>New users receive 100 WIR to start exploring the marketplace.</span>
-        </div>
-      </div>
+    <div style="background-color: var(--bg-medium); border: 1px solid var(--border-color); padding: 20px; border-radius: 4px;">
+      <h2 style="color: var(--secondary-color); margin-bottom: 15px;">About WIR</h2>
+      
+      <p style="margin-bottom: 15px; line-height: 1.5;">
+        <strong>WIR (Wirebase Internal Resource)</strong> is the digital currency used in the Vivid Market.
+      </p>
+      
+      <ul style="list-style-type: none; padding: 0; margin-bottom: 15px;">
+        <li style="margin-bottom: 10px; display: flex; align-items: center;">
+          <i class="fa fa-check" style="color: var(--secondary-color); margin-right: 10px;"></i>
+          Purchase digital assets in the marketplace
+        </li>
+        <li style="margin-bottom: 10px; display: flex; align-items: center;">
+          <i class="fa fa-check" style="color: var(--secondary-color); margin-right: 10px;"></i>
+          Sell your creations to earn WIR
+        </li>
+        <li style="margin-bottom: 10px; display: flex; align-items: center;">
+          <i class="fa fa-check" style="color: var(--secondary-color); margin-right: 10px;"></i>
+          Transfer WIR to other users
+        </li>
+        <li style="margin-bottom: 10px; display: flex; align-items: center;">
+          <i class="fa fa-check" style="color: var(--secondary-color); margin-right: 10px;"></i>
+          Convert between WIR and Loot Tokens
+        </li>
+      </ul>
+      
+      <p style="color: var(--text-muted); font-size: 0.9rem;">
+        New users receive 100 WIR to start exploring the marketplace.
+      </p>
     </div>
   </div>
 
@@ -132,87 +113,52 @@
   </div>
 
   <% if (transactions && transactions.length > 0) { %>
-    <div class="transaction-filter-container">
-      <select id="transaction-filter" class="transaction-filter">
-        <option value="all">All Transactions</option>
-        <option value="purchase">Purchases</option>
-        <option value="sale">Sales</option>
-        <option value="transfer">Transfers</option>
-        <option value="conversion">Conversions</option>
-        <option value="listing_fee">Listing Fees</option>
-      </select>
-    </div>
-
-    <div class="transaction-list">
-      <% transactions.forEach(transaction => { %>
-        <div class="transaction-item type-<%= transaction.transactionType %>">
-          <div class="transaction-icon">
-            <% if (transaction.transactionType === 'purchase') { %>
-              🛒
-            <% } else if (transaction.transactionType === 'sale') { %>
-              💵
-            <% } else if (transaction.transactionType === 'transfer') { %>
-              <% if (transaction.direction === 'outgoing') { %>
-                ↗️
-              <% } else { %>
-                ↘️
-              <% } %>
-            <% } else if (transaction.transactionType === 'loot_to_wir_conversion' || transaction.transactionType === 'wir_to_loot_conversion') { %>
-              🔄
-            <% } else if (transaction.transactionType === 'listing_fee') { %>
-              📋
-            <% } else { %>
-              💱
-            <% } %>
-          </div>
-
-          <div class="transaction-details">
-            <div class="transaction-title">
-              <% if (transaction.transactionType === 'purchase') { %>
-                <span class="transaction-type-badge purchase">Purchase</span> Purchased item
-              <% } else if (transaction.transactionType === 'sale') { %>
-                <span class="transaction-type-badge sale">Sale</span> Sold item
-              <% } else if (transaction.transactionType === 'transfer') { %>
-                <% if (transaction.direction === 'outgoing') { %>
-                  <span class="transaction-type-badge transfer-out">Transfer Out</span> Sent WIR to
-                  <span class="user-reference"><%= transaction.receiver ? transaction.receiver.displayName : 'User' %></span>
-                <% } else { %>
-                  <span class="transaction-type-badge transfer-in">Transfer In</span> Received WIR from
-                  <span class="user-reference"><%= transaction.sender ? transaction.sender.displayName : 'User' %></span>
-                <% } %>
-              <% } else if (transaction.transactionType === 'loot_to_wir_conversion') { %>
-                <span class="transaction-type-badge conversion">Conversion</span> Converted Loot to WIR
-              <% } else if (transaction.transactionType === 'wir_to_loot_conversion') { %>
-                <span class="transaction-type-badge conversion">Conversion</span> Converted WIR to Loot
-              <% } else if (transaction.transactionType === 'listing_fee') { %>
-                <span class="transaction-type-badge fee">Fee</span> Listing fee
-              <% } else { %>
-                <span class="transaction-type-badge"><%= transaction.transactionType %></span>
-              <% } %>
-            </div>
-
-            <% if (transaction.item) { %>
-              <div class="transaction-item-name">
-                <a href="/market/item/<%= transaction.item.id %>"><%= transaction.item.title %></a>
-              </div>
-            <% } %>
-
-            <% if (transaction.notes) { %>
-              <div class="transaction-notes"><%= transaction.notes %></div>
-            <% } %>
-
-            <div class="transaction-date"><%= new Date(transaction.createdAt).toLocaleDateString() %> <%= new Date(transaction.createdAt).toLocaleTimeString() %></div>
-          </div>
-
-          <div class="transaction-amount <%= transaction.direction %>">
-            <% if (transaction.direction === 'outgoing') { %>
-              -<%= transaction.amount %> WIR
-            <% } else { %>
-              +<%= transaction.amount %> WIR
-            <% } %>
-          </div>
-        </div>
-      <% }); %>
+    <div style="background-color: var(--bg-medium); border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden;">
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background-color: var(--bg-dark); color: var(--text-light);">
+            <th style="padding: 12px; text-align: left;">Date</th>
+            <th style="padding: 12px; text-align: left;">Type</th>
+            <th style="padding: 12px; text-align: left;">Description</th>
+            <th style="padding: 12px; text-align: right;">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% transactions.forEach(transaction => { %>
+            <tr style="border-top: 1px solid var(--border-color);">
+              <td style="padding: 12px; color: var(--text-muted);"><%= new Date(transaction.createdAt).toLocaleDateString() %></td>
+              <td style="padding: 12px;">
+                <span style="
+                  display: inline-block;
+                  padding: 3px 8px;
+                  border-radius: 3px;
+                  font-size: 0.8rem;
+                  background-color: <%= 
+                    transaction.transactionType === 'purchase' ? 'rgba(76, 175, 80, 0.2)' : 
+                    transaction.transactionType === 'sale' ? 'rgba(33, 150, 243, 0.2)' :
+                    transaction.transactionType === 'transfer' ? 'rgba(156, 39, 176, 0.2)' :
+                    transaction.transactionType === 'conversion' ? 'rgba(255, 152, 0, 0.2)' :
+                    'rgba(158, 158, 158, 0.2)'
+                  %>;
+                  color: <%= 
+                    transaction.transactionType === 'purchase' ? 'rgb(76, 175, 80)' : 
+                    transaction.transactionType === 'sale' ? 'rgb(33, 150, 243)' :
+                    transaction.transactionType === 'transfer' ? 'rgb(156, 39, 176)' :
+                    transaction.transactionType === 'conversion' ? 'rgb(255, 152, 0)' :
+                    'rgb(158, 158, 158)'
+                  %>;
+                ">
+                  <%= transaction.transactionType.charAt(0).toUpperCase() + transaction.transactionType.slice(1) %>
+                </span>
+              </td>
+              <td style="padding: 12px;"><%= transaction.notes %></td>
+              <td style="padding: 12px; text-align: right; font-weight: bold; color: <%= transaction.amount > 0 ? 'var(--success-color)' : 'var(--error-color)' %>;">
+                <%= transaction.amount > 0 ? '+' : '' %><%= transaction.amount %> WIR
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
     </div>
   <% } else { %>
     <div class="empty-state">
@@ -288,59 +234,26 @@
 <script src="/js/vivid-market.js"></script>
 
 <script>
-  // Transaction filtering
-  const transactionFilter = document.getElementById('transaction-filter');
-  const transactionItems = document.querySelectorAll('.transaction-item');
-
-  if (transactionFilter) {
-    transactionFilter.addEventListener('change', function() {
-      const type = this.value;
-
-      if (type === 'all') {
-        transactionItems.forEach(item => {
-          item.style.display = 'flex';
-        });
-      } else if (type === 'conversion') {
-        // Handle both conversion types
-        transactionItems.forEach(item => {
-          if (item.classList.contains('type-loot_to_wir_conversion') ||
-              item.classList.contains('type-wir_to_loot_conversion')) {
-            item.style.display = 'flex';
-          } else {
-            item.style.display = 'none';
-          }
-        });
-      } else {
-        transactionItems.forEach(item => {
-          if (item.classList.contains(`type-${type}`)) {
-            item.style.display = 'flex';
-          } else {
-            item.style.display = 'none';
-          }
-        });
-      }
-    });
-  }
   document.addEventListener('DOMContentLoaded', function() {
     // Transfer WIR Modal
     const transferBtn = document.getElementById('transfer-wir-btn');
     const transferModal = document.getElementById('transfer-wir-modal');
     const transferForm = document.getElementById('transfer-wir-form');
-
+    
     transferBtn.addEventListener('click', function() {
       transferModal.style.display = 'block';
     });
-
+    
     transferForm.addEventListener('submit', async function(e) {
       e.preventDefault();
-
+      
       const formData = new FormData(transferForm);
       const data = {
         receiverUsername: formData.get('receiverUsername'),
         amount: parseInt(formData.get('amount')),
         notes: formData.get('notes')
       };
-
+      
       try {
         const response = await fetch('/market/user/wir/transfer', {
           method: 'POST',
@@ -349,9 +262,9 @@
           },
           body: JSON.stringify(data)
         });
-
+        
         const result = await response.json();
-
+        
         if (result.success) {
           showNotification('Transfer successful', 'success');
           setTimeout(() => {
@@ -365,7 +278,7 @@
         showNotification('Error transferring WIR', 'error');
       }
     });
-
+    
     // Convert Currency Modal
     const convertBtn = document.getElementById('convert-wir-btn');
     const convertModal = document.getElementById('convert-currency-modal');
@@ -374,26 +287,26 @@
     const conversionAmount = document.getElementById('conversion-amount');
     const conversionHint = document.getElementById('conversion-hint');
     const conversionResult = document.getElementById('conversion-result');
-
+    
     convertBtn.addEventListener('click', function() {
       convertModal.style.display = 'block';
     });
-
+    
     // Update available balance and conversion result when direction changes
     conversionDirection.addEventListener('change', function() {
       updateConversionInfo();
     });
-
+    
     // Update conversion result when amount changes
     conversionAmount.addEventListener('input', function() {
       updateConversionResult();
     });
-
+    
     function updateConversionInfo() {
       const direction = conversionDirection.value;
       const wirBalance = <%= user.wirBalance %>;
       const lootBalance = <%= user.lootTokens || 0 %>;
-
+      
       if (direction === 'loot_to_wir') {
         conversionHint.textContent = `Available: ${lootBalance} Loot Tokens`;
         conversionAmount.max = lootBalance;
@@ -401,14 +314,14 @@
         conversionHint.textContent = `Available: ${wirBalance} WIR`;
         conversionAmount.max = wirBalance;
       }
-
+      
       updateConversionResult();
     }
-
+    
     function updateConversionResult() {
       const direction = conversionDirection.value;
       const amount = parseInt(conversionAmount.value) || 0;
-
+      
       if (direction === 'loot_to_wir') {
         // 1 Loot Token = 5 WIR
         conversionResult.textContent = `${amount * 5} WIR`;
@@ -417,16 +330,16 @@
         conversionResult.textContent = `${Math.floor(amount / 5)} Loot Tokens`;
       }
     }
-
+    
     convertForm.addEventListener('submit', async function(e) {
       e.preventDefault();
-
+      
       const formData = new FormData(convertForm);
       const data = {
         direction: formData.get('direction'),
         amount: parseInt(formData.get('amount'))
       };
-
+      
       try {
         const response = await fetch('/market/user/wir/convert', {
           method: 'POST',
@@ -435,9 +348,9 @@
           },
           body: JSON.stringify(data)
         });
-
+        
         const result = await response.json();
-
+        
         if (result.success) {
           showNotification('Conversion successful', 'success');
           setTimeout(() => {
@@ -451,7 +364,7 @@
         showNotification('Error converting currency', 'error');
       }
     });
-
+    
     // Initialize conversion info
     updateConversionInfo();
   });

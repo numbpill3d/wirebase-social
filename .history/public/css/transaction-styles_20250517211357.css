@@ -1,0 +1,172 @@
+/* Transaction Styles */
+.transaction-item {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-medium);
+  border: 1px solid var(--border-color);
+  padding: 15px;
+  transition: all 0.2s ease;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+
+.transaction-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-color: var(--primary-color);
+}
+
+.transaction-icon {
+  font-size: 1.5rem;
+  margin-right: 15px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-dark);
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+}
+
+.transaction-details {
+  flex: 1;
+}
+
+.transaction-type-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  border-radius: 3px;
+  margin-right: 5px;
+  background-color: var(--bg-dark);
+  color: var(--text-light);
+}
+
+.transaction-type-badge.purchase {
+  background-color: #2196f3;
+  color: white;
+}
+
+.transaction-type-badge.sale {
+  background-color: #4caf50;
+  color: white;
+}
+
+.transaction-type-badge.transfer-in {
+  background-color: #8a2be2;
+  color: white;
+}
+
+.transaction-type-badge.transfer-out {
+  background-color: #9c27b0;
+  color: white;
+}
+
+.transaction-type-badge.conversion {
+  background-color: #ff9800;
+  color: white;
+}
+
+.transaction-type-badge.fee {
+  background-color: #f44336;
+  color: white;
+}
+
+.user-reference {
+  font-weight: bold;
+  color: var(--secondary-color);
+}
+
+.transaction-notes {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 5px 0;
+  font-style: italic;
+}
+
+.transaction-amount {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.transaction-amount.incoming {
+  color: var(--success-color);
+}
+
+.transaction-amount.outgoing {
+  color: var(--error-color);
+}
+
+.transaction-date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.transaction-item-name {
+  margin: 5px 0;
+}
+
+.transaction-item-name a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.transaction-item-name a:hover {
+  color: var(--secondary-color);
+  text-decoration: underline;
+}
+
+/* Transaction List */
+.transaction-list {
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.transaction-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.transaction-list::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+
+.transaction-list::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color);
+  border-radius: 4px;
+}
+
+/* Transaction Filter */
+.transaction-filter-container {
+  margin-bottom: 15px;
+}
+
+.transaction-filter {
+  background-color: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  color: var(--text-light);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  width: 100%;
+  max-width: 200px;
+}
+
+.transaction-filter:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+/* Empty Transactions */
+.empty-transactions {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  color: var(--text-dark);
+  margin-bottom: 15px;
+}
