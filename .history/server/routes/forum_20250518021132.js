@@ -3,7 +3,6 @@ const router = express.Router();
 const Thread = require('../models/Thread');
 const Reply = require('../models/Reply');
 const { cache } = require('../utils/performance');
-const { supabase } = require('../utils/database');
 
 // Authentication middleware
 const ensureAuthenticated = (req, res, next) => {
@@ -138,8 +137,8 @@ router.get('/thread/:id', async (req, res) => {
       });
     }
 
-    // Increment view count
-    await Thread.incrementViews(id);
+    // Increment view count (in a real app, we would do this)
+    // await Thread.incrementViews(id);
 
     res.render('forum/thread', {
       title: `${thread.title} - Assembly - Wirebase`,

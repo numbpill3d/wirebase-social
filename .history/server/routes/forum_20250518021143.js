@@ -138,8 +138,8 @@ router.get('/thread/:id', async (req, res) => {
       });
     }
 
-    // Increment view count
-    await Thread.incrementViews(id);
+    // Increment view count (in a real app, we would do this)
+    // await Thread.incrementViews(id);
 
     res.render('forum/thread', {
       title: `${thread.title} - Assembly - Wirebase`,

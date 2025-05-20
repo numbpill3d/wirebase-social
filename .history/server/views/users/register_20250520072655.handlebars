@@ -580,19 +580,5 @@
 
             container.appendChild(particle);
         }
-
-        // Add a special hovering effect to the register button
-        const registerButton = document.querySelector('.register-form .cyber-button');
-        if (registerButton) {
-            registerButton.addEventListener('mouseover', function() {
-                this.style.transform = 'translateY(-2px)';
-                this.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 255, 0, 0.3)';
-            });
-
-            registerButton.addEventListener('mouseout', function() {
-                this.style.transform = '';
-                this.style.boxShadow = '';
-            });
-        }
     });
 </script>

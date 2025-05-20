@@ -172,7 +172,7 @@
               </div>
               <div class="thread-meta">
                 <span class="thread-author">{{creator.username}}</span>
-                <span class="thread-date">{{formatDate createdAt 'relative'}}</span>
+                <span class="thread-date">{{formatDate createdAt}}</span>
                 <span class="thread-category">{{category}}</span>
                 <span class="thread-replies">{{replyCount}} {{#if (eq replyCount 1)}}reply{{else}}replies{{/if}}</span>
                 <span class="thread-views">{{views}} {{#if (eq views 1)}}view{{else}}views{{/if}}</span>

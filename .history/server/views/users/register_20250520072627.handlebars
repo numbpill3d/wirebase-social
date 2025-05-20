@@ -429,23 +429,6 @@
         z-index: 1;
     }
 
-    /* Digital particles animation */
-    @keyframes float-digital {
-        0% { transform: translateY(0) translateX(0); }
-        25% { transform: translateY(-10px) translateX(5px); }
-        50% { transform: translateY(0) translateX(10px); }
-        75% { transform: translateY(10px) translateX(5px); }
-        100% { transform: translateY(0) translateX(0); }
-    }
-
-    .digital-particle {
-        position: absolute;
-        background-color: var(--cyber-green);
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 2;
-    }
-
     /* Responsive adjustments */
     @media (max-width: 768px) {
         .register-window {
@@ -579,20 +562,6 @@
             particle.style.zIndex = '2';
 
             container.appendChild(particle);
-        }
-
-        // Add a special hovering effect to the register button
-        const registerButton = document.querySelector('.register-form .cyber-button');
-        if (registerButton) {
-            registerButton.addEventListener('mouseover', function() {
-                this.style.transform = 'translateY(-2px)';
-                this.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 255, 0, 0.3)';
-            });
-
-            registerButton.addEventListener('mouseout', function() {
-                this.style.transform = '';
-                this.style.boxShadow = '';
-            });
         }
     });
 </script>

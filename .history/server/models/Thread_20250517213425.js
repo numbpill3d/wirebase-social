@@ -338,43 +338,6 @@ class Thread {
       cache.del(`threads:recent:${i}`);
     }
   }
-
-  /**
-   * Increment view count for a thread
-   * @param {string} id - Thread ID
-   * @returns {Promise<boolean>} Success status
-   */
-  static async incrementViews(id) {
-    try {
-      // Get current views
-      const { data: thread, error: getError } = await supabase
-        .from('forum_threads')
-        .select('views')
-        .eq('id', id)
-        .single();
-
-      if (getError) throw getError;
-      if (!thread) return false;
-
-      // Increment views
-      const { error: updateError } = await supabase
-        .from('forum_threads')
-        .update({
-          views: (thread.views || 0) + 1
-        })
-        .eq('id', id);
-
-      if (updateError) throw updateError;
-
-      // Clear thread cache
-      this.clearThreadCache(id);
-
-      return true;
-    } catch (error) {
-      console.error('Error incrementing thread views:', error);
-      return false;
-    }
-  }
 }
 
 module.exports = Thread;
