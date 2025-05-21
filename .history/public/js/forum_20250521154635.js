@@ -1,3 +1,6 @@
+/* eslint-env browser */
+/* globals document, window, localStorage, HTMLElement, customElements, prompt, Audio, MutationObserver, IntersectionObserver, requestIdleCallback */
+
 /**
  * forum.js - Enhanced Forum Functionality for wirebase.city
  * Cyberschizo aesthetic with improved UI and navigation

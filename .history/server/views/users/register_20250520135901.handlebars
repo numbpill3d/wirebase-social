@@ -1,0 +1,599 @@
+<div class="cyber-register-container">
+    <div class="glitch-container">
+        <div class="glitch-effect left"></div>
+        <div class="glitch-effect right"></div>
+    </div>
+
+    <div class="cyber-window register-window">
+        <div class="cyber-window-header">
+            <span class="cyber-window-title">system.node.initialization</span>
+            <div class="cyber-window-controls">
+                <span class="cyber-window-control">_</span>
+                <span class="cyber-window-control">□</span>
+                <span class="cyber-window-control">×</span>
+            </div>
+        </div>
+        <div class="cyber-window-content">
+            <div class="cyber-terminal">
+                <div class="register-header">
+                    <img src="/images/wirebase-logo.svg" alt="wirebase.city" class="register-logo">
+                    <h2>Initialize New Node</h2>
+                    <div class="separator">
+                        <span class="separator-icon">💻</span>
+                    </div>
+                </div>
+
+                {{#if errors}}
+                    <div class="register-errors">
+                        <ul class="error-list">
+                            {{#each errors}}
+                                <li><span class="error-icon">⚠️</span> {{this.msg}}</li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                {{/if}}
+
+                <form action="/users/register" method="POST" class="register-form">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" class="cyber-input" value="{{username}}" required>
+                        <small class="input-help">3-20 characters, letters, numbers, underscores, hyphens only</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" class="cyber-input" value="{{email}}" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" class="cyber-input" required>
+                            <small class="input-help">At least 6 characters</small>
+                        </div>
+
+                        <div class="form-group half">
+                            <label for="password2">Confirm Password</label>
+                            <input type="password" id="password2" name="password2" class="cyber-input" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="displayName">Display Name (optional)</label>
+                        <input type="text" id="displayName" name="displayName" class="cyber-input" value="{{displayName}}">
+                        <small class="input-help">How you'll appear to others</small>
+                    </div>
+
+                    <div class="custom-details">
+                        <h3>Configure Node Identity</h3>
+
+                        <div class="form-row">
+                            <div class="form-group half">
+                                <label for="customGlyph">Identity Symbol</label>
+                                <div class="glyph-picker">
+                                    <input type="text" id="customGlyph" name="customGlyph" class="cyber-input glyph-input" value="{{customGlyph}}" maxlength="2">
+                                    <div class="glyph-options">
+                                        <button type="button" class="glyph-option" data-glyph="👁️">👁️</button>
+                                        <button type="button" class="glyph-option" data-glyph="💾">💾</button>
+                                        <button type="button" class="glyph-option" data-glyph="🔌">🔌</button>
+                                        <button type="button" class="glyph-option" data-glyph="📡">📡</button>
+                                        <button type="button" class="glyph-option" data-glyph="🖥️">🖥️</button>
+                                        <button type="button" class="glyph-option" data-glyph="🕸️">🕸️</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group half">
+                                <label for="statusMessage">Node Status</label>
+                                <input type="text" id="statusMessage" name="statusMessage" class="cyber-input" value="{{statusMessage}}" placeholder="Enter node status...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="terms-agreement">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="agreeTerms" class="cyber-checkbox" required>
+                            I agree to the <a href="/terms" target="_blank">Terms of Service</a> and <a href="/privacy" target="_blank">Privacy Policy</a>
+                        </label>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="cyber-button">Initialize Node</button>
+                        <a href="/users/login" class="login-link">Already connected? Login</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="cyber-decorations">
+        <div class="decoration circuit left"></div>
+        <div class="decoration circuit right"></div>
+        <div class="decoration static"></div>
+    </div>
+</div>
+
+<style>
+    .cyber-register-container {
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        padding: 50px 20px;
+    }
+
+    .register-window {
+        max-width: 600px;
+        width: 100%;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+        position: relative;
+        z-index: 10;
+    }
+
+    .cyber-terminal {
+        background-color: var(--cyber-dark);
+        background-image: linear-gradient(0deg, rgba(70, 0, 102, 0.1) 0%, transparent 100%);
+        border: 1px solid var(--cyber-purple);
+        padding: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cyber-terminal::before,
+    .cyber-terminal::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(to right, transparent, var(--cyber-purple), transparent);
+        left: 0;
+    }
+
+    .cyber-terminal::before {
+        top: 0;
+    }
+
+    .cyber-terminal::after {
+        bottom: 0;
+    }
+
+    .register-header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .register-logo {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 10px;
+        filter: hue-rotate(280deg) brightness(0.7) contrast(1.2);
+        animation: pulse 3s infinite;
+    }
+
+    .register-header h2 {
+        color: var(--cyber-green);
+        font-size: 2.2rem;
+        margin: 10px 0;
+        text-shadow: 0 0 10px var(--cyber-glow);
+    }
+
+    .separator {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .separator::before,
+    .separator::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid var(--cyber-purple);
+    }
+
+    .separator::before {
+        margin-right: 15px;
+        background: linear-gradient(to right, transparent, var(--cyber-purple));
+    }
+
+    .separator::after {
+        margin-left: 15px;
+        background: linear-gradient(to left, transparent, var(--cyber-purple));
+    }
+
+    .separator-icon {
+        font-size: 1.5rem;
+        color: var(--cyber-green);
+        filter: drop-shadow(0 0 5px var(--cyber-glow));
+    }
+
+    .register-errors {
+        background-color: rgba(255, 0, 0, 0.2);
+        border: 1px solid var(--cyber-red);
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+
+    .error-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .error-list li {
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+    }
+
+    .error-icon {
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .form-group.half {
+        flex: 1;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--cyber-green);
+        font-family: 'PixelOperator', 'VT323', monospace;
+    }
+
+    .cyber-input {
+        width: 100%;
+        padding: 8px;
+        background-color: #000;
+        color: var(--cyber-green);
+        border: 1px solid var(--cyber-purple);
+        box-sizing: border-box;
+    }
+
+    .input-help {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--cyber-light);
+        margin-top: 3px;
+    }
+
+    .custom-details {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid var(--cyber-purple);
+        background-color: rgba(70, 0, 102, 0.2);
+    }
+
+    .custom-details h3 {
+        margin-top: 0;
+        color: var(--cyber-green);
+        font-size: 1.3rem;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+    .glyph-picker {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .glyph-input {
+        text-align: center;
+        font-size: 1.5rem;
+    }
+
+    .glyph-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 5px;
+    }
+
+    .glyph-option {
+        background-color: var(--cyber-dark);
+        border: 1px solid var(--cyber-purple);
+        font-size: 1.2rem;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .glyph-option:hover {
+        background-color: var(--cyber-purple);
+    }
+
+    .terms-agreement {
+        margin-bottom: 20px;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .checkbox-label input {
+        margin-right: 10px;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 25px;
+    }
+
+    .login-link {
+        color: var(--cyber-red);
+        font-size: 0.9rem;
+    }
+
+    .login-link:hover {
+        color: var(--cyber-green);
+    }
+
+    /* Glitch effects and decorations */
+    .glitch-container {
+        position: absolute;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 20%;
+        top: 30%;
+    }
+
+    .glitch-effect {
+        width: 15px;
+        height: 100px;
+        background-color: var(--cyber-purple);
+        position: relative;
+        z-index: 5;
+        opacity: 0.7;
+    }
+
+    .glitch-effect.left {
+        transform: translateX(-50px) skewX(-20deg);
+    }
+
+    .glitch-effect.right {
+        transform: translateX(50px) skewX(20deg);
+    }
+
+    .glitch-effect::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, var(--cyber-purple) 0%, var(--cyber-green) 50%, transparent 100%);
+        top: 0;
+        left: 0;
+        filter: blur(2px);
+        animation: glitchEffect 2s infinite alternate;
+    }
+
+    .cyber-decorations {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    .decoration {
+        position: absolute;
+        background-size: contain;
+        background-repeat: no-repeat;
+        opacity: 0.7;
+    }
+
+    .circuit {
+        width: 100px;
+        height: 300px;
+        background: linear-gradient(to bottom, var(--cyber-purple), transparent);
+        top: 10%;
+        opacity: 0.2;
+    }
+
+    .circuit.left {
+        left: 10%;
+        transform: skewY(-5deg);
+    }
+
+    .circuit.right {
+        right: 10%;
+        transform: skewY(5deg);
+    }
+
+    .static {
+        width: 100%;
+        height: 100%;
+        background-image: url('data:image/png;base64,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');
+        opacity: 0.03;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    /* Digital particles animation */
+    @keyframes float-digital {
+        0% { transform: translateY(0) translateX(0); }
+        25% { transform: translateY(-10px) translateX(5px); }
+        50% { transform: translateY(0) translateX(10px); }
+        75% { transform: translateY(10px) translateX(5px); }
+        100% { transform: translateY(0) translateX(0); }
+    }
+
+    .digital-particle {
+        position: absolute;
+        background-color: var(--cyber-green);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .register-window {
+            max-width: 95%;
+        }
+
+        .form-row {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .form-group.half {
+            flex: none;
+        }
+
+        .torches-container {
+            padding: 0 5%;
+        }
+
+        .cyber-terminal {
+            padding: 20px 15px;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Glyph picker functionality
+        const glyphOptions = document.querySelectorAll('.glyph-option');
+        const glyphInput = document.getElementById('customGlyph');
+
+        glyphOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const glyph = this.getAttribute('data-glyph');
+                glyphInput.value = glyph;
+            });
+        });
+
+        // Form validation
+        const registerForm = document.querySelector('.register-form');
+        const passwordInput = document.getElementById('password');
+        const password2Input = document.getElementById('password2');
+        const usernameInput = document.getElementById('username');
+
+        registerForm.addEventListener('submit', function(e) {
+            let valid = true;
+
+            // Clear previous errors
+            const errorContainer = document.querySelector('.register-errors');
+            if (errorContainer) {
+                errorContainer.remove();
+            }
+
+            // Create a new error container
+            const errors = [];
+
+            // Check username format
+            const usernamePattern = /^[a-zA-Z0-9_-]{3,20}$/;
+            if (!usernamePattern.test(usernameInput.value)) {
+                errors.push('Username must be 3-20 characters and contain only letters, numbers, underscores, and hyphens');
+                valid = false;
+            }
+
+            // Check password length
+            if (passwordInput.value.length < 6) {
+                errors.push('Password must be at least 6 characters');
+                valid = false;
+            }
+
+            // Check if passwords match
+            if (passwordInput.value !== password2Input.value) {
+                errors.push('Passwords do not match');
+                valid = false;
+            }
+
+            // Display errors if any
+            if (!valid) {
+                e.preventDefault();
+
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'register-errors';
+                errorDiv.innerHTML = '<ul class="error-list"></ul>';
+
+                const errorList = errorDiv.querySelector('.error-list');
+
+                errors.forEach(error => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span class="error-icon">⚠️</span> ${error}`;
+                    errorList.appendChild(li);
+                });
+
+                const formHeader = document.querySelector('.register-header');
+                formHeader.insertAdjacentElement('afterend', errorDiv);
+
+                // Scroll to errors
+                errorDiv.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
+        // Add dust particles to the login background
+        const container = document.querySelector('.cyber-register-container');
+
+        if (container) {
+            for (let i = 0; i < 30; i++) {
+                createDigitalParticle(container);
+            }
+        }
+
+        function createDigitalParticle(container) {
+            const particle = document.createElement('div');
+
+            // Random properties
+            const size = Math.random() * 3 + 1;
+            const posX = Math.random() * 100;
+            const posY = Math.random() * 100;
+            const opacity = Math.random() * 0.3 + 0.1;
+            const duration = Math.random() * 30 + 15;
+            const delay = Math.random() * 10;
+
+            // Style the particle
+            particle.className = 'digital-particle';
+            particle.style.position = 'absolute';
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.backgroundColor = '#00ff00';
+            particle.style.left = `${posX}%`;
+            particle.style.top = `${posY}%`;
+            particle.style.opacity = opacity;
+            particle.style.boxShadow = '0 0 3px rgba(0, 255, 0, 0.5)';
+            particle.style.animation = `float-digital ${duration}s linear ${delay}s infinite`;
+            particle.style.zIndex = '2';
+
+            container.appendChild(particle);
+        }
+
+        // Add a special hovering effect to the register button
+        const registerButton = document.querySelector('.register-form .cyber-button');
+        if (registerButton) {
+            registerButton.addEventListener('mouseover', function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 255, 0, 0.3)';
+            });
+
+            registerButton.addEventListener('mouseout', function() {
+                this.style.transform = '';
+                this.style.boxShadow = '';
+            });
+        }
+    });
+</script>

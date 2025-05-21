@@ -17,8 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
 function initWidgets() {
   // Initialize loading states for all widgets
   document.querySelectorAll('[data-loading]').forEach(element => {
-    if (!window.loadingStates.has(element)) {
-      window.loadingStates.set(element, new window.LoadingState(element));
+    if (!loadingStates.has(element)) {
+      loadingStates.set(element, new LoadingState(element));
     }
   });
   
