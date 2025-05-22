@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connect - wirebase.city</title>
+    <title>Create Identity - wirebase.city</title>
     <link rel="stylesheet" href="../../css/styles.css">
     <link rel="stylesheet" href="../../css/laincore.css">
     <link rel="stylesheet" href="../../css/interface.css">
     <link rel="stylesheet" href="../../css/scanlines.css">
-    <link rel="stylesheet" href="../../css/login.css">
+    <link rel="stylesheet" href="../../css/register.css">
     <link rel="stylesheet" href="../../css/cyber-variables.css">
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <script src="../../js/laincore-loader.js"></script>
@@ -35,10 +35,10 @@
     <div class="crt-flicker"></div>
     <div class="digital-noise"></div>
 
-    <div class="container cyber-login-container">
-        <div class="cyber-window login-window">
+    <div class="container cyber-register-container">
+        <div class="cyber-window register-window">
             <div class="cyber-window-header">
-                <span class="cyber-window-title">system.authentication</span>
+                <span class="cyber-window-title">system.identity_creation</span>
                 <div class="cyber-window-controls">
                     <span class="cyber-window-control">_</span>
                     <span class="cyber-window-control">□</span>
@@ -47,73 +47,70 @@
             </div>
             <div class="cyber-window-content">
                 <div class="cyber-terminal">
-                    <div class="login-header">
-                        <h2>Network Authentication</h2>
-                        <p>Establish connection to access your digital shell</p>
+                    <div class="register-header">
+                        <h2>Create Digital Identity</h2>
+                        <p>Initialize your presence in the network</p>
                     </div>
                     
                     <div class="terminal-window">
                         <div class="terminal-header">Terminal.exe</div>
                         <div class="terminal-content">
-                            <pre>[system@wirebase]> auth --protocol=secure
-Initializing secure connection...
-Enter credentials to authenticate:
+                            <pre>[system@wirebase]> identity --create
+Initializing identity creation protocol...
+Enter parameters to configure your digital shell:
 <span class="cursor">_</span></pre>
                         </div>
                     </div>
                     
-                    <form class="login-form" action="/users/login" method="post">
+                    <form class="register-form" action="/users/register" method="post">
                         <div class="form-group">
-                            <label for="username">Node ID</label>
-                            <input type="text" id="username" name="username" class="cyber-input" placeholder="Enter your node identifier" required>
+                            <label for="username">Node Identifier</label>
+                            <input type="text" id="username" name="username" class="cyber-input" placeholder="Choose a unique identifier" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Connection Vector</label>
+                            <input type="email" id="email" name="email" class="cyber-input" placeholder="Enter your email address" required>
                         </div>
                         
                         <div class="form-group">
                             <label for="password">Access Key</label>
-                            <input type="password" id="password" name="password" class="cyber-input" placeholder="Enter your access key" required>
+                            <input type="password" id="password" name="password" class="cyber-input" placeholder="Create a secure access key" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirm-password">Verify Access Key</label>
+                            <input type="password" id="confirm-password" name="confirm-password" class="cyber-input" placeholder="Confirm your access key" required>
                         </div>
                         
                         <div class="form-options">
                             <div class="remember-me">
-                                <input type="checkbox" id="remember" name="remember" class="cyber-checkbox">
-                                <label for="remember">Maintain Connection</label>
+                                <input type="checkbox" id="terms" name="terms" required>
+                                <label for="terms">Accept Protocol Terms</label>
                             </div>
-                            <a href="/users/forgot-password" class="forgot-password">Reset Access Key</a>
                         </div>
                         
                         <div class="form-actions">
-                            <button type="submit" class="cyber-button primary">Authenticate</button>
-                            <a href="/users/register" class="cyber-button">Create New Identity</a>
+                            <button type="submit" class="cyber-button primary">Create Identity</button>
+                            <a href="/users/login" class="cyber-button">Return to Login</a>
                         </div>
                     </form>
                     
-                    <div class="login-footer">
+                    <div class="register-footer">
                         <div class="connection-status">
                             <span class="status-icon"></span>
                             <span class="status-text">Secure Connection Established</span>
                         </div>
                         <div class="auth-options">
                             <a href="/users/oauth/github">
-                                <span class="auth-icon">[G]</span>
+                                <span class="auth-icon">🔗</span>
                                 <span>GitHub Auth</span>
                             </a>
                             <a href="/users/oauth/google">
-                                <span class="auth-icon">[G+]</span>
+                                <span class="auth-icon">🔗</span>
                                 <span>Google Auth</span>
                             </a>
                         </div>
-                    </div>
-                    
-                    <!-- Glitch effects and decorations -->
-                    <div class="glitch-container">
-                        <div class="glitch-effect left"></div>
-                        <div class="glitch-effect right"></div>
-                    </div>
-                    
-                    <div class="cyber-decorations">
-                        <div class="decoration circuit left"></div>
-                        <div class="decoration circuit right"></div>
-                        <div class="decoration static"></div>
                     </div>
                 </div>
             </div>
@@ -140,6 +137,6 @@ Enter credentials to authenticate:
 
     <script src="../../js/main.js"></script>
     <script src="../../js/laincore.js"></script>
-    <script src="../../js/login.js"></script>
+    <script src="../../js/register.js"></script>
 </body>
 </html>
