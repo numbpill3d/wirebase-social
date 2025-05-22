@@ -2,10 +2,10 @@
 
 <div align="center">
   <img src="public/images/wirebase-logo.svg" alt="Wirebase" width="120">
-  <h3>Medieval Dungeon Fantasy Social Platform with Windows 98 Aesthetics</h3>
+  <h3>Join Us On The Wired: Social Platform with Retro/Laincore CyberAesthetics</h3>
 </div>
 
-Wirebase is a unique social media platform that combines medieval dungeon fantasy aesthetics with Windows 98 retro web design. Users can create highly customizable profile pages, interact with others via the Streetpass system, and share resources through the Scrapyard marketplace.
+Wirebase is a unique social media platform that combines retro  cyber-fantasy aesthetics with Wired/Surreal spirit-based web design. Users can create highly customizable profile pages, interact with others via the Streetpass-style system, and share resources through the Scrapyard marketplace.
 
 ## Features
 
@@ -29,7 +29,7 @@ Wirebase is a unique social media platform that combines medieval dungeon fantas
 
 ## Live Demo
 
-Visit the live demo at: [https://wirebase.onrender.com](https://wirebase.onrender.com)
+Visit the live demo at: [https://wirebase.city](https://wirebase.city)
 
 ## Screenshots
 
@@ -162,5 +162,5 @@ This project is available under the MIT License. See the [LICENSE](LICENSE) file
 
 ## Acknowledgements
 
-- Design inspired by Windows 98 UI and medieval fantasy aesthetics
+- Design inspired by Windows 98 UI and medieval fantasy aesthetics, as well as by the Ethos and Feeling of the Wired, from Serial Experiments Lain. Temple OS also.
 - Built with Express.js, MongoDB, and Handlebars
