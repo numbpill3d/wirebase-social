@@ -156,6 +156,17 @@ PORT=3000
 NODE_ENV=development
 ```
 
+## Docker Usage
+
+To run Wirebase locally with Docker:
+
+1. Create a `.env` file using the environment variables shown above.
+2. Build and start the containers:
+   ```bash
+   docker-compose up --build
+   ```
+   The app will be available at `http://localhost:3000`.
+
 ## License
 
 This project is available under the MIT License. See the [LICENSE](LICENSE) file for details.
