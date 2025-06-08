@@ -48,11 +48,11 @@ class WIRTransaction {
    * @param {string} userId - The user ID
    * @param {number} limit - Maximum number of transactions to return
    * @param {number} offset - Offset for pagination
-   * @returns {Array} Array of transactions
+   * @returns {Object} Object containing formatted transactions and total count
    */
   static async getByUser(userId, limit = 50, offset = 0) {
     try {
-      const { data: transactions, error } = await supabase
+      const { data: transactions, error, count } = await supabase
         .from('market_wir_transactions')
         .select(`
           *,
@@ -72,7 +72,7 @@ class WIRTransaction {
             id,
             title
           )
-        `)
+        `, { count: 'exact' })
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .range(offset, offset + limit - 1);
@@ -80,10 +80,11 @@ class WIRTransaction {
       if (error) throw error;
 
       // Format the transactions
-      return transactions.map(transaction => this.formatTransaction(transaction));
+      const formatted = transactions.map(transaction => this.formatTransaction(transaction));
+      return { transactions: formatted, total: count || 0 };
     } catch (error) {
       console.error('Error getting WIR transactions by user:', error);
-      return [];
+      return { transactions: [], total: 0 };
     }
   }
 
