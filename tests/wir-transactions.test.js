@@ -130,12 +130,12 @@ describe('WIR Transactions', () => {
       expect(total).toBeGreaterThanOrEqual(2);
       
       // Check if the transactions contain the expected data
-      const foundTransaction1 = transactions.some(t => 
-        t.amount === 50 && t.transaction_type === 'reward' && t.notes === 'Test transaction 1'
+      const foundTransaction1 = transactions.some(t =>
+        t.amount === 50 && t.transactionType === 'reward' && t.notes === 'Test transaction 1'
       );
-      
-      const foundTransaction2 = transactions.some(t => 
-        t.amount === -20 && t.transaction_type === 'purchase' && t.notes === 'Test transaction 2'
+
+      const foundTransaction2 = transactions.some(t =>
+        t.amount === 20 && t.transactionType === 'purchase' && t.notes === 'Test transaction 2'
       );
       
       expect(foundTransaction1).toBe(true);

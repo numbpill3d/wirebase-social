@@ -724,7 +724,7 @@ router.get('/user/wir', ensureApiAuth, async (req, res) => {
     const userId = req.user.id;
 
     // Get user's WIR transactions
-    const transactions = await WIRTransaction.getByUser(userId);
+    const { transactions } = await WIRTransaction.getByUser(userId);
 
     res.json({
       success: true,
