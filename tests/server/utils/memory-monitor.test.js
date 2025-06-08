@@ -35,7 +35,8 @@ describe('Memory Monitor', () => {
   });
 
   afterAll(() => {
-    // Restore original functions
+    // Stop any running monitor and restore original functions
+    memoryMonitor.stop();
     process.memoryUsage = originalMemoryUsage;
     console.warn = originalConsoleWarn;
     console.log = originalConsoleLog;
@@ -104,6 +105,26 @@ describe('Memory Monitor', () => {
       
       // Clean up
       delete global.gc;
+    });
+  });
+
+  describe('start and stop', () => {
+    it('should start and stop the monitoring interval', () => {
+      jest.useFakeTimers();
+      const setSpy = jest.spyOn(global, 'setInterval');
+      const clearSpy = jest.spyOn(global, 'clearInterval');
+
+      memoryMonitor.start(1000);
+
+      expect(setSpy).toHaveBeenCalledWith(expect.any(Function), 1000);
+
+      memoryMonitor.stop();
+
+      expect(clearSpy).toHaveBeenCalled();
+
+      setSpy.mockRestore();
+      clearSpy.mockRestore();
+      jest.useRealTimers();
     });
   });
 });
