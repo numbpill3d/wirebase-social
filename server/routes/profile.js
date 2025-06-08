@@ -3,6 +3,8 @@ const router = express.Router();
 const User = require('../models/User');
 const ScrapyardItem = require('../models/ScrapyardItem');
 const Feed = require('feed').Feed;
+const Streetpass = require('../models/Streetpass');
+const { supabase } = require('../utils/database');
 
 // Middleware to ensure user is authenticated
 const ensureAuthenticated = (req, res, next) => {
@@ -16,17 +18,11 @@ const ensureAuthenticated = (req, res, next) => {
 // User's own profile page
 router.get('/', ensureAuthenticated, async (req, res) => {
   try {
-    // Find the user with their streetpass visitors populated
-    const user = await User.findById(req.user._id)
-      .populate({
-        path: 'streetpassVisitors.user',
-        select: 'username customGlyph avatar'
-      });
-    
-    // Get recent visitors
-    const visitors = user.streetpassVisitors
-      .sort((a, b) => b.timestamp - a.timestamp)
-      .slice(0, 10);
+    // Find the user by ID
+    const user = await User.findById(req.user.id);
+
+    // Get recent visitors from Supabase
+    const visitors = await Streetpass.getVisitors(user.id, 10);
     
     // User's items in the Scrapyard
     const userItems = await ScrapyardItem.find({ creator: user._id })
@@ -68,25 +64,23 @@ router.get('/:username', async (req, res) => {
     }
     
     // Check if the current user is the owner
-    const isOwner = req.isAuthenticated() && req.user._id.toString() === profileUser._id.toString();
+    const isOwner = req.isAuthenticated() && req.user.id === profileUser.id;
     
     // Record a visit if authenticated and not the profile owner
-    if (req.isAuthenticated() && !isOwner) {
+    if (req.isAuthenticated() && !isOwner && profileUser.streetpassEnabled) {
       // Check if there's already a recent visit (within 1 hour)
-      const recentVisit = profileUser.streetpassVisitors.find(v => 
-        v.user.toString() === req.user._id.toString() && 
-        ((new Date()) - v.timestamp) < 60 * 60 * 1000
-      );
-      
-      if (!recentVisit && profileUser.streetpassEnabled) {
-        // Add current user to profile's visitors
-        profileUser.streetpassVisitors.push({
-          user: req.user._id,
-          timestamp: new Date(),
-          emote: '👋' // Default emote
-        });
-        
-        await profileUser.save();
+      const { data: existingVisit, error } = await supabase
+        .from('streetpass_visits')
+        .select('visited_at')
+        .eq('visitor_id', req.user.id)
+        .eq('profile_id', profileUser.id)
+        .single();
+
+      const visitedAt = existingVisit ? new Date(existingVisit.visited_at) : null;
+      const tooRecent = visitedAt && ((new Date()) - visitedAt) < 60 * 60 * 1000;
+
+      if (!tooRecent) {
+        await Streetpass.recordVisit(req.user.id, profileUser.id, '👋');
       }
     }
     
@@ -99,21 +93,13 @@ router.get('/:username', async (req, res) => {
         return []; // Return empty array instead of failing
       });
     
-    // Populate streetpass visitors with error handling
-    try {
-      await profileUser.populate({
-        path: 'streetpassVisitors.user',
-        select: 'username customGlyph avatar'
-      });
-    } catch (err) {
-      console.error('Failed to populate visitors:', err);
-      profileUser.streetpassVisitors = [];
-    }
-    
     // Get recent visitors
-    const visitors = profileUser.streetpassVisitors
-      .sort((a, b) => b.timestamp - a.timestamp)
-      .slice(0, 10);
+    let visitors = [];
+    try {
+      visitors = await Streetpass.getVisitors(profileUser.id, 10);
+    } catch (err) {
+      console.error('Failed to fetch visitors:', err);
+    }
     
     res.render('profile/view', {
       title: `${profileUser.displayName} - Wirebase Profile`,
@@ -149,9 +135,7 @@ router.post('/edit/html', ensureAuthenticated, async (req, res) => {
     const { profileHtml } = req.body;
     
     // Update the user's profile HTML
-    const user = await User.findById(req.user._id);
-    user.profileHtml = profileHtml;
-    await user.save();
+    await User.findByIdAndUpdate(req.user.id, { profileHtml });
     
     req.flash('success_msg', 'Profile HTML updated successfully');
     res.redirect('/profile');
@@ -181,9 +165,7 @@ router.post('/edit/css', ensureAuthenticated, async (req, res) => {
     const { profileCss } = req.body;
     
     // Update the user's profile CSS
-    const user = await User.findById(req.user._id);
-    user.profileCss = profileCss;
-    await user.save();
+    await User.findByIdAndUpdate(req.user.id, { profileCss });
     
     req.flash('success_msg', 'Profile CSS updated successfully');
     res.redirect('/profile');
@@ -272,23 +254,29 @@ router.post('/:username/streetpass/emote', ensureAuthenticated, async (req, res)
   try {
     const { emote } = req.body;
     const profileUser = await User.findOne({ username: req.params.username });
-    
+
     if (!profileUser) {
       return res.status(404).json({ error: 'User not found' });
     }
-    
-    // Find the visitor entry and update the emote
-    const visitorIndex = profileUser.streetpassVisitors.findIndex(
-      v => v.user.toString() === req.user._id.toString()
-    );
-    
-    if (visitorIndex !== -1) {
-      profileUser.streetpassVisitors[visitorIndex].emote = emote;
-      await profileUser.save();
-      return res.json({ success: true });
-    } else {
+
+    // Look up the visit record in Supabase
+    const { data: visit, error } = await supabase
+      .from('streetpass_visits')
+      .select('id')
+      .eq('visitor_id', req.user.id)
+      .eq('profile_id', profileUser.id)
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      throw error;
+    }
+
+    if (!visit) {
       return res.status(400).json({ error: 'No visit found' });
     }
+
+    await Streetpass.updateEmote(visit.id, emote);
+    return res.json({ success: true });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
