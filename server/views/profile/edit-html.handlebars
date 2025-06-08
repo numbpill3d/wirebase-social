@@ -1,0 +1,22 @@
+{{!< layouts/main}}
+
+<div class="profile-edit-container">
+    <div class="cyber-window edit-window">
+        <div class="cyber-window-header">
+            <span class="cyber-window-title">Edit Profile HTML</span>
+        </div>
+        <div class="cyber-window-content">
+            <form action="/profile/edit/html" method="POST">
+                <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                <div class="form-group">
+                    <label for="profileHtml">HTML</label>
+                    <textarea id="profileHtml" name="profileHtml" rows="15" class="cyber-textarea code-editor">{{user.profileHtml}}</textarea>
+                </div>
+                <div class="form-actions">
+                    <a href="/profile" class="cyber-button secondary">Cancel</a>
+                    <button type="submit" class="cyber-button">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
