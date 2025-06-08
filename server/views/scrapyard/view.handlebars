@@ -196,6 +196,7 @@
             <div class="modal-footer">
                 <button id="cancel-delete" class="cyber-button">Cancel</button>
                 <form action="/scrapyard/delete/{{item._id}}?_method=DELETE" method="POST">
+                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
                     <button type="submit" class="cyber-button danger">Delete</button>
                 </form>
             </div>

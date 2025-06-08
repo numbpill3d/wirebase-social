@@ -44,6 +44,7 @@
                 {{/if}}
 
                 <form action="/users/register" method="POST" class="register-form">
+                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
                     <div class="form-group">
                         <label for="username">Username</label>
                         <input type="text" id="username" name="username" class="cyber-input" value="{{username}}" required>

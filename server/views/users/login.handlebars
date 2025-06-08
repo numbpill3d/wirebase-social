@@ -41,6 +41,7 @@
                 {{/if}}
 
                 <form action="/users/login" method="POST" class="login-form">
+                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
                     <div class="form-group">
                         <label for="email">Email Address</label>
                         <input type="email" id="email" name="email" class="cyber-input" value="{{email}}" required>
