@@ -1,0 +1,80 @@
+{
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": ["eslint:recommended"],
+  "parserOptions": {
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "rules": {
+    "indent": ["error", 2],
+    "quotes": ["error", "single"],
+    "semi": ["error", "always"],
+    "no-var": "error",
+    "prefer-const": "error",
+    "linebreak-style": ["error", "unix"],
+    "eol-last": ["error", "always"],
+    "no-trailing-spaces": "error",
+    "max-len": ["error", { "code": 100 }]
+  },
+  "overrides": [
+    {
+      "files": ["public/js/**/*.js", "public/components/**/*.js"],
+      "env": {
+        "browser": true,
+        "node": false
+      },
+      "globals": {
+        "document": "readonly",
+        "window": "readonly",
+        "localStorage": "readonly",
+        "sessionStorage": "readonly",
+        "HTMLElement": "readonly",
+        "customElements": "readonly",
+        "prompt": "readonly",
+        "Audio": "readonly",
+        "MutationObserver": "readonly",
+        "IntersectionObserver": "readonly",
+        "requestAnimationFrame": "readonly",
+        "requestIdleCallback": "readonly"
+      },
+      "parserOptions": {
+        "ecmaVersion": 12,
+        "sourceType": "module"
+      },
+      "rules": {
+        "no-unused-vars": "warn"
+      }
+    },
+    {
+      "files": ["server/**/*.js", "scripts/**/*.js", "*.js"],
+      "env": {
+        "browser": false,
+        "node": true
+      },
+      "parserOptions": {
+        "ecmaVersion": 12
+      },
+      "rules": {
+        "no-unused-vars": "warn"
+      }
+    },
+    {
+      "files": ["tests/**/*.js"],
+      "env": {
+        "jest": true,
+        "node": true
+      },
+      "parserOptions": {
+        "ecmaVersion": 12
+      },
+      "rules": {
+        "no-unused-vars": "warn"
+      }
+    }
+  ]
+}
