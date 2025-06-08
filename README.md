@@ -65,7 +65,7 @@ You can use these accounts to explore the platform:
 
 1. Clone the repository
    ```
-   git clone https://github.com/yourusername/wirebase.git
+   git clone https://github.com/yourusername/wirebase-social.git
    cd wirebase
    ```
 
