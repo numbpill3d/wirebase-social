@@ -81,8 +81,13 @@ const rateLimiterConfig = {
   },
   // Skip rate limiting for trusted IPs
   skip: (req) => {
-    const trustedIps = (process.env.TRUSTED_IPS || '').split(',');
-    return trustedIps.includes(req.ip);
+    const trustedIps = (process.env.TRUSTED_IPS || '')
+      .split(',')
+      .map(ip => ip.trim())
+      .filter(Boolean);
+    const forwarded = (req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+    const ip = forwarded || req.ip;
+    return trustedIps.includes(ip);
   }
 };
 

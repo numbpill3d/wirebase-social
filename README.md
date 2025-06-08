@@ -80,6 +80,7 @@ You can use these accounts to explore the platform:
    MONGODB_URI=mongodb://localhost:27017/wirebase
    SESSION_SECRET=your-session-secret
    NODE_ENV=development
+   TRUSTED_IPS=127.0.0.1
    ```
 
 4. Seed the database with initial data
@@ -119,6 +120,11 @@ You can use these accounts to explore the platform:
    - `SESSION_SECRET`: (generate a random string)
    - `PORT`: `10000` (or use Render assigned port)
    - `MONGODB_URI`: (your MongoDB connection string)
+   - `TRUSTED_IPS`: comma-separated list of IPs to bypass rate limiting
+
+   When your service is behind a proxy or load balancer, the server checks the
+   `X-Forwarded-For` header to identify the real client IP. Include any trusted
+   addresses in `TRUSTED_IPS` if they should skip rate limiting.
 
 3. Create a MongoDB database and connect it to your service
 
