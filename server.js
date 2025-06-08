@@ -394,7 +394,9 @@ const gracefulShutdown = async () => {
   try {
     // Stop health checks and leak detection
     console.log('Stopping database monitoring...');
-    clearInterval(healthCheckTimer);
+    if (healthCheckTimer && typeof healthCheckTimer.stop === 'function') {
+      healthCheckTimer.stop();
+    }
     clearInterval(leakDetectionTimers.checkTimer);
     clearInterval(leakDetectionTimers.fixTimer);
 
