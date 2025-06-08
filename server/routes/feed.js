@@ -5,7 +5,7 @@ const User = require('../models/User');
 const ScrapyardItem = require('../models/ScrapyardItem');
 
 // Global site feed
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
   try {
     // Create main site feed
     const feed = new Feed({
@@ -95,12 +95,12 @@ router.get('/', async (req, res) => {
     }
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error generating feed');
+    next(err);
   }
 });
 
 // User-specific feed
-router.get('/user/:username', async (req, res) => {
+router.get('/user/:username', async (req, res, next) => {
   try {
     // Find user
     const user = await User.findOne({ username: req.params.username });
@@ -166,12 +166,12 @@ router.get('/user/:username', async (req, res) => {
     }
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error generating feed');
+    next(err);
   }
 });
 
 // Category-specific feed for Scrapyard
-router.get('/scrapyard/:category', async (req, res) => {
+router.get('/scrapyard/:category', async (req, res, next) => {
   try {
     const category = req.params.category;
     const validCategories = ['widget', 'template', 'icon', 'banner', 'gif', 'all'];
@@ -251,7 +251,7 @@ router.get('/scrapyard/:category', async (req, res) => {
     }
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error generating feed');
+    next(err);
   }
 });
 

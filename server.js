@@ -315,6 +315,7 @@ const dbMonitor = require('./server/utils/db-monitor');
 const dbHealth = require('./server/utils/db-health');
 const dbErrorHandler = require('./server/utils/db-error-handler');
 const dbLeakDetector = require('./server/utils/db-leak-detector');
+const errorHandler = require('./server/middleware/error-handler');
 const { queryTimeoutMiddleware, transactionTimeoutMiddleware } = require('./server/middleware/query-timeout');
 
 // Initialize database utilities with knex instance
@@ -376,24 +377,7 @@ app.use((err, req, res, next) => {
 });
 
 // Error handler
-app.use((err, req, res, next) => {
-  console.error('Server Error:', err.name, err.message);
-  console.error('Error Stack:', err.stack);
-  console.error('Request URL:', req.method, req.url);
-  console.error('Request Headers:', JSON.stringify(req.headers, null, 2));
-
-  // Check if headers have already been sent
-  if (res.headersSent) {
-    return next(err);
-  }
-
-  res.status(500).render('error', {
-    title: '500 - Server Error',
-    errorCode: 500,
-    message: 'Something went wrong on our end.',
-    theme: 'broken-window'
-  });
-});
+app.use(errorHandler);
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (reason, promise) => {
