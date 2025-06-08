@@ -52,7 +52,7 @@ router.post('/register', async (req, res, next) => {
     errors.push({ msg: 'Username must be between 3 and 20 characters' });
   }
 
-  if (username && !/^[a-zA-Z0-9_-]+$/.test(username)) {
+  if (username && !/^[a-zA-Z0-9_-]+$/u.test(username)) {
     errors.push({ msg: 'Username can only contain letters, numbers, underscores, and hyphens' });
   }
 
