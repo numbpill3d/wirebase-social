@@ -1,9 +1,15 @@
 /**
- * Placeholder function for initializing notifications.
- * TODO: Implement actual notification initialization logic.
+ * Initialize the notification system by creating a toast container
+ * if it doesn't already exist. This container will hold all
+ * notification elements.
  */
 function initializeNotifications() {
-  console.warn('initializeNotifications function called, but not implemented.');
+  let container = document.querySelector('.notification-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.className = 'notification-container';
+    document.body.appendChild(container);
+  }
 }
 /**
  * Vivid Market JavaScript
@@ -217,26 +223,31 @@ function initializeItemPreviews() {
  * @param {string} type - Notification type (success, error, info)
  */
 function showNotification(message, type = 'info') {
-  // Create notification element if it doesn't exist
-  let notification = document.querySelector('.notification');
-  if (!notification) {
-    notification = document.createElement('div');
-    notification.className = 'notification';
-    document.body.appendChild(notification);
-  }
+  // Ensure container exists
+  initializeNotifications();
 
-  // Set notification content and type
-  notification.textContent = message;
+  const container = document.querySelector('.notification-container');
+
+  // Create individual toast element
+  const notification = document.createElement('div');
   notification.className = `notification ${type}`;
+  notification.textContent = message;
 
-  // Show notification
+  container.appendChild(notification);
+
+  // Trigger show animation
   setTimeout(() => {
     notification.classList.add('show');
   }, 10);
 
-  // Hide notification after 3 seconds
+  // Hide and remove after 3 seconds
   setTimeout(() => {
     notification.classList.remove('show');
+    notification.addEventListener(
+      'transitionend',
+      () => notification.remove(),
+      { once: true }
+    );
   }, 3000);
 }
 
@@ -376,4 +387,13 @@ function initializePurchaseFlow() {
  */
 function isUserLoggedIn() {
   return document.body.classList.contains('user-logged-in');
+}
+
+// Export functions for testing in Node environments
+if (typeof module !== 'undefined') {
+  module.exports = {
+    initializeNotifications,
+    showNotification,
+    isUserLoggedIn
+  };
 }
