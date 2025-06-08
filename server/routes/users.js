@@ -3,15 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const passport = require('passport');
 const User = require('../models/User');
-
-// Middleware to ensure user is authenticated
-const ensureAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  req.flash('error_msg', 'Please log in to view this resource');
-  res.redirect('/users/login');
-};
+const { ensureAuthenticated } = require('../utils/auth-helpers');
 
 // Login page
 router.get('/login', (req, res) => {
