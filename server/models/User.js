@@ -203,6 +203,11 @@ class User {
    */
   static async findByIdAndUpdate(id, updateData) {
     try {
+      // Hash password if provided
+      if (updateData.password) {
+        const salt = await bcrypt.genSalt(10);
+        updateData.password = await bcrypt.hash(updateData.password, salt);
+      }
       // Convert to snake_case for Supabase
       const snakeCaseData = {};
 
@@ -236,6 +241,10 @@ class User {
    */
   async save() {
     try {
+      if (this.password) {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+      }
       // Convert user object to snake_case for Supabase
       const userData = {
         username: this.username,

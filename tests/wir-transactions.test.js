@@ -3,6 +3,10 @@
  * Tests for the WIR currency system and transactions
  */
 
+process.env.SUPABASE_URL = process.env.SUPABASE_URL || 'http://localhost';
+process.env.SUPABASE_KEY = process.env.SUPABASE_KEY || 'key';
+process.env.SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || 'service';
+
 const { supabase } = require('../server/utils/database');
 const WIRTransaction = require('../server/models/WIRTransaction');
 const createWIRTransactionsTable = require('../scripts/migrations/create-wir-transactions-table');

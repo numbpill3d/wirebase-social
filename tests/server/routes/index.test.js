@@ -4,6 +4,10 @@
 const request = require('supertest');
 const express = require('express');
 
+process.env.SUPABASE_URL = process.env.SUPABASE_URL || 'http://localhost';
+process.env.SUPABASE_KEY = process.env.SUPABASE_KEY || 'key';
+process.env.SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || 'service';
+
 // Mock dependencies
 jest.mock('../../../server/models/User', () => ({
   findRecent: jest.fn().mockResolvedValue([
@@ -21,7 +25,7 @@ jest.mock('../../../server/models/Item', () => ({
     { id: 3, title: 'Featured Item 1' },
     { id: 4, title: 'Featured Item 2' }
   ])
-}));
+}), { virtual: true });
 
 // Mock express-handlebars
 jest.mock('express-handlebars', () => ({
