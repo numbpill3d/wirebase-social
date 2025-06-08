@@ -55,6 +55,12 @@ router.post('/register', async (req, res) => {
     errors.push({ msg: 'Password should be at least 6 characters' });
   }
 
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (email && !emailRegex.test(email)) {
+    errors.push({ msg: 'Please enter a valid email address' });
+  }
+
   // Check username format and length
   if (username && (username.length < 3 || username.length > 20)) {
     errors.push({ msg: 'Username must be between 3 and 20 characters' });
@@ -192,7 +198,23 @@ router.get('/settings', ensureAuthenticated, (req, res) => {
 // Update account settings
 router.post('/settings', ensureAuthenticated, async (req, res) => {
   const { displayName, email, statusMessage, customGlyph } = req.body;
-  
+  const errors = [];
+
+  // Validate email format if provided
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (email && !emailRegex.test(email)) {
+    errors.push({ msg: 'Please enter a valid email address' });
+  }
+
+  if (errors.length > 0) {
+    return res.render('users/settings', {
+      title: 'Account Settings - Wirebase',
+      user: req.user,
+      errors,
+      pageTheme: 'dark-dungeon'
+    });
+  }
+
   try {
     // Prepare update data
     const updateData = {
