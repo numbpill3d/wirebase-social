@@ -394,7 +394,11 @@ const gracefulShutdown = async () => {
   try {
     // Stop health checks and leak detection
     console.log('Stopping database monitoring...');
-    clearInterval(healthCheckTimer);
+    if (stopHealthChecks) {
+      stopHealthChecks();
+    } else {
+      clearInterval(healthCheckTimer);
+    }
     clearInterval(leakDetectionTimers.checkTimer);
     clearInterval(leakDetectionTimers.fixTimer);
 
@@ -428,6 +432,7 @@ process.on('SIGINT', gracefulShutdown);
 
 // Initialize timers for health checks and leak detection
 let healthCheckTimer;
+let stopHealthChecks;
 let leakDetectionTimers;
 
 // Start server
@@ -438,7 +443,9 @@ const server = app.listen(PORT, () => {
   console.log('Starting database monitoring...');
 
   // Start health checks (every 60 seconds)
-  healthCheckTimer = dbHealth.startPeriodicHealthChecks(60000);
+  const healthCheck = dbHealth.startPeriodicHealthChecks(60000);
+  healthCheckTimer = healthCheck.timer;
+  stopHealthChecks = healthCheck.stop;
 
   // Start leak detection (check every 30 seconds, fix every 5 minutes)
   leakDetectionTimers = dbLeakDetector.startLeakDetection(null, 30000, 300000);

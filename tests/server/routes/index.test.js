@@ -9,10 +9,12 @@ jest.mock('../../../server/models/User', () => ({
   findRecent: jest.fn().mockResolvedValue([
     { username: 'testuser1', displayName: 'Test User 1' },
     { username: 'testuser2', displayName: 'Test User 2' }
-  ])
+  ]),
+  countDocuments: jest.fn().mockResolvedValue(2),
+  find: jest.fn().mockResolvedValue([{ username: 'activeuser' }])
 }));
 
-jest.mock('../../../server/models/Item', () => ({
+jest.mock('../../../server/models/ScrapyardItem', () => ({
   findRecent: jest.fn().mockResolvedValue([
     { id: 1, title: 'Test Item 1' },
     { id: 2, title: 'Test Item 2' }
@@ -20,7 +22,17 @@ jest.mock('../../../server/models/Item', () => ({
   findFeatured: jest.fn().mockResolvedValue([
     { id: 3, title: 'Featured Item 1' },
     { id: 4, title: 'Featured Item 2' }
-  ])
+  ]),
+  countDocuments: jest.fn().mockResolvedValue(2),
+  find: jest.fn().mockReturnValue({
+    sort: () => ({
+      skip: () => ({
+        limit: () => ({
+          populate: () => ({ select: jest.fn() })
+        })
+      })
+    })
+  })
 }));
 
 // Mock express-handlebars
