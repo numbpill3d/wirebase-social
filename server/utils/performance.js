@@ -20,14 +20,38 @@ try {
   console.warn('NodeCache module not found, using fallback implementation');
   // Simple fallback implementation
   NodeCache = class SimpleCache {
-    constructor() {
+    constructor(options = {}) {
       this.cache = new Map();
+      this.stdTTL = options.stdTTL || 0;
+      this.checkperiod = options.checkperiod || 0;
+
+      if (this.checkperiod > 0) {
+        this._cleanupInterval = setInterval(() => this.cleanup(), this.checkperiod * 1000);
+        if (this._cleanupInterval.unref) {
+          this._cleanupInterval.unref();
+        }
+
+        const clear = () => clearInterval(this._cleanupInterval);
+        process.once('exit', clear);
+        process.once('SIGINT', clear);
+        process.once('SIGTERM', clear);
+      }
+    }
+
+    cleanup() {
+      const now = Date.now();
+      for (const [key, item] of this.cache.entries()) {
+        if (item.expires && now > item.expires) {
+          this.cache.delete(key);
+        }
+      }
     }
 
     set(key, value, ttl) {
+      const actualTtl = typeof ttl === 'number' ? ttl : this.stdTTL;
       this.cache.set(key, {
         value,
-        expires: ttl ? Date.now() + (ttl * 1000) : null
+        expires: actualTtl ? Date.now() + (actualTtl * 1000) : null
       });
       return true;
     }
