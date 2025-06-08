@@ -203,6 +203,12 @@ class User {
    */
   static async findByIdAndUpdate(id, updateData) {
     try {
+      // Hash password if it is being updated
+      if (updateData.password) {
+        const salt = await bcrypt.genSalt(10);
+        updateData.password = await bcrypt.hash(updateData.password, salt);
+      }
+
       // Convert to snake_case for Supabase
       const snakeCaseData = {};
 
