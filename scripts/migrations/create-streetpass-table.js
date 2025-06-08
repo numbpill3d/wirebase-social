@@ -18,7 +18,7 @@ async function createStreetpassTable() {
       // Table doesn't exist, create it
       console.log('Creating streetpass_visits table...');
       
-      await supabaseAdmin.query(`
+      await supabaseAdmin.rpc('execute_sql', { sql: `
         CREATE TABLE streetpass_visits (
           id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
           visitor_id UUID NOT NULL REFERENCES users(id),
@@ -35,7 +35,7 @@ async function createStreetpassTable() {
         CREATE INDEX idx_streetpass_visits_profile_id ON streetpass_visits(profile_id);
         CREATE INDEX idx_streetpass_visits_visitor_id ON streetpass_visits(visitor_id);
         CREATE INDEX idx_streetpass_visits_visited_at ON streetpass_visits(visited_at);
-      `);
+      ` });
       
       console.log('streetpass_visits table created successfully!');
     } else {
