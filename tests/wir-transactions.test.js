@@ -186,6 +186,42 @@ describe('WIR Transactions', () => {
       // Restore the original implementation
       jest.restoreAllMocks();
     });
+
+    it('should handle invalid conversion direction', async () => {
+      // Mock user data
+      const mockUser = {
+        id: testSenderId,
+        wir_balance: 100,
+        loot_tokens: 50
+      };
+
+      // Mock the supabase query for getting user
+      jest.spyOn(supabase, 'from').mockImplementation((table) => {
+        if (table === 'users') {
+          return {
+            select: () => ({
+              eq: () => ({
+                single: () => Promise.resolve({ data: mockUser, error: null })
+              })
+            }),
+            update: () => ({
+              eq: () => Promise.resolve({ error: null })
+            })
+          };
+        }
+
+        return supabase.from(table);
+      });
+
+      const result = await WIRTransaction.convert(testSenderId, 'invalid', 10);
+
+      expect(result).toEqual({
+        success: false,
+        message: 'Invalid conversion direction'
+      });
+
+      jest.restoreAllMocks();
+    });
   });
 });
 }
