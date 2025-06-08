@@ -29,6 +29,7 @@ const KnexSessionStore = require('connect-session-knex')(session);
 const passport = require('passport');
 const path = require('path');
 const multer = require('multer');
+const csurf = require('csurf');
 const fs = require('fs');
 const { supabase, supabaseAdmin } = require('./server/utils/database');
 
@@ -230,6 +231,15 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// CSRF protection (disabled during tests)
+if (NODE_ENV !== 'test') {
+  app.use(csurf());
+  app.use((req, res, next) => {
+    res.locals.csrfToken = req.csrfToken();
+    next();
+  });
+}
+
 // Setup file storage for user uploads
 const storage = multer.diskStorage({
   destination: function (req, _file, cb) {
@@ -348,6 +358,19 @@ app.use((req, res) => {
     message: 'The page you are looking for does not exist.',
     theme: 'dark-dungeon'
   });
+});
+
+// CSRF error handler
+app.use((err, req, res, next) => {
+  if (err.code === 'EBADCSRFTOKEN') {
+    return res.status(403).render('error', {
+      title: 'Invalid CSRF Token',
+      errorCode: 403,
+      message: 'Form tampered with or session expired.',
+      theme: 'locked-dungeon'
+    });
+  }
+  next(err);
 });
 
 // Error handler
