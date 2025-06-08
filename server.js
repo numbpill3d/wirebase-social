@@ -8,6 +8,9 @@ try {
   console.warn('dotenv module not found, using existing environment variables');
 }
 
+// Verify required environment variables
+require('./server/utils/env-check')();
+
 // Import performance optimization utilities
 const {
   compressionMiddleware,
