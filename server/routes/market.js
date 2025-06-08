@@ -611,6 +611,31 @@ router.post('/submit', ensureAuthenticated, async (req, res) => {
       });
     }
 
+    // Validate title length
+    if (title.length > 100) {
+      return res.status(400).json({
+        success: false,
+        message: 'Title must be 100 characters or less'
+      });
+    }
+
+    // Validate description length
+    if (description.length > 1000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Description must be 1000 characters or less'
+      });
+    }
+
+    // Validate category is allowed
+    const allowedCategories = await MarketItem.getCategories();
+    if (!allowedCategories.includes(category)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid category'
+      });
+    }
+
     // Parse WIR price
     const price = parseInt(wirPrice) || 0;
 
