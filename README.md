@@ -59,7 +59,7 @@ You can use these accounts to explore the platform:
 
 ### Prerequisites
 - Node.js (v16 or higher)
-- MongoDB (local or remote)
+- Supabase project with PostgreSQL database
 
 ### Installation
 
@@ -77,7 +77,10 @@ You can use these accounts to explore the platform:
 3. Create a `.env` file in the root directory with the following variables:
    ```
    PORT=3000
-   MONGODB_URI=mongodb://localhost:27017/wirebase
+   SUPABASE_URL=your-supabase-url
+   SUPABASE_KEY=your-anon-key
+   SUPABASE_SERVICE_KEY=your-service-role-key
+   SUPABASE_DB_PASSWORD=your-database-password
    SESSION_SECRET=your-session-secret
    NODE_ENV=development
    ```
@@ -118,9 +121,12 @@ You can use these accounts to explore the platform:
    - `NODE_ENV`: `production`
    - `SESSION_SECRET`: (generate a random string)
    - `PORT`: `10000` (or use Render assigned port)
-   - `MONGODB_URI`: (your MongoDB connection string)
+   - `SUPABASE_URL`: your Supabase project URL
+   - `SUPABASE_KEY`: your anon key
+   - `SUPABASE_SERVICE_KEY`: your service role key
+   - `SUPABASE_DB_PASSWORD`: your database password
 
-3. Create a MongoDB database and connect it to your service
+3. Create a Supabase project and connect it to your service using the variables above
 
 ## Customization
 
@@ -151,6 +157,7 @@ Users can create their profiles with raw HTML/CSS, either through:
 SUPABASE_URL=your-supabase-url
 SUPABASE_KEY=your-anon-key
 SUPABASE_SERVICE_KEY=your-service-role-key
+SUPABASE_DB_PASSWORD=your-database-password
 SESSION_SECRET=your-secret
 PORT=3000
 NODE_ENV=development
