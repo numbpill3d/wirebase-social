@@ -64,8 +64,9 @@ router.post('/register', async (req, res) => {
     errors.push({ msg: 'Username can only contain letters, numbers, underscores, and hyphens' });
   }
 
-  // Validate email format
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  // Normalize and validate email format
+  let normalizedEmail = email ? email.trim().toLowerCase() : email;
+  if (normalizedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
     errors.push({ msg: 'Invalid email address' });
   }
 
