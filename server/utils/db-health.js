@@ -106,7 +106,7 @@ const getHealthStatus = (knex = null) => {
  * @returns {Promise<Object>} Maintenance result
  */
 const performMaintenance = async (knex = null) => {
-  const kInstance = knex || knexInstance || global.knex;
+  let kInstance = knex || knexInstance || global.knex;
 
   if (!kInstance) {
     console.error('ERROR: No knex instance available for maintenance');
@@ -124,9 +124,16 @@ const performMaintenance = async (knex = null) => {
     if (healthCheckStatus.consecutiveFailures >= 3) {
       console.log('Performing database pool reset due to consecutive failures');
 
-      // Destroy and recreate the pool
+      // Destroy existing instance and create a fresh one using the same config
+      const config = kInstance.client && kInstance.client.config ? kInstance.client.config : null;
       await kInstance.destroy();
-      await kInstance.initialize();
+
+      if (config) {
+        const newKnex = require('knex')(config);
+        kInstance = newKnex;
+        knexInstance = newKnex;
+        global.knex = newKnex;
+      }
 
       // Reset health check status
       healthCheckStatus.consecutiveFailures = 0;
