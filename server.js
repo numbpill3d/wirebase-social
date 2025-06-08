@@ -151,11 +151,6 @@ app.use(resourceHints); // Add resource hints
 app.use(xssMiddleware); // Prevent XSS attacks
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public'), {
-  maxAge: '7d', // Cache static assets for 7 days
-  etag: true,
-  lastModified: true
-}));
 app.use(cacheControl); // Add cache control headers
 
 // Apply rate limiting to API routes
@@ -356,6 +351,13 @@ app.use('/admin/api', require('./server/routes/admin-api'));
 app.use('/market', require('./server/routes/market'));
 app.use('/market/user', require('./server/routes/user-market'));
 app.use('/api/market', require('./server/routes/market-api'));
+
+// Serve static assets after routes so dynamic pages take precedence
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: '7d', // Cache static assets for 7 days
+  etag: true,
+  lastModified: true
+}));
 
 // 404 handler
 app.use((req, res) => {
