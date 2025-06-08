@@ -156,6 +156,16 @@ PORT=3000
 NODE_ENV=development
 ```
 
+## Continuous Integration
+
+Run the following commands in your CI pipeline:
+
+```bash
+npm ci
+npm run lint
+npm test
+```
+
 ## License
 
 This project is available under the MIT License. See the [LICENSE](LICENSE) file for details.
