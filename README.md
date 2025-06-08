@@ -59,7 +59,7 @@ You can use these accounts to explore the platform:
 
 ### Prerequisites
 - Node.js (v16 or higher)
-- MongoDB (local or remote)
+- Supabase project credentials
 
 ### Installation
 
@@ -77,7 +77,9 @@ You can use these accounts to explore the platform:
 3. Create a `.env` file in the root directory with the following variables:
    ```
    PORT=3000
-   MONGODB_URI=mongodb://localhost:27017/wirebase
+   SUPABASE_URL=your-supabase-url
+   SUPABASE_KEY=your-anon-key
+   SUPABASE_SERVICE_KEY=your-service-role-key
    SESSION_SECRET=your-session-secret
    NODE_ENV=development
    ```
@@ -118,9 +120,9 @@ You can use these accounts to explore the platform:
    - `NODE_ENV`: `production`
    - `SESSION_SECRET`: (generate a random string)
    - `PORT`: `10000` (or use Render assigned port)
-   - `MONGODB_URI`: (your MongoDB connection string)
-
-3. Create a MongoDB database and connect it to your service
+   - `SUPABASE_URL`: your Supabase project URL
+   - `SUPABASE_KEY`: your Supabase anon key
+   - `SUPABASE_SERVICE_KEY`: your service role key
 
 ## Customization
 
@@ -177,4 +179,4 @@ This project is available under the MIT License. See the [LICENSE](LICENSE) file
 ## Acknowledgements
 
 - Design inspired by Windows 98 UI and medieval fantasy aesthetics, as well as by the Ethos and Feeling of the Wired, from Serial Experiments Lain. Temple OS also.
-- Built with Express.js, MongoDB, and Handlebars
+- Built with Express.js, Supabase, and Handlebars
