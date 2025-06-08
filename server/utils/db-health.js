@@ -167,14 +167,14 @@ const performMaintenance = async (knex = null) => {
  * Start periodic health checks
  * @param {Object} knexInstance - The knex instance to use
  * @param {number} interval - Check interval in milliseconds
- * @returns {Object} Timer object
+ * @returns {Object} Object containing the timer and a stop function
  */
 const startPeriodicHealthChecks = (knex = null, interval = 60000) => {
   const kInstance = knex || knexInstance || global.knex;
 
   if (!kInstance) {
     console.error('ERROR: No knex instance available for health checks');
-    return null;
+    return { timer: null, stop: () => {} };
   }
 
   // Store the instance for future use
@@ -197,7 +197,12 @@ const startPeriodicHealthChecks = (knex = null, interval = 60000) => {
 
   console.log(`Database health checks started (interval: ${interval}ms)`);
 
-  return timer;
+  const stop = () => {
+    clearInterval(timer);
+    console.log('Database health checks stopped');
+  };
+
+  return { timer, stop };
 };
 
 /**
