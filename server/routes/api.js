@@ -23,7 +23,9 @@ router.get('/users', async (req, res) => {
     res.json(users);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({
+      error: process.env.NODE_ENV !== 'production' ? err.message : 'Server error'
+    });
   }
 });
 
@@ -40,7 +42,9 @@ router.get('/users/:username', async (req, res) => {
     res.json(user);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({
+      error: process.env.NODE_ENV !== 'production' ? err.message : 'Server error'
+    });
   }
 });
 
@@ -56,7 +60,9 @@ router.get('/me', ensureAuthenticated, async (req, res) => {
     res.json(user);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({
+      error: process.env.NODE_ENV !== 'production' ? err.message : 'Server error'
+    });
   }
 });
 
@@ -74,7 +80,9 @@ router.get('/scrapyard', async (req, res) => {
     res.json(items);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({
+      error: process.env.NODE_ENV !== 'production' ? err.message : 'Server error'
+    });
   }
 });
 
@@ -91,7 +99,9 @@ router.get('/scrapyard/:id', async (req, res) => {
     res.json(item);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({
+      error: process.env.NODE_ENV !== 'production' ? err.message : 'Server error'
+    });
   }
 });
 
@@ -135,7 +145,12 @@ router.get('/market/items', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching market items:', error);
-    res.status(500).json({ error: 'An error occurred while fetching marketplace items' });
+    res.status(500).json({
+      error:
+        process.env.NODE_ENV !== 'production'
+          ? error.message
+          : 'An error occurred while fetching marketplace items'
+    });
   }
 });
 
@@ -151,7 +166,12 @@ router.get('/market/items/:id', async (req, res) => {
     res.json(item);
   } catch (error) {
     console.error('Error fetching market item:', error);
-    res.status(500).json({ error: 'An error occurred while fetching the marketplace item' });
+    res.status(500).json({
+      error:
+        process.env.NODE_ENV !== 'production'
+          ? error.message
+          : 'An error occurred while fetching the marketplace item'
+    });
   }
 });
 
@@ -182,7 +202,7 @@ router.post('/streetpass/visit', ensureAuthenticated, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to record visit',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Server error'
+      error: process.env.NODE_ENV !== 'production' ? error.message : 'Server error'
     });
   }
 });
@@ -208,7 +228,7 @@ router.get('/streetpass/visitors/:profileId', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to get visitors',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Server error'
+      error: process.env.NODE_ENV !== 'production' ? error.message : 'Server error'
     });
   }
 });
@@ -237,7 +257,7 @@ router.put('/streetpass/emote', ensureAuthenticated, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to update emote',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Server error'
+      error: process.env.NODE_ENV !== 'production' ? error.message : 'Server error'
     });
   }
 });
