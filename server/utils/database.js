@@ -80,7 +80,8 @@ async function initializeDatabase() {
 
     if (error && error.code === '42P01') { // Table doesn't exist
       console.log('Creating users table...');
-      await supabaseAdmin.query(`
+      await supabaseAdmin.rpc('execute_sql', {
+        sql: `
         CREATE TABLE users (
           id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
           username TEXT UNIQUE NOT NULL,
@@ -111,7 +112,8 @@ async function initializeDatabase() {
         -- Create index on username and email
         CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
         CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-      `);
+      `
+      });
     }
 
     // Create scrapyard_items table if not exists
@@ -122,7 +124,8 @@ async function initializeDatabase() {
 
     if (itemsError && itemsError.code === '42P01') { // Table doesn't exist
       console.log('Creating scrapyard_items table...');
-      await supabaseAdmin.query(`
+      await supabaseAdmin.rpc('execute_sql', {
+        sql: `
         CREATE TABLE scrapyard_items (
           id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
           title TEXT NOT NULL,
@@ -146,7 +149,8 @@ async function initializeDatabase() {
         -- Create indexes
         CREATE INDEX IF NOT EXISTS idx_scrapyard_items_creator ON scrapyard_items(creator);
         CREATE INDEX IF NOT EXISTS idx_scrapyard_items_category ON scrapyard_items(category);
-      `);
+      `
+      });
     }
 
     // Create sessions table if not exists
@@ -157,7 +161,8 @@ async function initializeDatabase() {
 
     if (sessionsError && sessionsError.code === '42P01') { // Table doesn't exist
       console.log('Creating sessions table...');
-      await supabaseAdmin.query(`
+      await supabaseAdmin.rpc('execute_sql', {
+        sql: `
         CREATE TABLE sessions (
           sid varchar NOT NULL PRIMARY KEY,
           sess json NOT NULL,
@@ -165,7 +170,8 @@ async function initializeDatabase() {
         );
 
         CREATE INDEX IF NOT EXISTS idx_sessions_expired ON sessions(expired);
-      `);
+      `
+      });
     }
 
     console.log('Database initialization complete');

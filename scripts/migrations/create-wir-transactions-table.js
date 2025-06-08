@@ -18,7 +18,8 @@ async function createWIRTransactionsTable() {
       // Table doesn't exist, create it
       console.log('Creating market_wir_transactions table...');
       
-      await supabaseAdmin.query(`
+      await supabaseAdmin.rpc('execute_sql', {
+        sql: `
         CREATE TABLE market_wir_transactions (
           id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
           user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -48,7 +49,8 @@ async function createWIRTransactionsTable() {
         CREATE INDEX idx_wir_transactions_reference_id ON market_wir_transactions(reference_id);
         CREATE INDEX idx_wir_transactions_created_at ON market_wir_transactions(created_at);
         CREATE INDEX idx_wir_transactions_type ON market_wir_transactions(transaction_type);
-      `);
+      `
+      });
       
       console.log('market_wir_transactions table created successfully!');
     } else {
