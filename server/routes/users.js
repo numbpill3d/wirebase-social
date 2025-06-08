@@ -64,6 +64,11 @@ router.post('/register', async (req, res) => {
     errors.push({ msg: 'Username can only contain letters, numbers, underscores, and hyphens' });
   }
 
+  // Validate email format
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errors.push({ msg: 'Invalid email address' });
+  }
+
   // Validate custom glyph
   if (customGlyph && customGlyph.length > 2) {
     errors.push({ msg: 'Custom glyph must be at most 2 characters' });
