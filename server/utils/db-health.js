@@ -126,16 +126,20 @@ const performMaintenance = async (knex = null) => {
 
       // Destroy and recreate the pool
       await kInstance.destroy();
-      await kInstance.initialize();
+
+      // Recreate knex instance using original configuration
+      const newKnex = require('knex')(kInstance.client.config);
+      knexInstance = newKnex;
+      global.knex = newKnex;
 
       // Reset health check status
       healthCheckStatus.consecutiveFailures = 0;
       dbMonitor.resetMetrics();
-      dbMonitor.setupPoolMonitoring(kInstance);
+      dbMonitor.setupPoolMonitoring(newKnex);
     }
 
     // Get pool status after maintenance
-    const afterStatus = dbMonitor.getPoolStatus(kInstance);
+    const afterStatus = dbMonitor.getPoolStatus(knexInstance);
 
     return {
       success: true,
