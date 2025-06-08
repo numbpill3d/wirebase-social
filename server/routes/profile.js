@@ -3,6 +3,16 @@ const router = express.Router();
 const User = require('../models/User');
 const ScrapyardItem = require('../models/ScrapyardItem');
 const Feed = require('feed').Feed;
+let DOMPurify;
+try {
+  const createDOMPurify = require('dompurify');
+  const { JSDOM } = require('jsdom');
+  const window = new JSDOM('').window;
+  DOMPurify = createDOMPurify(window);
+} catch (err) {
+  console.warn('DOMPurify module not found, using fallback sanitization');
+  DOMPurify = { sanitize: (input) => input.replace(/</g, '&lt;').replace(/>/g, '&gt;') };
+}
 
 // Middleware to ensure user is authenticated
 const ensureAuthenticated = (req, res, next) => {
@@ -147,10 +157,17 @@ router.get('/edit/html', ensureAuthenticated, (req, res) => {
 router.post('/edit/html', ensureAuthenticated, async (req, res) => {
   try {
     const { profileHtml } = req.body;
-    
+    const sanitizedHtml = DOMPurify.sanitize(profileHtml, {
+      ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'ul', 'ol', 'li',
+                     'strong', 'em', 'a', 'img', 'div', 'span', 'blockquote', 'code', 'pre'],
+      ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id', 'style'],
+      FORBID_TAGS: ['script', 'iframe', 'object', 'embed'],
+      FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover']
+    });
+
     // Update the user's profile HTML
     const user = await User.findById(req.user._id);
-    user.profileHtml = profileHtml;
+    user.profileHtml = sanitizedHtml;
     await user.save();
     
     req.flash('success_msg', 'Profile HTML updated successfully');
@@ -179,10 +196,15 @@ router.get('/edit/css', ensureAuthenticated, (req, res) => {
 router.post('/edit/css', ensureAuthenticated, async (req, res) => {
   try {
     const { profileCss } = req.body;
-    
+    const sanitizedCss = DOMPurify.sanitize(profileCss, {
+      ALLOWED_TAGS: [],
+      ALLOWED_ATTR: [],
+      FORBID_TAGS: ['script', 'iframe', 'object', 'embed']
+    });
+
     // Update the user's profile CSS
     const user = await User.findById(req.user._id);
-    user.profileCss = profileCss;
+    user.profileCss = sanitizedCss;
     await user.save();
     
     req.flash('success_msg', 'Profile CSS updated successfully');
