@@ -12,6 +12,12 @@ try {
   }
 }
 
+const { validateEnv } = require('./server/utils/env-check');
+if (!validateEnv()) {
+  console.error('Environment validation failed. Exiting.');
+  process.exit(1);
+}
+
 // Import performance optimization utilities
 const {
   compressionMiddleware,
