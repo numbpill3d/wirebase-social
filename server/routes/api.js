@@ -66,10 +66,10 @@ router.get('/scrapyard', async (req, res) => {
     const category = req.query.category;
     const query = category ? { category } : {};
 
-    const items = await ScrapyardItem.find(query)
-      .sort({ createdAt: -1 })
-      .limit(20)
-      .populate('creator', 'username displayName avatar customGlyph');
+    const items = await ScrapyardItem.find(
+      query,
+      { sort: { createdAt: -1 }, limit: 20 }
+    );
 
     res.json(items);
   } catch (err) {
@@ -81,8 +81,7 @@ router.get('/scrapyard', async (req, res) => {
 // GET scrapyard item by ID
 router.get('/scrapyard/:id', async (req, res) => {
   try {
-    const item = await ScrapyardItem.findById(req.params.id)
-      .populate('creator', 'username displayName avatar customGlyph');
+    const item = await ScrapyardItem.findById(req.params.id);
 
     if (!item) {
       return res.status(404).json({ error: 'Item not found' });
