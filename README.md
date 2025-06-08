@@ -145,6 +145,10 @@ Users can create their profiles with raw HTML/CSS, either through:
 - **Authentication**: Passport.js with Supabase Auth
 - **Templates**: Handlebars
 
+## API Documentation
+
+See [docs/API.md](docs/API.md) for a summary of available `/api` routes.
+
 ## Environment Setup
 ```bash
 # Required environment variables
