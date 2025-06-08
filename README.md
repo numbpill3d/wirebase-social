@@ -106,6 +106,7 @@ You can use these accounts to explore the platform:
    - Render will automatically set up the web service and database
 
 3. Configure environment variables in Render dashboard if needed
+   - Include `TRUSTED_IPS` if you want certain IPs to bypass rate limiting. The server will check `x-forwarded-for` when behind a proxy.
 
 ### Manual Deployment
 
@@ -119,6 +120,7 @@ You can use these accounts to explore the platform:
    - `SESSION_SECRET`: (generate a random string)
    - `PORT`: `10000` (or use Render assigned port)
    - `MONGODB_URI`: (your MongoDB connection string)
+   - `TRUSTED_IPS`: comma-separated list of IP addresses exempt from rate limiting. When behind a proxy, the server checks `x-forwarded-for` for the client IP.
 
 3. Create a MongoDB database and connect it to your service
 
