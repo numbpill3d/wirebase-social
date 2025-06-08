@@ -305,6 +305,7 @@ const dbMonitor = require('./server/utils/db-monitor');
 const dbHealth = require('./server/utils/db-health');
 const dbErrorHandler = require('./server/utils/db-error-handler');
 const dbLeakDetector = require('./server/utils/db-leak-detector');
+const memoryMonitor = require('./server/utils/memory-monitor');
 const { queryTimeoutMiddleware, transactionTimeoutMiddleware } = require('./server/middleware/query-timeout');
 
 // Initialize database utilities with knex instance
@@ -397,6 +398,7 @@ const gracefulShutdown = async () => {
     clearInterval(healthCheckTimer);
     clearInterval(leakDetectionTimers.checkTimer);
     clearInterval(leakDetectionTimers.fixTimer);
+    memoryMonitor.stop();
 
     // Fix any connection leaks before shutdown
     console.log('Checking for connection leaks before shutdown...');
@@ -436,6 +438,9 @@ const server = app.listen(PORT, () => {
 
   // Start database monitoring after server starts
   console.log('Starting database monitoring...');
+
+  // Start memory monitor
+  memoryMonitor.start();
 
   // Start health checks (every 60 seconds)
   healthCheckTimer = dbHealth.startPeriodicHealthChecks(60000);
