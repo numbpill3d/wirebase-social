@@ -3,9 +3,17 @@
  * Tests for the WIR currency system and transactions
  */
 
-const { supabase } = require('../server/utils/database');
-const WIRTransaction = require('../server/models/WIRTransaction');
-const createWIRTransactionsTable = require('../scripts/migrations/create-wir-transactions-table');
+if (!process.env.SUPABASE_URL || !process.env.SUPABASE_KEY || !process.env.SUPABASE_SERVICE_KEY) {
+  // Skip the suite if Supabase credentials are not available
+  describe.skip('WIR Transactions', () => {
+    it('skipped because Supabase credentials are missing', () => {
+      expect(true).toBe(true);
+    });
+  });
+} else {
+  const { supabase } = require('../server/utils/database');
+  const WIRTransaction = require('../server/models/WIRTransaction');
+  const createWIRTransactionsTable = require('../scripts/migrations/create-wir-transactions-table');
 
 describe('WIR Transactions', () => {
   // Test user IDs
@@ -180,3 +188,4 @@ describe('WIR Transactions', () => {
     });
   });
 });
+}
