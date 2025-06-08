@@ -117,8 +117,8 @@ const verifyDatabaseConnection = async (retries = 5, delay = 5000) => {
   }
 };
 
-// Start the verification process
-verifyDatabaseConnection();
+// Placeholder for HTTP server instance
+let server;
 
 // Initialize app
 const app = express();
@@ -430,22 +430,35 @@ process.on('SIGINT', gracefulShutdown);
 let healthCheckTimer;
 let leakDetectionTimers;
 
-// Start server
-const server = app.listen(PORT, () => {
-  console.log(`Wirebase server running in ${NODE_ENV} mode on port ${PORT}`);
+// Start server only after verifying the database connection
+verifyDatabaseConnection()
+  .then((connected) => {
+    if (!connected) {
+      console.error('Database connection verification failed. Exiting.');
+      process.exit(1);
+      return;
+    }
 
-  // Start database monitoring after server starts
-  console.log('Starting database monitoring...');
+    server = app.listen(PORT, () => {
+      console.log(`Wirebase server running in ${NODE_ENV} mode on port ${PORT}`);
 
-  // Start health checks (every 60 seconds)
-  healthCheckTimer = dbHealth.startPeriodicHealthChecks(60000);
+      // Start database monitoring after server starts
+      console.log('Starting database monitoring...');
 
-  // Start leak detection (check every 30 seconds, fix every 5 minutes)
-  leakDetectionTimers = dbLeakDetector.startLeakDetection(null, 30000, 300000);
-});
+      // Start health checks (every 60 seconds)
+      healthCheckTimer = dbHealth.startPeriodicHealthChecks(60000);
 
-// Add server timeout to prevent hanging connections
-server.timeout = 120000; // 2 minutes
+      // Start leak detection (check every 30 seconds, fix every 5 minutes)
+      leakDetectionTimers = dbLeakDetector.startLeakDetection(null, 30000, 300000);
+    });
+
+    // Add server timeout to prevent hanging connections
+    server.timeout = 120000; // 2 minutes
+  })
+  .catch((err) => {
+    console.error('Database connection verification rejected:', err);
+    process.exit(1);
+  });
 
 // Export knex instance and monitoring utilities for use in other modules
 module.exports = {
