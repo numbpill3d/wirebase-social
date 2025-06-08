@@ -13,6 +13,7 @@ const { formatDate, truncateText } = require('../utils/format-helpers');
 const MarketItem = require('../models/MarketItem');
 const Collection = require('../models/Collection');
 const WIRTransaction = require('../models/WIRTransaction');
+const User = require('../models/User');
 
 /**
  * GET /market
@@ -176,8 +177,12 @@ router.get('/item/:id', async (req, res) => {
     let userCollections = [];
 
     if (req.isAuthenticated()) {
+      // Fetch fresh user data before verifying balance
+      const currentUser = await User.findById(req.user.id);
+
       // Check if user has enough WIR
-      canPurchase = req.user.wirBalance >= item.wirPrice;
+      const wirBalance = currentUser ? currentUser.wirBalance : req.user.wirBalance;
+      canPurchase = wirBalance >= item.wirPrice;
 
       // Check if item is in user's wishlist
       isInWishlist = await MarketItem.isInWishlist(itemId, req.user.id);
@@ -273,8 +278,17 @@ router.post('/item/:id/purchase', ensureAuthenticated, async (req, res) => {
       });
     }
 
+    // Fetch fresh user data before verifying balance
+    const currentUser = await User.findById(req.user.id);
+    if (!currentUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
     // Check if user has enough WIR
-    if (req.user.wirBalance < item.wirPrice) {
+    if (currentUser.wirBalance < item.wirPrice) {
       return res.status(400).json({
         success: false,
         message: 'Insufficient WIR balance'
@@ -299,6 +313,11 @@ router.post('/item/:id/purchase', ensureAuthenticated, async (req, res) => {
 
       // Update user's WIR balance in session
       req.user.wirBalance = result.newBalance;
+      req.session.save(err => {
+        if (err) {
+          console.error('Session save error after purchase:', err);
+        }
+      });
 
       return res.json({
         success: true,
@@ -619,7 +638,10 @@ router.post('/submit', ensureAuthenticated, async (req, res) => {
     const featuredFee = featuredInMarket ? 5 : 0;
     const totalFee = listingFee + featuredFee;
 
-    if (req.user.wirBalance < totalFee) {
+    const currentUser = await User.findById(req.user.id);
+    const wirBalance = currentUser ? currentUser.wirBalance : req.user.wirBalance;
+
+    if (wirBalance < totalFee) {
       return res.status(400).json({
         success: false,
         message: 'Insufficient WIR balance for listing fees'
