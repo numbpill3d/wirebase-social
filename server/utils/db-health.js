@@ -94,6 +94,12 @@ const checkHealth = async (knex = null) => {
  */
 const getHealthStatus = (knex = null) => {
   const kInstance = knex || knexInstance || global.knex;
+
+  if (!kInstance) {
+    console.warn('WARN: No knex instance available to get health status');
+    return { ...healthCheckStatus, poolStatus: null };
+  }
+
   return {
     ...healthCheckStatus,
     poolStatus: dbMonitor.getPoolStatus(kInstance)

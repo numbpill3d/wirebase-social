@@ -53,6 +53,12 @@ const handleError = async (error, context = 'unknown') => {
 
   // Get pool status - use stored knex instance or fallback to global
   const kInstance = knexInstance || global.knex;
+
+  if (!kInstance) {
+    console.warn('WARN: No knex instance available for error handling');
+    return error;
+  }
+
   const poolStatus = dbMonitor.getPoolStatus(kInstance);
 
   // Log error with context and pool status
@@ -82,6 +88,12 @@ const handleError = async (error, context = 'unknown') => {
  */
 const getErrorStats = (knex = null) => {
   const kInstance = knex || knexInstance || global.knex;
+
+  if (!kInstance) {
+    console.warn('WARN: No knex instance available for error statistics');
+    return { ...errorStats, poolStatus: null };
+  }
+
   return {
     ...errorStats,
     poolStatus: dbMonitor.getPoolStatus(kInstance)
