@@ -157,10 +157,26 @@ const server = http.createServer((req, res) => {
   // Parse URL
   const parsedUrl = url.parse(req.url, true);
   const pathname = parsedUrl.pathname;
-  
+
   // Log all requests
   console.log(`Request: ${req.method} ${pathname}`);
-  
+
+  // Special case for favicon
+  if (req.method === 'GET' && pathname === '/favicon.ico') {
+    const filePath = path.join(__dirname, 'public', 'favicon.ico');
+    fs.readFile(filePath, (err, content) => {
+      if (err) {
+        console.error('Favicon not found:', err.message);
+        res.writeHead(404);
+        res.end();
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'image/x-icon' });
+      res.end(content);
+    });
+    return;
+  }
+
   // Serve static files
   if (req.method === 'GET' && (pathname.startsWith('/css/') ||
       pathname.startsWith('/js/') ||
