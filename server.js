@@ -1,11 +1,15 @@
 // Main server file for Wirebase
+let dotenvWarned = false;
 try {
   // Try to load dotenv if available
   const dotenv = require('dotenv');
   dotenv.config();
   console.log('Environment variables loaded from .env file');
 } catch (err) {
-  console.warn('dotenv module not found, using existing environment variables');
+  if (!dotenvWarned) {
+    console.warn('dotenv module not found, using existing environment variables');
+    dotenvWarned = true;
+  }
 }
 
 // Import performance optimization utilities
