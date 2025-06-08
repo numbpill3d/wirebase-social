@@ -14,7 +14,7 @@ const ensureAuthenticated = (req, res, next) => {
 };
 
 // User's own profile page
-router.get('/', ensureAuthenticated, async (req, res) => {
+router.get('/', ensureAuthenticated, async (req, res, next) => {
   try {
     // Find the user with their streetpass visitors populated
     const user = await User.findById(req.user._id)
@@ -43,17 +43,12 @@ router.get('/', ensureAuthenticated, async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).render('error', {
-      title: 'Server Error',
-      errorCode: 500,
-      message: 'There was an error loading your profile',
-      theme: 'broken-window'
-    });
+    next(err);
   }
 });
 
 // View another user's profile
-router.get('/:username', async (req, res) => {
+router.get('/:username', async (req, res, next) => {
   try {
     // Find the user by username
     const profileUser = await User.findOne({ username: req.params.username });
@@ -125,12 +120,7 @@ router.get('/:username', async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).render('error', {
-      title: 'Server Error',
-      errorCode: 500,
-      message: 'There was an error loading this profile',
-      theme: 'broken-window'
-    });
+    next(err);
   }
 });
 
@@ -144,7 +134,7 @@ router.get('/edit/html', ensureAuthenticated, (req, res) => {
 });
 
 // Save profile HTML
-router.post('/edit/html', ensureAuthenticated, async (req, res) => {
+router.post('/edit/html', ensureAuthenticated, async (req, res, next) => {
   try {
     const { profileHtml } = req.body;
     
@@ -157,12 +147,7 @@ router.post('/edit/html', ensureAuthenticated, async (req, res) => {
     res.redirect('/profile');
   } catch (err) {
     console.error(err);
-    res.status(500).render('error', {
-      title: 'Server Error',
-      errorCode: 500,
-      message: 'There was an error saving your profile HTML',
-      theme: 'broken-window'
-    });
+    next(err);
   }
 });
 
@@ -176,7 +161,7 @@ router.get('/edit/css', ensureAuthenticated, (req, res) => {
 });
 
 // Save profile CSS
-router.post('/edit/css', ensureAuthenticated, async (req, res) => {
+router.post('/edit/css', ensureAuthenticated, async (req, res, next) => {
   try {
     const { profileCss } = req.body;
     
@@ -189,12 +174,7 @@ router.post('/edit/css', ensureAuthenticated, async (req, res) => {
     res.redirect('/profile');
   } catch (err) {
     console.error(err);
-    res.status(500).render('error', {
-      title: 'Server Error',
-      errorCode: 500,
-      message: 'There was an error saving your profile CSS',
-      theme: 'broken-window'
-    });
+    next(err);
   }
 });
 
@@ -208,7 +188,7 @@ router.get('/terminal', ensureAuthenticated, (req, res) => {
 });
 
 // RSS feed for user profile
-router.get('/:username/feed', async (req, res) => {
+router.get('/:username/feed', async (req, res, next) => {
   try {
     // Find the user by username
     const user = await User.findOne({ username: req.params.username });
@@ -263,12 +243,12 @@ router.get('/:username/feed', async (req, res) => {
     res.send(feed.rss2());
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error generating feed');
+    next(err);
   }
 });
 
 // Update streetpass emote
-router.post('/:username/streetpass/emote', ensureAuthenticated, async (req, res) => {
+router.post('/:username/streetpass/emote', ensureAuthenticated, async (req, res, next) => {
   try {
     const { emote } = req.body;
     const profileUser = await User.findOne({ username: req.params.username });
@@ -291,7 +271,7 @@ router.post('/:username/streetpass/emote', ensureAuthenticated, async (req, res)
     }
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    next(err);
   }
 });
 
