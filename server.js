@@ -338,9 +338,11 @@ app.use('/api/market', require('./server/routes/market-api'));
 
 // 404 handler
 app.use((req, res) => {
-  console.log('404 Not Found:', req.method, req.url);
-  console.log('Referrer:', req.get('Referrer') || 'None');
-  console.log('User Agent:', req.get('User-Agent'));
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('404 Not Found:', req.method, req.url);
+    console.log('Referrer:', req.get('Referrer') || 'None');
+    console.log('User Agent:', req.get('User-Agent'));
+  }
 
   res.status(404).render('error', {
     title: '404 - Page Not Found',
