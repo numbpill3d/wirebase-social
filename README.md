@@ -84,7 +84,7 @@ You can use these accounts to explore the platform:
 
 4. Seed the database with initial data
    ```
-   node scripts/seed.js
+   node scripts/seed-defaults.js
    ```
 
 5. Start the development server
