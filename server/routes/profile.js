@@ -16,17 +16,25 @@ const ensureAuthenticated = (req, res, next) => {
 // User's own profile page
 router.get('/', ensureAuthenticated, async (req, res) => {
   try {
-    // Find the user with their streetpass visitors populated
-    const user = await User.findById(req.user._id)
-      .populate({
-        path: 'streetpassVisitors.user',
-        select: 'username customGlyph avatar'
-      });
-    
+    // Find the user
+    const user = await User.findById(req.user._id);
+
     // Get recent visitors
-    const visitors = user.streetpassVisitors
+    let visitors = user.streetpassVisitors
       .sort((a, b) => b.timestamp - a.timestamp)
       .slice(0, 10);
+
+    // Fetch visitor user data
+    const visitorIds = visitors.map(v => v.user);
+    const visitorUsers = await User.findByIds(visitorIds);
+    const visitorMap = {};
+    visitorUsers.forEach(u => {
+      visitorMap[u.id] = u;
+    });
+    visitors = visitors.map(v => ({
+      ...v,
+      user: visitorMap[v.user] || v.user
+    }));
     
     // User's items in the Scrapyard
     const userItems = await ScrapyardItem.find({ creator: user._id })
@@ -99,21 +107,22 @@ router.get('/:username', async (req, res) => {
         return []; // Return empty array instead of failing
       });
     
-    // Populate streetpass visitors with error handling
-    try {
-      await profileUser.populate({
-        path: 'streetpassVisitors.user',
-        select: 'username customGlyph avatar'
-      });
-    } catch (err) {
-      console.error('Failed to populate visitors:', err);
-      profileUser.streetpassVisitors = [];
-    }
-    
     // Get recent visitors
-    const visitors = profileUser.streetpassVisitors
+    let visitors = profileUser.streetpassVisitors
       .sort((a, b) => b.timestamp - a.timestamp)
       .slice(0, 10);
+
+    // Fetch visitor user data
+    const visitorIds = visitors.map(v => v.user);
+    const visitorUsers = await User.findByIds(visitorIds);
+    const visitorMap = {};
+    visitorUsers.forEach(u => {
+      visitorMap[u.id] = u;
+    });
+    visitors = visitors.map(v => ({
+      ...v,
+      user: visitorMap[v.user] || v.user
+    }));
     
     res.render('profile/view', {
       title: `${profileUser.displayName} - Wirebase Profile`,

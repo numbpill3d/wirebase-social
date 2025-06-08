@@ -443,6 +443,39 @@ class User {
   }
 
   /**
+   * Find multiple users by their IDs
+   * @param {Array<string>} ids - Array of user IDs
+   * @returns {Promise<Array>} - Array of user objects
+   */
+  static async findByIds(ids = []) {
+    try {
+      if (!ids.length) {
+        return [];
+      }
+
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, username, display_name, avatar, custom_glyph')
+        .in('id', ids);
+
+      if (error) {
+        throw error;
+      }
+
+      return data.map(row => ({
+        id: row.id,
+        username: row.username,
+        displayName: row.display_name,
+        avatar: row.avatar,
+        customGlyph: row.custom_glyph
+      }));
+    } catch (error) {
+      console.error('Error finding users by IDs:', error);
+      return [];
+    }
+  }
+
+  /**
    * Find recent users
    * @param {number} limit - Maximum number of users to return
    * @returns {Promise<Array>} - Array of recent users
