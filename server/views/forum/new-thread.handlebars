@@ -66,6 +66,7 @@
       {{/if}}
 
       <form action="/forum/new" method="POST" id="new-thread-form">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="form-group">
           <label for="title">Thread Title</label>
           <input type="text" id="title" name="title" class="cyber-input" value="{{formData.title}}" required maxlength="100">

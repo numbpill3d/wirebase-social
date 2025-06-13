@@ -1,9 +1,21 @@
 /**
- * Placeholder function for initializing notifications.
- * TODO: Implement actual notification initialization logic.
+ * Setup the notification system for the market.
+ * Creates a toast container used by showNotification.
  */
 function initializeNotifications() {
-  console.warn('initializeNotifications function called, but not implemented.');
+  let container = document.querySelector('.toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.className = 'toast-container';
+    container.style.position = 'fixed';
+    container.style.bottom = '20px';
+    container.style.right = '20px';
+    container.style.zIndex = '1000';
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = '10px';
+    document.body.appendChild(container);
+  }
 }
 /**
  * Vivid Market JavaScript
@@ -217,26 +229,29 @@ function initializeItemPreviews() {
  * @param {string} type - Notification type (success, error, info)
  */
 function showNotification(message, type = 'info') {
-  // Create notification element if it doesn't exist
-  let notification = document.querySelector('.notification');
-  if (!notification) {
-    notification = document.createElement('div');
-    notification.className = 'notification';
-    document.body.appendChild(notification);
+  // Ensure notification system is initialized
+  let container = document.querySelector('.toast-container');
+  if (!container) {
+    initializeNotifications();
+    container = document.querySelector('.toast-container');
   }
 
-  // Set notification content and type
-  notification.textContent = message;
+  const notification = document.createElement('div');
   notification.className = `notification ${type}`;
+  notification.textContent = message;
+  container.appendChild(notification);
 
   // Show notification
-  setTimeout(() => {
+  requestAnimationFrame(() => {
     notification.classList.add('show');
-  }, 10);
+  });
 
-  // Hide notification after 3 seconds
+  // Hide and remove notification after 3 seconds
   setTimeout(() => {
     notification.classList.remove('show');
+    const removeFn = () => notification.remove();
+    notification.addEventListener('transitionend', removeFn, { once: true });
+    setTimeout(removeFn, 300); // fallback if transition event doesn't fire
   }, 3000);
 }
 

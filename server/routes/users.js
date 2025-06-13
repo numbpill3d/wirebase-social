@@ -3,15 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const passport = require('passport');
 const User = require('../models/User');
-
-// Middleware to ensure user is authenticated
-const ensureAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  req.flash('error_msg', 'Please log in to view this resource');
-  res.redirect('/users/login');
-};
+const { ensureAuthenticated } = require('../utils/auth-helpers');
 
 // Login page
 router.get('/login', (req, res) => {
@@ -36,7 +28,7 @@ router.get('/register', (req, res) => {
 });
 
 // Handle user registration
-router.post('/register', async (req, res) => {
+router.post('/register', async (req, res, next) => {
   const { username, email, password, password2, displayName, customGlyph, statusMessage } = req.body;
   const errors = [];
 
@@ -60,7 +52,7 @@ router.post('/register', async (req, res) => {
     errors.push({ msg: 'Username must be between 3 and 20 characters' });
   }
 
-  if (username && !/^[a-zA-Z0-9_-]+$/.test(username)) {
+  if (username && !/^[a-zA-Z0-9_-]+$/u.test(username)) {
     errors.push({ msg: 'Username can only contain letters, numbers, underscores, and hyphens' });
   }
 
@@ -124,12 +116,7 @@ router.post('/register', async (req, res) => {
     res.redirect('/users/login');
   } catch (err) {
     console.error(err);
-    res.status(500).render('error', {
-      title: 'Server Error',
-      errorCode: 500,
-      message: 'Registration error occurred',
-      theme: 'broken-window'
-    });
+    next(err);
   }
 });
 
@@ -160,7 +147,7 @@ router.get('/forgot-password', (req, res) => {
 });
 
 // Handle password reset request
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', async (req, res, next) => {
   const { email } = req.body;
   
   try {
@@ -171,12 +158,7 @@ router.post('/forgot-password', async (req, res) => {
     res.redirect('/users/login');
   } catch (err) {
     console.error(err);
-    res.status(500).render('error', {
-      title: 'Server Error',
-      errorCode: 500,
-      message: 'Error processing password reset',
-      theme: 'broken-window'
-    });
+    next(err);
   }
 });
 
@@ -190,7 +172,7 @@ router.get('/settings', ensureAuthenticated, (req, res) => {
 });
 
 // Update account settings
-router.post('/settings', ensureAuthenticated, async (req, res) => {
+router.post('/settings', ensureAuthenticated, async (req, res, next) => {
   const { displayName, email, statusMessage, customGlyph } = req.body;
   
   try {
@@ -212,17 +194,12 @@ router.post('/settings', ensureAuthenticated, async (req, res) => {
     res.redirect('/users/settings');
   } catch (err) {
     console.error(err);
-    res.status(500).render('error', {
-      title: 'Server Error',
-      errorCode: 500,
-      message: 'Error updating account settings',
-      theme: 'broken-window'
-    });
+    next(err);
   }
 });
 
 // Change password
-router.post('/change-password', ensureAuthenticated, async (req, res) => {
+router.post('/change-password', ensureAuthenticated, async (req, res, next) => {
   const { currentPassword, newPassword, confirmPassword } = req.body;
   const errors = [];
   
@@ -269,12 +246,7 @@ router.post('/change-password', ensureAuthenticated, async (req, res) => {
     res.redirect('/users/settings');
   } catch (err) {
     console.error(err);
-    res.status(500).render('error', {
-      title: 'Server Error',
-      errorCode: 500,
-      message: 'Error updating password',
-      theme: 'broken-window'
-    });
+    next(err);
   }
 });
 

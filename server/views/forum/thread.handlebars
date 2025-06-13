@@ -145,6 +145,7 @@
         </div>
         <div class="cyber-window-content">
           <form action="/forum/thread/{{threadId}}/reply" method="POST">
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
             <!-- WYSIWYG Editor -->
             <div class="wysiwyg-editor">
               <div class="wysiwyg-toolbar">

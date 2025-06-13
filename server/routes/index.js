@@ -123,7 +123,7 @@ router.get('/about', (req, res) => {
 // Global discovery feed
 router.get('/discover', async (req, res) => {
   try {
-    console.log('Discover route accessed');
+    if (process.env.DEBUG) console.log('Discover route accessed');
     // Validate and sanitize pagination params
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.min(50, parseInt(req.query.limit) || 20);
@@ -170,7 +170,7 @@ router.get('/discover', async (req, res) => {
 
     const totalPages = Math.ceil(Math.max(userCount, itemCount) / limit);
 
-    console.log('Attempting to render discover template');
+    if (process.env.DEBUG) console.log('Attempting to render discover template');
     res.render('discover', {
       title: 'Discover - Wirebase',
       updates,

@@ -18,7 +18,7 @@ async function createForumTables() {
       // Table doesn't exist, create it
       console.log('Creating forum_threads table...');
       
-      await supabaseAdmin.query(`
+      await supabaseAdmin.rpc('execute_sql', { sql: `
         CREATE TABLE forum_threads (
           id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
           title TEXT NOT NULL,
@@ -38,7 +38,7 @@ async function createForumTables() {
         CREATE INDEX idx_forum_threads_creator_id ON forum_threads(creator_id);
         CREATE INDEX idx_forum_threads_created_at ON forum_threads(created_at);
         CREATE INDEX idx_forum_threads_updated_at ON forum_threads(updated_at);
-      `);
+      ` });
       
       console.log('forum_threads table created successfully!');
     } else {
@@ -55,7 +55,7 @@ async function createForumTables() {
       // Table doesn't exist, create it
       console.log('Creating forum_replies table...');
       
-      await supabaseAdmin.query(`
+      await supabaseAdmin.rpc('execute_sql', { sql: `
         CREATE TABLE forum_replies (
           id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
           thread_id UUID NOT NULL REFERENCES forum_threads(id) ON DELETE CASCADE,
@@ -69,7 +69,7 @@ async function createForumTables() {
         CREATE INDEX idx_forum_replies_thread_id ON forum_replies(thread_id);
         CREATE INDEX idx_forum_replies_creator_id ON forum_replies(creator_id);
         CREATE INDEX idx_forum_replies_created_at ON forum_replies(created_at);
-      `);
+      ` });
       
       console.log('forum_replies table created successfully!');
     } else {
@@ -86,7 +86,7 @@ async function createForumTables() {
       // Table doesn't exist, create it
       console.log('Creating forum_categories table...');
       
-      await supabaseAdmin.query(`
+      await supabaseAdmin.rpc('execute_sql', { sql: `
         CREATE TABLE forum_categories (
           id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
           name TEXT NOT NULL UNIQUE,
@@ -96,10 +96,10 @@ async function createForumTables() {
           created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
           updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
         );
-        
+
         -- Create index
         CREATE INDEX idx_forum_categories_display_order ON forum_categories(display_order);
-      `);
+      ` });
       
       // Insert default categories
       await supabaseAdmin.from('forum_categories').insert([
