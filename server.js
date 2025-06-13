@@ -32,70 +32,15 @@ const multer = require('multer');
 const fs = require('fs');
 const { supabase, supabaseAdmin } = require('./server/utils/database');
 
-// Configure Knex with optimized connection pooling and better error handling
-// Make knex instance globally available for utilities
-global.knex = require('knex')({
-  client: 'pg',
-  connection: {
-    host: new URL(process.env.SUPABASE_URL).hostname,
-    port: 5432,
-    user: 'postgres',
-    password: process.env.SUPABASE_SERVICE_KEY.split('.')[0],
-    database: 'postgres',
-    ssl: { rejectUnauthorized: false }
-  },
-  pool: {
-    min: 0, // Start with no connections
-    max: 5, // Reduced max connections to prevent pool exhaustion
-    // Add connection timeout handling
-    acquireTimeoutMillis: 60000, // Increased to 60 seconds
-    createTimeoutMillis: 60000, // Increased to 60 seconds
-    idleTimeoutMillis: 60000, // Reduced to 1 minute to release idle connections faster
-    // Add automatic reconnection
-    afterCreate: (conn, done) => {
-      conn.query('SELECT 1', err => {
-        if (err) {
-          console.error('Error in database connection afterCreate:', err);
-          done(err, conn);
-        } else {
-          console.log('Database connection established in afterCreate');
-          done(null, conn);
-        }
-      });
-    },
-    // Add destroy handler to ensure connections are properly closed
-    destroyTimeoutMillis: 5000, // 5 seconds to wait for connections to close
-  },
-  // Add better error handling
-  acquireConnectionTimeout: 60000 // Increased to 60 seconds
-});
-
-// Add better error handling with detailed logging
-global.knex.on('error', (err) => {
-  console.error('Unexpected database error:', err);
-  console.error('Error details:', {
-    code: err.code,
-    message: err.message,
-    stack: err.stack,
-    timestamp: new Date().toISOString()
-  });
-
-  // Log error but don't exit process in production to maintain uptime
-  if (process.env.NODE_ENV !== 'production') {
-    process.exit(-1);
-  }
-});
 
 // Verify database connection with retry logic
 const verifyDatabaseConnection = async (retries = 5, delay = 5000) => {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      // Try using Supabase first
+      // Check Supabase connection
       const { data, error } = await supabase.from('users').select('id').limit(1);
-      if (error) {
-        // If Supabase fails, try Knex as fallback
-        await global.knex.raw('SELECT 1');
-      }
+      if (error) throw error;
+      
       console.log('Database connection established successfully');
       return true;
     } catch (err) {
@@ -109,7 +54,6 @@ const verifyDatabaseConnection = async (retries = 5, delay = 5000) => {
         // Don't exit in production to maintain service availability
         if (process.env.NODE_ENV !== 'production') {
           console.warn('Database connection failed in development mode. Check your database configuration.');
-          // Don't exit to allow for mock data or fallback mechanisms
         }
         return false;
       }
@@ -189,23 +133,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// Session configuration with Knex store - optimized settings
-const store = new KnexSessionStore({
-  knex: global.knex, // Use the same knex instance to avoid creating multiple pools
-  tablename: 'sessions',
-  createtable: true,
-  // Fix potential memory leak with proper cleanup
+// Session configuration with Supabase
+const SupabaseSessionStore = require('./server/utils/supabase-session-store')(session);
+const store = new SupabaseSessionStore({
+  supabase: supabaseAdmin,
+  tableName: 'sessions',
+  createTable: true,
   clearInterval: 86400000, // Clear expired sessions daily (24 hours)
-  sidfieldname: 'sid',
-  // Performance optimizations
-  disableKeepExtensions: true, // Disable extensions to reduce DB load
-  disableReaper: false, // Keep reaper to clean up old sessions
-  reapInterval: 43200000, // Reap every 12 hours (reduced frequency further)
-  reapMaxConcurrent: 1, // Reduce to 1 concurrent delete operation
-  // Serialize/deserialize function options
-  serializer: JSON.stringify,
-  deserializer: JSON.parse
-  // Remove separate pool configuration to use the main knex pool
+  reapInterval: 43200000, // Reap every 12 hours
+  reapMaxConcurrent: 1
 });
 
 app.use(session({
@@ -300,26 +236,11 @@ app.use((req, res, next) => {
   next();
 });
 
-// Import database utilities
-const dbMonitor = require('./server/utils/db-monitor');
+// Import health check utility
 const dbHealth = require('./server/utils/db-health');
-const dbErrorHandler = require('./server/utils/db-error-handler');
-const dbLeakDetector = require('./server/utils/db-leak-detector');
-const { queryTimeoutMiddleware, transactionTimeoutMiddleware } = require('./server/middleware/query-timeout');
 
-// Initialize database utilities with knex instance
-dbMonitor.initialize(global.knex);
-dbHealth.initialize(global.knex);
-dbErrorHandler.initialize(global.knex);
-dbLeakDetector.initialize(global.knex);
-
-// Setup pool monitoring after initialization
-dbMonitor.setupPoolMonitoring();
-
-// Apply database middleware with knex instance
-app.use(queryTimeoutMiddleware(global.knex, 30000)); // 30 second query timeout
-app.use(transactionTimeoutMiddleware(global.knex, 60000)); // 60 second transaction timeout
-app.use(dbErrorHandler.errorHandlerMiddleware());
+// Start health checks
+dbHealth.startPeriodicHealthChecks();
 
 // Routes
 app.use('/', require('./server/routes/index'));
@@ -387,31 +308,20 @@ process.on('uncaughtException', (error) => {
   }
 });
 
-// Graceful shutdown function to properly close database connections
+// Graceful shutdown function
 const gracefulShutdown = async () => {
   console.log('Shutting down gracefully...');
 
   try {
-    // Stop health checks and leak detection
+    // Stop health checks
     console.log('Stopping database monitoring...');
     clearInterval(healthCheckTimer);
-    clearInterval(leakDetectionTimers.checkTimer);
-    clearInterval(leakDetectionTimers.fixTimer);
-
-    // Fix any connection leaks before shutdown
-    console.log('Checking for connection leaks before shutdown...');
-    await dbLeakDetector.fixLeaks(true);
 
     // Close server to stop accepting new connections
     console.log('Closing HTTP server...');
     await new Promise((resolve) => {
       server.close(resolve);
     });
-
-    // Close database connections
-    console.log('Closing database connections...');
-    await global.knex.destroy();
-    console.log('Database connections closed successfully');
 
     // Exit process
     console.log('Shutdown complete');
@@ -434,24 +344,14 @@ let leakDetectionTimers;
 const server = app.listen(PORT, () => {
   console.log(`Wirebase server running in ${NODE_ENV} mode on port ${PORT}`);
 
-  // Start database monitoring after server starts
-  console.log('Starting database monitoring...');
-
   // Start health checks (every 60 seconds)
   healthCheckTimer = dbHealth.startPeriodicHealthChecks(60000);
-
-  // Start leak detection (check every 30 seconds, fix every 5 minutes)
-  leakDetectionTimers = dbLeakDetector.startLeakDetection(null, 30000, 300000);
 });
 
 // Add server timeout to prevent hanging connections
 server.timeout = 120000; // 2 minutes
 
-// Export knex instance and monitoring utilities for use in other modules
+// Export health check utility for use in other modules
 module.exports = {
-  knex: global.knex,
-  dbMonitor,
-  dbHealth,
-  dbErrorHandler,
-  dbLeakDetector
+  dbHealth
 };

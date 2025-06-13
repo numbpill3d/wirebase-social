@@ -1,8 +1,12 @@
 // Main server file for Wirebase
-const dotenv = require('dotenv');
-
-// Load environment variables first
-dotenv.config();
+try {
+  // Try to load dotenv if available
+  const dotenv = require('dotenv');
+  dotenv.config();
+  console.log('Environment variables loaded from .env file');
+} catch (err) {
+  console.warn('dotenv module not found, using existing environment variables');
+}
 
 // Import performance optimization utilities
 const {
@@ -28,55 +32,15 @@ const multer = require('multer');
 const fs = require('fs');
 const { supabase, supabaseAdmin } = require('./server/utils/database');
 
-// Configure Knex with connection pooling and better error handling
-const knex = require('knex')({
-  client: 'pg',
-  connection: process.env.DATABASE_URL || {
-    host: new URL(process.env.SUPABASE_URL).hostname,
-    port: 5432,
-    user: 'postgres',
-    password: process.env.SUPABASE_SERVICE_KEY.split('.')[0],
-    database: 'postgres',
-    ssl: { rejectUnauthorized: false }
-  },
-  pool: {
-    min: 2,
-    max: 20,
-    // Add connection timeout handling
-    acquireTimeoutMillis: 60000,
-    createTimeoutMillis: 30000,
-    idleTimeoutMillis: 600000, // 10 minutes
-    // Add automatic reconnection
-    afterCreate: (conn, done) => {
-      conn.query('SELECT 1', err => {
-        if (err) {
-          console.error('Error in database connection afterCreate:', err);
-          done(err, conn);
-        } else {
-          console.log('Database connection established in afterCreate');
-          done(null, conn);
-        }
-      });
-    }
-  },
-  // Add better error handling
-  acquireConnectionTimeout: 60000 // 60 seconds
-});
-
-// Add better error handling
-knex.on('error', (err) => {
-  console.error('Unexpected database error:', err);
-  // Log error but don't exit process in production to maintain uptime
-  if (process.env.NODE_ENV !== 'production') {
-    process.exit(-1);
-  }
-});
 
 // Verify database connection with retry logic
 const verifyDatabaseConnection = async (retries = 5, delay = 5000) => {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      await knex.raw('SELECT 1');
+      // Check Supabase connection
+      const { data, error } = await supabase.from('users').select('id').limit(1);
+      if (error) throw error;
+      
       console.log('Database connection established successfully');
       return true;
     } catch (err) {
@@ -87,9 +51,9 @@ const verifyDatabaseConnection = async (retries = 5, delay = 5000) => {
         await new Promise(resolve => setTimeout(resolve, delay));
       } else {
         console.error('All database connection attempts failed');
-        // Only exit in development to assist with debugging
+        // Don't exit in production to maintain service availability
         if (process.env.NODE_ENV !== 'production') {
-          process.exit(-1);
+          console.warn('Database connection failed in development mode. Check your database configuration.');
         }
         return false;
       }
@@ -169,44 +133,33 @@ app.use((req, res, next) => {
   next();
 });
 
-// Session configuration with Knex store - optimized settings
-const store = new KnexSessionStore({
-  knex,
-  tablename: 'sessions',
-  createtable: true,
-  // Fix potential memory leak with proper cleanup
+// Session configuration with Supabase
+const SupabaseSessionStore = require('./server/utils/supabase-session-store')(session);
+const store = new SupabaseSessionStore({
+  supabase: supabaseAdmin,
+  tableName: 'sessions',
+  createTable: true,
   clearInterval: 86400000, // Clear expired sessions daily (24 hours)
-  sidfieldname: 'sid',
-  // Performance optimizations
-  disableKeepExtensions: true, // Disable extensions to reduce DB load
-  disableReaper: false, // Keep reaper to clean up old sessions
-  reapInterval: 7200000, // Reap every 2 hours
-  reapMaxConcurrent: 5, // Reduce concurrent delete operations
-  // Serialize/deserialize function options
-  serializer: JSON.stringify,
-  deserializer: JSON.parse,
-  // Add connection pool settings specific to session store
-  pool: {
-    min: 1,
-    max: 5
-  }
+  reapInterval: 43200000, // Reap every 12 hours
+  reapMaxConcurrent: 1
 });
 
 app.use(session({
   store: store,
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || 'wirebase-dev-secret',
   resave: false,
   saveUninitialized: false, // Only save sessions when necessary
   rolling: false, // Disable rolling to reduce database writes
   name: 'wirebase.sid', // Custom cookie name for better security
   cookie: {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days (reduced from 30)
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    httpOnly: true // Prevent client-side JS from accessing cookie
+    httpOnly: true, // Prevent client-side JS from accessing cookie
+    path: '/'
   },
   // Add touch option to reduce database writes
-  touchAfter: 24 * 3600 // Only update session once per day instead of on every request
+  touchAfter: 24 * 3600 // Only update session once per day
 }));
 
 // Initialize passport for authentication
@@ -215,7 +168,7 @@ app.use(passport.session());
 
 // Setup file storage for user uploads
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
+  destination: function (req, _file, cb) {
     const userId = req.user ? req.user.id : 'anonymous';
     // Use tmp directory for Render compatibility
     const baseDir = process.env.NODE_ENV === 'production' ? '/tmp' : __dirname;
@@ -242,7 +195,7 @@ const storage = multer.diskStorage({
       }
     }
   },
-  filename: function (req, file, cb) {
+  filename: function (_req, file, cb) {
     // Add file type validation
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
     if (!allowedTypes.includes(file.mimetype)) {
@@ -283,6 +236,12 @@ app.use((req, res, next) => {
   next();
 });
 
+// Import health check utility
+const dbHealth = require('./server/utils/db-health');
+
+// Start health checks
+dbHealth.startPeriodicHealthChecks();
+
 // Routes
 app.use('/', require('./server/routes/index'));
 app.use('/users', require('./server/routes/users'));
@@ -290,9 +249,20 @@ app.use('/profile', require('./server/routes/profile'));
 app.use('/scrapyard', require('./server/routes/scrapyard'));
 app.use('/feed', require('./server/routes/feed'));
 app.use('/api', require('./server/routes/api'));
+app.use('/forum', require('./server/routes/forum'));
+app.use('/admin/api', require('./server/routes/admin-api'));
+
+// Vivid Market routes
+app.use('/market', require('./server/routes/market'));
+app.use('/market/user', require('./server/routes/user-market'));
+app.use('/api/market', require('./server/routes/market-api'));
 
 // 404 handler
-app.use((req, res, next) => {
+app.use((req, res) => {
+  console.log('404 Not Found:', req.method, req.url);
+  console.log('Referrer:', req.get('Referrer') || 'None');
+  console.log('User Agent:', req.get('User-Agent'));
+
   res.status(404).render('error', {
     title: '404 - Page Not Found',
     errorCode: 404,
@@ -303,7 +273,16 @@ app.use((req, res, next) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('Server Error:', err.name, err.message);
+  console.error('Error Stack:', err.stack);
+  console.error('Request URL:', req.method, req.url);
+  console.error('Request Headers:', JSON.stringify(req.headers, null, 2));
+
+  // Check if headers have already been sent
+  if (res.headersSent) {
+    return next(err);
+  }
+
   res.status(500).render('error', {
     title: '500 - Server Error',
     errorCode: 500,
@@ -325,11 +304,75 @@ process.on('uncaughtException', (error) => {
   if (process.env.NODE_ENV === 'production') {
     // In production, gracefully shut down to prevent undefined state
     console.error('Shutting down due to uncaught exception');
-    process.exit(1);
+    gracefulShutdown();
   }
 });
 
+// Graceful shutdown function to properly close database connections
+const gracefulShutdown = async () => {
+  console.log('Shutting down gracefully...');
+
+  try {
+    // Stop health checks and leak detection
+    console.log('Stopping database monitoring...');
+    clearInterval(healthCheckTimer);
+    clearInterval(leakDetectionTimers.checkTimer);
+    clearInterval(leakDetectionTimers.fixTimer);
+
+    // Fix any connection leaks before shutdown
+    console.log('Checking for connection leaks before shutdown...');
+    await dbLeakDetector.fixLeaks(true);
+
+    // Close server to stop accepting new connections
+    console.log('Closing HTTP server...');
+    await new Promise((resolve) => {
+      server.close(resolve);
+    });
+
+    // Close database connections
+    console.log('Closing database connections...');
+    await global.knex.destroy();
+    console.log('Database connections closed successfully');
+
+    // Exit process
+    console.log('Shutdown complete');
+    process.exit(0);
+  } catch (err) {
+    console.error('Error during graceful shutdown:', err);
+    process.exit(1);
+  }
+};
+
+// Handle termination signals
+process.on('SIGTERM', gracefulShutdown);
+process.on('SIGINT', gracefulShutdown);
+
+// Initialize timers for health checks and leak detection
+let healthCheckTimer;
+let leakDetectionTimers;
+
 // Start server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Wirebase server running in ${NODE_ENV} mode on port ${PORT}`);
+
+  // Start database monitoring after server starts
+  console.log('Starting database monitoring...');
+
+  // Start health checks (every 60 seconds)
+  healthCheckTimer = dbHealth.startPeriodicHealthChecks(60000);
+
+  // Start leak detection (check every 30 seconds, fix every 5 minutes)
+  leakDetectionTimers = dbLeakDetector.startLeakDetection(null, 30000, 300000);
 });
+
+// Add server timeout to prevent hanging connections
+server.timeout = 120000; // 2 minutes
+
+// Export knex instance and monitoring utilities for use in other modules
+module.exports = {
+  knex: global.knex,
+  dbMonitor,
+  dbHealth,
+  dbErrorHandler,
+  dbLeakDetector
+};
