@@ -10,9 +10,12 @@ router.get('/login', (req, res) => {
   if (req.isAuthenticated()) {
     return res.redirect('/profile');
   }
+  const errorMsg = req.flash('error')[0] || req.flash('error_msg')[0];
   res.render('users/login', {
     title: 'Login - Wirebase',
-    pageTheme: 'dark-dungeon'
+    pageTheme: 'dark-dungeon',
+    error_msg: errorMsg,
+    email: req.flash('email')[0]
   });
 });
 
@@ -122,10 +125,17 @@ router.post('/register', async (req, res, next) => {
 
 // Handle login process
 router.post('/login', (req, res, next) => {
-  passport.authenticate('local', {
-    successRedirect: '/profile',
-    failureRedirect: '/users/login',
-    failureFlash: true
+  passport.authenticate('local', (err, user, info) => {
+    if (err) { return next(err); }
+    if (!user) {
+      req.flash('error_msg', info && info.message ? info.message : 'Invalid credentials');
+      req.flash('email', req.body.email);
+      return res.redirect('/users/login');
+    }
+    req.logIn(user, (loginErr) => {
+      if (loginErr) { return next(loginErr); }
+      return res.redirect('/profile');
+    });
   })(req, res, next);
 });
 

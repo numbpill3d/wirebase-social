@@ -107,7 +107,10 @@ router.post('/edit/html', ensureAuthenticated, async (req, res, next) => {
     const { profileHtml } = req.body;
     
     // Update the user's profile HTML
-    await User.findByIdAndUpdate(req.user.id, { profileHtml });
+    const updated = await User.findByIdAndUpdate(req.user.id, { profileHtml });
+    if (updated) {
+      req.user = { ...req.user, ...updated };
+    }
     
     req.flash('success_msg', 'Profile HTML updated successfully');
     res.redirect('/profile');
@@ -132,7 +135,10 @@ router.post('/edit/css', ensureAuthenticated, async (req, res, next) => {
     const { profileCss } = req.body;
     
     // Update the user's profile CSS
-    await User.findByIdAndUpdate(req.user.id, { profileCss });
+    const updated = await User.findByIdAndUpdate(req.user.id, { profileCss });
+    if (updated) {
+      req.user = { ...req.user, ...updated };
+    }
     
     req.flash('success_msg', 'Profile CSS updated successfully');
     res.redirect('/profile');
@@ -140,6 +146,23 @@ router.post('/edit/css', ensureAuthenticated, async (req, res, next) => {
     console.error(err);
     next(err);
   }
+});
+
+// Edit theme
+router.get('/edit/theme', ensureAuthenticated, (req, res) => {
+  res.render('profile/edit-theme', {
+    title: 'Edit Theme - Wirebase',
+    currentTheme: req.session.theme || 'dark-dungeon',
+    pageTheme: 'retro-windows'
+  });
+});
+
+// Save theme selection
+router.post('/edit/theme', ensureAuthenticated, (req, res) => {
+  const { theme } = req.body;
+  req.session.theme = theme;
+  req.flash('success_msg', 'Theme updated successfully');
+  res.redirect('/profile');
 });
 
 // Terminal mode for profile editing
