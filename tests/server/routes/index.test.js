@@ -29,6 +29,14 @@ jest.mock('../../../server/models/ScrapyardItem', () => ({
   countDocuments: jest.fn().mockResolvedValue(2)
 }));
 
+jest.mock('../../../server/models/Thread', () => ({
+  countDocuments: jest.fn().mockResolvedValue(5)
+}));
+
+jest.mock('../../../server/models/Reply', () => ({
+  countDocuments: jest.fn().mockResolvedValue(10)
+}));
+
 // Mock express-handlebars
 jest.mock('express-handlebars', () => ({
   engine: () => jest.fn()
