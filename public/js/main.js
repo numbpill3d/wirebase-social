@@ -46,6 +46,13 @@ function setupCyberElements() {
     const windowControls = document.querySelectorAll('.cyber-window-control');
 
     windowControls.forEach(control => {
+        if (control.tagName !== 'BUTTON') {
+            control.setAttribute('role', 'button');
+            control.setAttribute('tabindex', '0');
+        }
+    });
+
+    windowControls.forEach(control => {
         control.addEventListener('mousedown', function() {
             playSound('click');
 
@@ -287,10 +294,8 @@ function setupCyberEffects() {
     // Temporarily disable custom page transitions to fix navigation issues
     document.querySelectorAll('a:not([data-no-transition])').forEach(link => {
         if (link.href && link.href.indexOf(window.location.hostname) !== -1) {
-            console.log('Adding standard navigation to link:', link.href);
             link.addEventListener('click', function() {
                 // Don't prevent default - let the browser handle navigation normally
-                console.log('Navigation link clicked, using default browser navigation:', this.href);
                 try {
                     playSound('click');
                 } catch (soundErr) {
@@ -647,7 +652,6 @@ function showConnectionNotification() {
  */
 function recordEmote(emote) {
     // In a real app, this would send the data to the server
-    console.log(`Recorded emote: ${emote}`);
 
     // Show notification that emote was recorded
     const toast = document.createElement('div');
@@ -953,12 +957,10 @@ function setupCustomCursors() {
  * Play a sound effect
  */
 function playSound(sound) {
-    console.log('playSound called with:', sound);
 
     // Check if sound is enabled in settings
     const soundEnabled = localStorage.getItem('soundEffects') !== 'disabled';
     if (!soundEnabled) {
-        console.log('Sound effects are disabled in settings, returning early');
         return;
     }
 
@@ -972,14 +974,11 @@ function playSound(sound) {
 
     // Play the sound if it exists
     if (sounds[sound]) {
-        console.log('Sound exists in library, creating Audio object for:', sounds[sound]);
         try {
             const audio = new Audio(sounds[sound]);
             audio.volume = 0.5; // 50% volume
-            console.log('Audio object created, attempting to play...');
 
             audio.play().catch(e => {
-                console.log('Sound playback prevented:', e);
                 // Don't show errors for autoplay restrictions - these are expected
                 if (!e.message.includes('user didn\'t interact')) {
                     console.error('Showing error toast for sound issue:', e.message);
