@@ -411,9 +411,14 @@ function initializeItemHtmlViewer() {
 
       try {
         const response = await fetch(`/api/market/items/${itemId}`);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
 
-        if (!response.ok || !data.success) {
+        if (!data.success) {
           throw new Error(data.message || 'Error loading item');
         }
 
