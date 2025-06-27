@@ -167,6 +167,10 @@ router.get('/settings', ensureAuthenticated, (req, res) => {
   res.render('users/settings', {
     title: 'Account Settings - Wirebase',
     user: req.user,
+    displayName: req.user.displayName,
+    email: req.user.email,
+    customGlyph: req.user.customGlyph,
+    statusMessage: req.user.statusMessage,
     pageTheme: 'dark-dungeon'
   });
 });
@@ -174,22 +178,55 @@ router.get('/settings', ensureAuthenticated, (req, res) => {
 // Update account settings
 router.post('/settings', ensureAuthenticated, async (req, res, next) => {
   const { displayName, email, statusMessage, customGlyph } = req.body;
-  
+  const errors = [];
+
+  // Validate inputs
+  if (displayName && displayName.length < 3) {
+    errors.push({ msg: 'Display name must be at least 3 characters' });
+  }
+
+  if (email && !/^\S+@\S+\.\S+$/.test(email)) {
+    errors.push({ msg: 'Please enter a valid email address' });
+  }
+
+  if (customGlyph && customGlyph.length > 2) {
+    errors.push({ msg: 'Custom glyph must be at most 2 characters' });
+  }
+
+  // Check if new email already exists
+  if (email && email !== req.user.email) {
+    const existing = await User.findOne({ email });
+    if (existing) {
+      errors.push({ msg: 'Email is already registered' });
+    }
+  }
+
+  if (errors.length > 0) {
+    return res.render('users/settings', {
+      title: 'Account Settings - Wirebase',
+      user: req.user,
+      errors,
+      displayName,
+      email,
+      customGlyph,
+      statusMessage,
+      pageTheme: 'dark-dungeon'
+    });
+  }
+
   try {
-    // Prepare update data
     const updateData = {
       displayName: displayName || req.user.displayName,
       email: email || req.user.email,
       statusMessage: statusMessage || req.user.statusMessage
     };
-    
-    if (customGlyph && customGlyph.length <= 2) {
+
+    if (customGlyph) {
       updateData.customGlyph = customGlyph;
     }
-    
-    // Use Supabase method to update
+
     await User.findByIdAndUpdate(req.user.id, updateData);
-    
+
     req.flash('success_msg', 'Account settings updated');
     res.redirect('/users/settings');
   } catch (err) {
