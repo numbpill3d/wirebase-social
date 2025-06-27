@@ -405,7 +405,7 @@ function initializeItemHtmlViewer() {
     button.addEventListener('click', async function(e) {
       e.preventDefault();
 
-      const itemId = this.dataset.itemId;
+      const {itemId} = this.dataset;
       const modalId = this.dataset.modalTarget;
       if (!itemId) return;
 
