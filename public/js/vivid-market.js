@@ -435,7 +435,7 @@ function initializeItemHtmlViewer() {
               htmlEl.className = 'item-html-container';
               container.appendChild(htmlEl);
             }
-            htmlEl.innerHTML = htmlContent;
+            htmlEl.textContent = htmlContent;
           }
         }
       } catch (error) {
