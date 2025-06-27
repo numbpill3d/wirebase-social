@@ -423,7 +423,7 @@ function initializeItemHtmlViewer() {
           const modal = document.getElementById(modalId);
           if (modal) {
             const container = modal.querySelector('.item-html-container');
-            if (container) container.innerHTML = htmlContent;
+            if (container) container.textContent = htmlContent;
             modal.style.display = 'block';
           }
         } else {
