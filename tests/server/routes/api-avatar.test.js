@@ -37,7 +37,7 @@ beforeEach(() => {
       fs.mkdirSync(dir, { recursive: true });
       cb(null, dir);
     },
-    filename: (_req, file, cb) => cb(null, file.originalname)
+    filename: (_req, file, cb) => cb(null, Date.now() + '-' + file.originalname.replace(/[^a-zA-Z0-9.]/g, '_'))
   });
   const upload = multer({ storage });
   app.locals.upload = upload;
