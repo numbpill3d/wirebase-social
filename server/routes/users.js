@@ -159,17 +159,21 @@ router.get('/forgot-password', (req, res) => {
 // Handle password reset request
 router.post('/forgot-password', async (req, res, next) => {
   const { email } = req.body;
-  
+
   try {
-    const user = await User.findOne({ email });
-    
-    // Don't reveal if user exists or not for security
-    req.flash('success_msg', 'If an account with that email exists, a password reset link has been sent');
-    res.redirect('/users/login');
+    const { supabaseAdmin } = require('../utils/database');
+    // Request Supabase to send a password recovery email
+    await supabaseAdmin.auth.resetPasswordForEmail(email, {
+redirectTo: `${req.protocol}://${req.get('host')}/users/reset-password`
+    });
   } catch (err) {
     console.error(err);
-    next(err);
+    // Ignore errors to avoid revealing whether the email exists
   }
+
+  // Always show the same message for security
+  req.flash('success_msg', 'If an account with that email exists, a password reset link has been sent');
+  res.redirect('/users/login');
 });
 
 // Account settings page
