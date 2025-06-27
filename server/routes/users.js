@@ -122,10 +122,23 @@ router.post('/register', async (req, res, next) => {
 
 // Handle login process
 router.post('/login', (req, res, next) => {
-  passport.authenticate('local', {
-    successRedirect: '/profile',
-    failureRedirect: '/users/login',
-    failureFlash: true
+  passport.authenticate('local', (err, user, info) => {
+    if (err) { return next(err); }
+    if (!user) {
+      req.flash('error_msg', info?.message || 'Authentication failed');
+      return res.redirect('/users/login');
+    }
+    req.logIn(user, err => {
+      if (err) { return next(err); }
+      if (req.body.remember) {
+        // Persist session for 30 days when remember is checked
+        req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
+      } else {
+        // Session cookie expires on browser close
+        req.session.cookie.expires = false;
+      }
+      return res.redirect('/profile');
+    });
   })(req, res, next);
 });
 
