@@ -447,9 +447,12 @@
                             const formData = new FormData();
                             formData.append('avatar', fileInput.files[0]);
                             
+                            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
                             // Upload avatar
                             fetch('/api/user/avatar', {
                                 method: 'POST',
+                                headers: { 'CSRF-Token': csrfToken },
                                 body: formData
                             })
                             .then(response => response.json())

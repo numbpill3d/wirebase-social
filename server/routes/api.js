@@ -4,6 +4,7 @@ const User = require('../models/User');
 const ScrapyardItem = require('../models/ScrapyardItem');
 const MarketItem = require('../models/MarketItem');
 const Streetpass = require('../models/Streetpass');
+const path = require('path');
 
 // Middleware to ensure user is authenticated
 const ensureAuthenticated = (req, res, next) => {
@@ -256,6 +257,37 @@ router.put('/streetpass/emote', ensureAuthenticated, async (req, res) => {
       error: process.env.NODE_ENV !== 'production' ? error.message : 'Server error'
     });
   }
+});
+
+/**
+ * POST /api/user/avatar
+ * Upload a new avatar for the authenticated user
+ */
+router.post('/user/avatar', ensureAuthenticated, (req, res) => {
+  const upload = req.app.locals.upload;
+  upload.single('avatar')(req, res, async err => {
+    if (err) {
+      console.error('Avatar upload error:', err);
+      return res.status(400).json({ success: false, error: err.message });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'No file uploaded' });
+    }
+
+    try {
+      const relativePath = `/uploads/${req.user.id}/${req.file.filename}`;
+      await User.findByIdAndUpdate(req.user.id, { avatar: relativePath });
+      res.json({ success: true, avatarUrl: relativePath });
+    } catch (error) {
+      console.error('Error updating avatar:', error);
+      res.status(500).json({
+        success: false,
+        error:
+          process.env.NODE_ENV !== 'production' ? error.message : 'Server error'
+      });
+    }
+  });
 });
 
 // Health check endpoint
