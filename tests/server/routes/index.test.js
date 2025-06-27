@@ -29,6 +29,15 @@ jest.mock('../../../server/models/ScrapyardItem', () => ({
   countDocuments: jest.fn().mockResolvedValue(2)
 }));
 
+jest.mock('../../../server/models/Visit', () => ({
+  record: jest.fn().mockResolvedValue(),
+  getHourlyCounts: jest.fn().mockResolvedValue(
+    Array.from({ length: 24 }, (_, i) => ({ hour: i, count: 0 }))
+  )
+}));
+
+const Visit = require('../../../server/models/Visit');
+
 // Mock express-handlebars
 jest.mock('express-handlebars', () => ({
   engine: () => jest.fn()
@@ -55,13 +64,15 @@ describe('Index Routes', () => {
   describe('GET /', () => {
     it('should render the index page with correct data', async () => {
       const response = await request(app).get('/');
-      
+
       expect(response.status).toBe(200);
       expect(response.body.view).toBe('index');
       expect(response.body.options).toHaveProperty('title');
       expect(response.body.options).toHaveProperty('recentUsers');
       expect(response.body.options).toHaveProperty('recentItems');
       expect(response.body.options).toHaveProperty('featuredItems');
+      expect(Visit.record).toHaveBeenCalled();
+      expect(Visit.getHourlyCounts).toHaveBeenCalled();
     });
   });
 });
