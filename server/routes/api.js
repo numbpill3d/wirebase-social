@@ -277,7 +277,12 @@ router.post('/user/avatar', ensureAuthenticated, (req, res) => {
 
     try {
       const relativePath = `/uploads/${req.user.id}/${req.file.filename}`;
-      await User.findByIdAndUpdate(req.user.id, { avatar: relativePath });
+      const updatedUser = await User.findByIdAndUpdate(req.user.id, { avatar: relativePath }, { new: true });
+  
+      if (!updatedUser) {
+        return res.status(404).json({ success: false, error: 'User not found' });
+      }
+  
       res.json({ success: true, avatarUrl: relativePath });
     } catch (error) {
       console.error('Error updating avatar:', error);
