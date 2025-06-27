@@ -264,7 +264,7 @@ router.put('/streetpass/emote', ensureAuthenticated, async (req, res) => {
  * Upload a new avatar for the authenticated user
  */
 router.post('/user/avatar', ensureAuthenticated, (req, res) => {
-  const upload = req.app.locals.upload;
+  const {upload} = req.app.locals;
   upload.single('avatar')(req, res, async err => {
     if (err) {
       console.error('Avatar upload error:', err);
