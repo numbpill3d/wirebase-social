@@ -47,7 +47,10 @@ class Visit {
 
       const counts = Array.from({ length: 24 }, (_, i) => ({ hour: i, count: 0 }));
       data.forEach(row => {
-        counts[row.hour] = { hour: row.hour, count: parseInt(row.count, 10) };
+        const hour = parseInt(row.hour, 10);
+        if (hour >= 0 && hour < 24) {
+          counts[hour] = { hour, count: parseInt(row.count, 10) };
+        }
       });
 
       cache.set(cacheKey, counts, 300);
