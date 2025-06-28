@@ -231,7 +231,7 @@ class Reply {
     try {
       let supabaseQuery = supabase
         .from('forum_replies')
-        .select('id', { count: 'exact' });
+        .select('*', { count: 'exact', head: true });
 
       Object.entries(query).forEach(([key, value]) => {
         const snakeKey = key.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
