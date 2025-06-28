@@ -1,0 +1,40 @@
+{{!< layouts/main}}
+
+<div class="profile-edit-container">
+    <div class="cyber-window edit-window">
+        <div class="cyber-window-header">
+            <span class="cyber-window-title">Choose Theme</span>
+        </div>
+        <div class="cyber-window-content">
+            <form action="/profile/edit/theme" method="POST" id="theme-form">
+                <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                <div class="form-group">
+                    <label for="themeSelect">Theme</label>
+                    <select id="themeSelect" name="theme" class="cyber-select">
+                        <option value="dark-dungeon" {{#ifeq currentTheme "dark-dungeon"}}selected{{/ifeq}}>Dark Dungeon</option>
+                        <option value="retro-windows" {{#ifeq currentTheme "retro-windows"}}selected{{/ifeq}}>Retro Windows</option>
+                        <option value="broken-window" {{#ifeq currentTheme "broken-window"}}selected{{/ifeq}}>Broken Window</option>
+                        <option value="terminal" {{#ifeq currentTheme "terminal"}}selected{{/ifeq}}>Terminal</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <a href="/profile" class="cyber-button secondary">Cancel</a>
+                    <button type="submit" class="cyber-button">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="theme-preview cyber-window">
+        <div class="cyber-window-header">
+            <span class="cyber-window-title">Preview</span>
+        </div>
+        <div class="cyber-window-content">
+            <div class="preview-area theme-{{currentTheme}}">Theme Preview</div>
+        </div>
+    </div>
+</div>
+
+{{#* content "additionalScripts"}}
+    <script src="/js/profile-edit.js" defer></script>
+{{/content}}
