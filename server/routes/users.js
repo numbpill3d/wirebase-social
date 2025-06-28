@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const passport = require('passport');
 const User = require('../models/User');
 const { ensureAuthenticated } = require('../utils/auth-helpers');
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Login page
 router.get('/login', (req, res) => {
@@ -51,7 +52,6 @@ router.post('/register', async (req, res, next) => {
   }
 
   // Validate email format
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (email && !emailRegex.test(email)) {
     errors.push({ msg: 'Please enter a valid email address' });
   }
@@ -212,7 +212,6 @@ router.post('/settings', ensureAuthenticated, async (req, res, next) => {
   const errors = [];
 
 // Validate inputs
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 if (displayName && displayName.length < 3) {
   errors.push({ msg: 'Display name must be at least 3 characters' });
