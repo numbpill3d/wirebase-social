@@ -652,7 +652,7 @@ function showConnectionNotification() {
  */
 function recordEmote(emote, visitId) {
     fetch('/api/streetpass/emote', {
-        method: 'POST',
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
