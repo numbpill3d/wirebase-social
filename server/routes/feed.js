@@ -4,6 +4,7 @@ const { Feed } = require('feed');
 const User = require('../models/User');
 const ScrapyardItem = require('../models/ScrapyardItem');
 const { cache } = require('../utils/performance');
+const { supabase } = require('../utils/database');
 
 // Helper to get content type from format
 const getContentType = format => {
@@ -53,31 +54,33 @@ router.get('/', async (req, res, next) => {
     });
 
     // Get recent updates - both users and items
-    const [recentUsers, recentItems] = await Promise.all([
+    const [recentUsers, itemsRes] = await Promise.all([
       User.find()
         .sort({ lastActive: -1 })
         .limit(20)
         .select('username displayName avatar customGlyph statusMessage lastActive'),
-        
-const { data: items, error } = await supabase
-  .from('scrapyard_items')
-  .select(`
-    title,
-    category,
-    description,
-    previewImage,
-    createdAt,
-    creator:users (
-      username,
-      displayName,
-      avatar,
-      customGlyph
-    )
-  `)
-  .order('createdAt', { ascending: false })
-  .limit(20);
-
+      supabase
+        .from('scrapyard_items')
+        .select(`
+          *,
+          creator:creator (
+            id, username, display_name, avatar, custom_glyph
+          )
+        `)
+        .order('created_at', { ascending: false })
+        .limit(20)
     ]);
+
+    if (itemsRes.error) {
+        // Log the original error for debugging (optional, ensure logs are secure)
+        console.error('Supabase error in feed:', itemsRes.error);
+
+        // Throw a sanitized error to avoid leaking sensitive details
+        const err = new Error('Failed to fetch recent items.');
+        err.status = 500;
+        throw err;
+    }
+    const recentItems = (itemsRes.data || []).map(item => ScrapyardItem.formatItem(item));
 
     // Add recent user updates to feed
     recentUsers.forEach(user => {
@@ -249,17 +252,26 @@ router.get('/scrapyard/:category', async (req, res, next) => {
       }
     });
     
-    // Query for items
-    const query = category === 'all' ? {} : { category: category };
-    
-    // Get recent items
-const { data: items, error } = await supabase
-  .from('scrapyard_items')
-  .select('*') // or specify fields
-  .order('createdAt', { ascending: false })
-  .limit(30);
+    // Build query for items
+    let itemQuery = supabase
+      .from('scrapyard_items')
+      .select(`
+        *,
+        creator:creator (
+          id, username, display_name, avatar, custom_glyph
+        )
+      `)
+      .order('created_at', { ascending: false })
+      .limit(30);
 
-    
+    if (category !== 'all') {
+      itemQuery = itemQuery.eq('category', category);
+    }
+
+    const { data, error } = await itemQuery;
+    if (error) throw error;
+    const items = (data || []).map(item => ScrapyardItem.formatItem(item));
+
     // Add items to feed
     items.forEach(item => {
       feed.addItem({
