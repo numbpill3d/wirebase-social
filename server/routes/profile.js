@@ -31,10 +31,15 @@ router.get('/', ensureAuthenticated, async (req, res) => {
     visitorUsers.forEach(u => {
       visitorMap[u.id] = u;
     });
-    visitors = visitors.map(v => ({
-      ...v,
-      user: visitorMap[v.user] || v.user
-    }));
+visitors = visitors.map(v => {
+  const visitorUserDetails = visitorMap[v.user];
+  if (visitorUserDetails) {
+    return { ...v, user: visitorUserDetails };
+  }
+  // Log or handle missing visitor user data, e.g., return null to filter out
+  console.warn(`Visitor user data not found for ID: ${v.user}`);
+  return null; 
+}).filter(Boolean); // Removes null entries
     
     // User's items in the Scrapyard
     const userItems = await ScrapyardItem.find({ creator: user._id })
