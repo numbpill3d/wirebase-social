@@ -128,12 +128,28 @@ router.post('/login', (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
     if (err) { return next(err); }
     if (!user) {
-      req.flash('error_msg', info && info.message ? info.message : 'Invalid credentials');
-      req.flash('email', req.body.email);
-      return res.redirect('/users/login');
-    }
-    req.logIn(user, (loginErr) => {
-      if (loginErr) { return next(loginErr); }
+if (!user) {
+  req.flash('error_msg', info?.message || 'Invalid credentials');
+  req.flash('email', req.body.email);
+  return res.redirect('/users/login');
+}
+
+req.logIn(user, (err) => {
+  if (err) return next(err);
+
+  const rememberMe = req.body.remember === 'on' || req.body.remember === true;
+
+  if (rememberMe) {
+    // Persist session for 30 days
+    req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
+  } else {
+    // Session expires on browser close
+    req.session.cookie.expires = false;
+  }
+
+  return res.redirect('/dashboard');
+});
+
       return res.redirect('/profile');
     });
   })(req, res, next);
