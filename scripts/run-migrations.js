@@ -16,23 +16,32 @@ async function runMigrations() {
     const streetpassResult = await createStreetpassTable();
     console.log('Result:', streetpassResult);
     if (streetpassResult.error) {
+      throw new Error(streetpassResult.error);
+    }
 
     // Run Forum tables migration
     console.log('\n=== Running Forum tables migration ===');
     const forumResult = await createForumTables();
     console.log('Result:', forumResult);
     if (forumResult.error) {
+      throw new Error(forumResult.error);
+    }
 
     // Run WIR transactions table migration
     console.log('\n=== Running WIR transactions table migration ===');
     const wirResult = await createWIRTransactionsTable();
     console.log('Result:', wirResult);
     if (wirResult.error) {
+      throw new Error(wirResult.error);
+    }
 
     // Run Traffic table migration
     console.log('\n=== Running Traffic table migration ===');
     const trafficResult = await createTrafficTable();
     console.log('Result:', trafficResult);
+    if (trafficResult.error) {
+      throw new Error(trafficResult.error);
+    }
 
     // Add more migrations here as needed
 
