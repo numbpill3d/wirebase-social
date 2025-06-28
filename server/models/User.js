@@ -462,7 +462,8 @@ class User {
         .in('id', ids);
 
       if (error) {
-        throw error;
+        console.error('Supabase query error:', error);
+        return [];
       }
 
       return data.map(row => ({
