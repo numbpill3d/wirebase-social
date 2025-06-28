@@ -39,7 +39,7 @@ async function createStreetpassTable() {
         `
       });
 
-      if (createError) throw createError;
+      if (createError) {
       
       console.log('streetpass_visits table created successfully!');
     } else {
