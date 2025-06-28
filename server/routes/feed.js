@@ -151,9 +151,10 @@ router.get('/user/:username', async (req, res, next) => {
     });
     
     // Get user's items in the Scrapyard
-    const userItems = await ScrapyardItem.find({ creator: user._id })
-      .sort({ createdAt: -1 })
-      .limit(20);
+    const userItems = await ScrapyardItem.find(
+      { creator: user._id },
+      { sort: { createdAt: -1 }, limit: 20 }
+    );
     
     // Add items to feed
     userItems.forEach(item => {

@@ -236,13 +236,14 @@ router.get('/item/:id', async (req, res, next) => {
     await ScrapyardItem.findByIdAndUpdate(req.params.id, { $inc: { usageCount: 1 } });
 
     // Get similar items
-    const similarItems = await ScrapyardItem.find(
-      { 
-        category: item.category,
-        _id: { $ne: item._id }
-      },
-      { sort: { createdAt: -1 }, limit: 4 }
-    );
+const similarItems = await ScrapyardItem.find(
+  { 
+    category: item.category,
+    _id: { $ne: item._id }
+  },
+  { sort: { createdAt: -1 }, limit: 4 }
+);
+
 
     res.render('scrapyard/item', {
       title: `${item.title} - Wirebase Scrapyard`,
@@ -535,16 +536,20 @@ router.get('/search', async (req, res, next) => {
     const limit = 12;
     const skip = (page - 1) * limit;
 
-    // Execute search using the new query method
-    const queryOptions = {
-      filter: { search: query },
-      sort: { createdAt: -1 },
-      limit,
-      offset: skip
-    };
-    if (category !== 'all') queryOptions.filter.category = category;
+// Execute search using the new query method
+const queryOptions = {
+  filter: { search: query },
+  sort: { createdAt: -1 },
+  limit,
+  offset: skip
+};
 
-    const items = await ScrapyardItem.query(queryOptions);
+if (category !== 'all') {
+  queryOptions.filter.category = category;
+}
+
+const items = await ScrapyardItem.query(queryOptions);
+
 
     // Count total results for pagination
     const total = await ScrapyardItem.count({ filter: queryOptions.filter });
