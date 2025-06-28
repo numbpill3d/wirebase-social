@@ -33,9 +33,9 @@ describe('WIR Transactions', () => {
     it('should create the market_wir_transactions table if it does not exist', async () => {
       // Run the migration
       const result = await createWIRTransactionsTable();
-      
+
       // Check if the migration was successful
-      expect(result.success).toBe(true);
+      expect(result.error).toBeNull();
       
       // Verify the table exists by trying to select from it
       const { error } = await supabase
