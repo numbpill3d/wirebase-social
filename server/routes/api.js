@@ -205,8 +205,12 @@ router.post('/user/avatar', ensureAuthenticated, uploadAvatar.single('avatar'), 
 
     await User.findByIdAndUpdate(req.user.id, { avatar: relativePath });
 
-    res.json({ success: true, avatarUrl: relativePath });
-  } catch (error) {
+
+const user = await User.findByIdAndUpdate(req.user.id, { avatar: relativePath });
+if (!user) {
+  fs.unlink(req.file.path, () => {});
+  throw new Error('User not found');
+}
     console.error('Error uploading avatar:', error);
     if (req.file) fs.unlink(req.file.path, () => {});
     res.status(500).json({
