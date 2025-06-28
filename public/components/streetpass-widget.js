@@ -44,15 +44,20 @@ class StreetpassWidget extends HTMLElement {
 
         if (data.success && Array.isArray(data.visitors)) {
             // Transform API data to widget format
-            this.visitors = data.visitors.map(visitor => ({
-                id: visitor.id,
-                username: visitor.visitor.username,
-                displayName: visitor.visitor.displayName,
-                glyph: visitor.visitor.customGlyph,
-                timestamp: new Date(visitor.visitedAt).getTime(),
-                emote: visitor.emote || '👋',
-                visitId: visitor.id
-            }));
+            this.visitors = data.visitors.map(visitor => {
+                if (!visitor.visitor) {
+                    throw new Error('Invalid visitor data structure');
+                }
+                return {
+                    id: visitor.id,
+                    username: visitor.visitor.username,
+                    displayName: visitor.visitor.displayName,
+                    glyph: visitor.visitor.customGlyph,
+                    timestamp: new Date(visitor.visitedAt).getTime(),
+                    emote: visitor.emote || '👋',
+                    visitId: visitor.id
+                };
+            });
         } else {
             // Invalid data format
             throw new Error('API returned invalid data format');
