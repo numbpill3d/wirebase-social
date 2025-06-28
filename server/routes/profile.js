@@ -124,10 +124,10 @@ router.get('/:username', async (req, res) => {
     visitorUsers.forEach(u => {
       visitorMap[u.id] = u;
     });
-    visitors = visitors.map(v => ({
-      ...v,
-      user: visitorMap[v.user] || v.user
-    }));
+visitors = visitors.map(v => ({
+  ...v,
+  user: visitorMap[v.user] || { id: v.user, username: 'Unknown User', avatar: '/images/laincore/default-avatar.png', customGlyph: '❓' }
+}));
     
     res.render('profile/view', {
       title: `${profileUser.displayName} - Wirebase Profile`,
