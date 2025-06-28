@@ -348,6 +348,7 @@
             </div>
             <div class="cyber-window-content">
                 <div class="customize-grid">
+                    {{#unless isProduction}}
                     <div class="terminal-preview">
                         <h3>Terminal Mode</h3>
                         <div class="terminal-window">
@@ -365,6 +366,7 @@ HTML saved successfully.
                             </div>
                         </div>
                     </div>
+                    {{/unless}}
 
                     <div class="profile-preview">
                         <h3>Profile Example</h3>
