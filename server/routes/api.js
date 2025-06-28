@@ -178,8 +178,7 @@ router.get('/market/items/:id', async (req, res) => {
 const avatarStorage = multer.diskStorage({
   destination: function (_req, _file, cb) {
     const dir = path.join(__dirname, '../../public/uploads/avatars');
-    fs.mkdirSync(dir, { recursive: true });
-    cb(null, dir);
+fs.mkdir(dir, { recursive: true }, (err) => cb(err, dir));
   },
   filename: function (_req, file, cb) {
     // Remove validation from filename function - handle in main route
