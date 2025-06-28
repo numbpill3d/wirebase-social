@@ -13,6 +13,7 @@ const { apiCache } = require('../utils/performance');
 const MarketItem = require('../models/MarketItem');
 const Collection = require('../models/Collection');
 const WIRTransaction = require('../models/WIRTransaction');
+const User = require('../models/User');
 
 const multer = require('multer');
 const sharp = require('sharp');
@@ -568,6 +569,16 @@ router.post('/items/:id/purchase', ensureApiAuth, async (req, res) => {
     const itemId = req.params.id;
     const userId = req.user.id;
 
+    // Refresh user's balance from the database
+    const freshUser = await User.findById(userId);
+    if (!freshUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    req.user.wirBalance = freshUser.wirBalance;
+
     // Get the item details
     const item = await MarketItem.getById(itemId);
 
@@ -599,6 +610,22 @@ router.post('/items/:id/purchase', ensureApiAuth, async (req, res) => {
     const result = await MarketItem.purchase(itemId, userId);
 
     if (result.success) {
+      // Update user's WIR balance in session
+      req.user.wirBalance = result.newBalance;
+
+      // Refresh session data
+      const updatedUser = await User.findById(userId);
+      if (updatedUser) {
+        await new Promise(resolve => {
+          req.login(updatedUser, err => {
+            if (err) {
+              console.error('Error updating session after purchase:', err);
+            }
+            resolve();
+          });
+        });
+      }
+
       return res.json({
         success: true,
         message: 'Purchase successful',

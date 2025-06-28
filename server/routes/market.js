@@ -269,6 +269,16 @@ router.post('/item/:id/purchase', ensureAuthenticated, async (req, res) => {
     const itemId = req.params.id;
     const userId = req.user.id;
 
+    // Refresh user's balance from the database
+    const freshUser = await User.findById(userId);
+    if (!freshUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    req.user.wirBalance = freshUser.wirBalance;
+
     // Get the item details
     const item = await MarketItem.getById(itemId);
 
@@ -319,6 +329,19 @@ router.post('/item/:id/purchase', ensureAuthenticated, async (req, res) => {
           console.error('Session save error after purchase:', err);
         }
       });
+
+      // Refresh session data
+      const updatedUser = await User.findById(userId);
+      if (updatedUser) {
+        await new Promise(resolve => {
+          req.login(updatedUser, err => {
+            if (err) {
+              console.error('Error updating session after purchase:', err);
+            }
+            resolve();
+          });
+        });
+      }
 
       return res.json({
         success: true,
