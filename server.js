@@ -300,6 +300,7 @@ require('./server/utils/passport-config')(passport);
 app.use((req, res, next) => {
   res.locals.user = req.user || null;
   res.locals.isAuthenticated = req.isAuthenticated();
+  res.locals.isProduction = process.env.NODE_ENV === 'production';
   next();
 });
 
