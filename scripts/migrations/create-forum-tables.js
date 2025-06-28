@@ -42,7 +42,7 @@ async function createForumTables() {
         `
       });
 
-      if (createError) throw createError;
+      if (createError) {
       
       console.log('forum_threads table created successfully!');
     } else {
