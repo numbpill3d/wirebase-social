@@ -20,7 +20,7 @@ async function runMigrations() {
     console.log('\n=== Running Forum tables migration ===');
     const forumResult = await createForumTables();
     console.log('Result:', forumResult);
-    if (forumResult.error) throw new Error(forumResult.error);
+    if (forumResult.error) {
 
     // Run WIR transactions table migration
     console.log('\n=== Running WIR transactions table migration ===');
