@@ -22,52 +22,40 @@ class StreetpassWidget extends HTMLElement {
             })
             .catch(error => {
                 console.error('Error loading streetpass data:', error);
+                this.visitors = [];
                 this.renderError();
             });
     }
 
     async loadVisitors() {
-        try {
-            if (!this.profileId) {
-                console.error('No profile ID provided to Streetpass widget');
-                this.visitors = [];
-                return;
-            }
+        if (!this.profileId) {
+            console.error('No profile ID provided to Streetpass widget');
+            this.visitors = [];
+            return;
+        }
+        // Fetch visitors from API
+        const response = await fetch(`/api/streetpass/visitors/${this.profileId}?limit=${this.maxVisitors}`);
 
-            // Fetch visitors from API
-            const response = await fetch(`/api/streetpass/visitors/${this.profileId}?limit=${this.maxVisitors}`);
+        if (!response.ok) {
+            throw new Error(`Failed to load visitors: ${response.status} ${response.statusText}`);
+        }
 
-            if (!response.ok) {
-                throw new Error(`Failed to load visitors: ${response.status} ${response.statusText}`);
-            }
+        const data = await response.json();
 
-            const data = await response.json();
-
-            if (data.success && Array.isArray(data.visitors)) {
-                // Transform API data to widget format
-                this.visitors = data.visitors.map(visitor => ({
-                    id: visitor.id,
-                    username: visitor.visitor.username,
-                    displayName: visitor.visitor.displayName,
-                    glyph: visitor.visitor.customGlyph,
-                    timestamp: new Date(visitor.visitedAt).getTime(),
-                    emote: visitor.emote || '👋',
-                    visitId: visitor.id
-                }));
-            } else {
-                // Fallback to empty array if API fails
-                console.warn('API returned invalid data format', data);
-                this.visitors = [];
-            }
-        } catch (error) {
-            console.error('Error loading streetpass data:', error);
-
-            // Fallback to demo data if API fails
-            this.visitors = [
-                { username: 'DungeonMaster', glyph: '🧙', timestamp: Date.now() - 3600000, emote: '👋' },
-                { username: 'PixelQueen', glyph: '👑', timestamp: Date.now() - 86400000, emote: '👍' },
-                { username: 'RetroWarrior', glyph: '⚔️', timestamp: Date.now() - 172800000, emote: '🔥' }
-            ];
+        if (data.success && Array.isArray(data.visitors)) {
+            // Transform API data to widget format
+            this.visitors = data.visitors.map(visitor => ({
+                id: visitor.id,
+                username: visitor.visitor.username,
+                displayName: visitor.visitor.displayName,
+                glyph: visitor.visitor.customGlyph,
+                timestamp: new Date(visitor.visitedAt).getTime(),
+                emote: visitor.emote || '👋',
+                visitId: visitor.id
+            }));
+        } else {
+            // Invalid data format
+            throw new Error('API returned invalid data format');
         }
     }
 
@@ -176,7 +164,16 @@ class StreetpassWidget extends HTMLElement {
         `;
 
         this.shadowRoot.querySelector('.retry-button').addEventListener('click', () => {
-            this.loadVisitors().then(() => this.render());
+            this.loadVisitors()
+                .then(() => {
+                    this.render();
+                    this.attachEventListeners();
+                })
+                .catch(err => {
+                    console.error('Error loading streetpass data:', err);
+                    this.visitors = [];
+                    this.renderError();
+                });
         });
     }
 
