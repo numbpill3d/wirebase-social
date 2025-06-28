@@ -188,14 +188,15 @@ describe('WIR Transactions', () => {
     });
 
     it('should handle invalid conversion direction', async () => {
-      // Mock user data
-      const mockUser = {
-        id: testSenderId,
-        wir_balance: 100,
-        loot_tokens: 50
-      };
+// Mock user data
+const mockUser = {
+  id: testSenderId,
+  wir_balance: 200,
+  loot_tokens: 100
+};
 
-      // Mock the supabase query for getting user
+// Mock the supabase query for getting user
+
       jest.spyOn(supabase, 'from').mockImplementation((table) => {
         if (table === 'users') {
           return {
@@ -203,9 +204,10 @@ describe('WIR Transactions', () => {
               eq: () => ({
                 single: () => Promise.resolve({ data: mockUser, error: null })
               })
-            }),
-            update: () => ({
-              eq: () => Promise.resolve({ error: null })
+update: () => ({
+  eq: () => Promise.resolve({ error: null })
+})
+
             })
           };
         }
@@ -213,7 +215,8 @@ describe('WIR Transactions', () => {
         return supabase.from(table);
       });
 
-      const result = await WIRTransaction.convert(testSenderId, 'invalid', 10);
+const result = await WIRTransaction.convert(testSenderId, 'invalid', 50);
+
 
       expect(result).toEqual({
         success: false,
