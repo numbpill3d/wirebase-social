@@ -135,7 +135,7 @@ router.post('/login', (req, res, next) => {
         req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
       } else {
         // Session cookie expires on browser close
-        req.session.cookie.expires = false;
+        req.session.cookie.maxAge = null;
       }
       return res.redirect('/profile');
     });
