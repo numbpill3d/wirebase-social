@@ -19,10 +19,11 @@ const ensureAuthenticated = (req, res, next) => {
 router.get('/', ensureAuthenticated, async (req, res, next) => {
   try {
     // Find the user
-    const user = await User.findById(req.user.id);
+const user = await User.findById(req.user.id);
 
-    // Get recent visitors using Streetpass model
-    const visitors = await Streetpass.getVisitors(user.id, 10);
+// Get recent visitors using Streetpass model
+const visitors = await Streetpass.getVisitors(user.id, 10);
+
     
     // User's items in the Scrapyard
     const userItems = await ScrapyardItem.find(
@@ -76,8 +77,20 @@ router.get('/:username', async (req, res, next) => {
         return []; // Return empty array instead of failing
       });
     
-    // Get recent visitors via Streetpass model
-    const visitors = await Streetpass.getVisitors(profileUser.id, 10);
+// Get recent visitors via Streetpass model
+let visitors = await Streetpass.getVisitors(profileUser.id, 10);
+
+// Fallback for missing user data (optional)
+visitors = visitors.map(v => ({
+  ...v,
+  user: v.user || {
+    id: 'unknown',
+    username: 'Unknown User',
+    avatar: '/images/laincore/default-avatar.png',
+    customGlyph: '❓'
+  }
+}));
+
     
     res.render('profile/view', {
       title: `${profileUser.displayName} - Wirebase Profile`,
