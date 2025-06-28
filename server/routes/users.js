@@ -130,7 +130,7 @@ router.post('/login', (req, res, next) => {
     }
     req.logIn(user, err => {
       if (err) { return next(err); }
-      if (req.body.remember) {
+      if (req.body.remember === 'on' || req.body.remember === true) {
         // Persist session for 30 days when remember is checked
         req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
       } else {
