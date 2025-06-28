@@ -493,9 +493,30 @@ function processTerminalCommand(command, terminal) {
     if (terminalEditMode) {
         if (command === ':wq' || command === ':save') {
             addTerminalOutput(`Saving ${terminalEditMode.toUpperCase()} changes...`);
-            saveProfile(terminalEditMode, terminalEditBuffer)
-                .then(() => addTerminalOutput('Changes saved successfully!'))
-                .catch(() => addTerminalOutput('Error saving changes.'));
+            const MAX_RETRIES = 2;
+            let attempt = 0;
+
+            function trySaveProfile() {
+                saveProfile(terminalEditMode, terminalEditBuffer)
+                    .then(() => addTerminalOutput('Changes saved successfully!'))
+                    .catch((error) => {
+                        attempt++;
+                        if (error && error.message && error.message.includes('Network')) {
+                            if (attempt <= MAX_RETRIES) {
+                                addTerminalOutput(`Network error while saving. Retrying (${attempt}/${MAX_RETRIES})...`);
+                                setTimeout(trySaveProfile, 1000 * attempt); // Exponential backoff
+                            } else {
+                                addTerminalOutput('Failed to save changes after multiple attempts due to network issues.');
+                            }
+                        } else if (error && error.message) {
+                            addTerminalOutput(`Error saving changes: ${error.message}`);
+                        } else {
+                            addTerminalOutput('An unknown error occurred while saving changes.');
+                        }
+                    });
+            }
+
+            trySaveProfile();
             terminal.dataset.editMode = '';
             terminalEditMode = null;
             terminalEditBuffer = '';
