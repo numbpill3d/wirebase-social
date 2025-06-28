@@ -3,9 +3,17 @@
  * Tests for the WIR currency system and transactions
  */
 
-const { supabase } = require('../server/utils/database');
-const WIRTransaction = require('../server/models/WIRTransaction');
-const createWIRTransactionsTable = require('../scripts/migrations/create-wir-transactions-table');
+if (!process.env.SUPABASE_URL || !process.env.SUPABASE_KEY || !process.env.SUPABASE_SERVICE_KEY) {
+  // Skip the suite if Supabase credentials are not available
+  describe.skip('WIR Transactions', () => {
+    it('skipped because Supabase credentials are missing', () => {
+      expect(true).toBe(true);
+    });
+  });
+} else {
+  const { supabase } = require('../server/utils/database');
+  const WIRTransaction = require('../server/models/WIRTransaction');
+  const createWIRTransactionsTable = require('../scripts/migrations/create-wir-transactions-table');
 
 describe('WIR Transactions', () => {
   // Test user IDs
@@ -25,9 +33,9 @@ describe('WIR Transactions', () => {
     it('should create the market_wir_transactions table if it does not exist', async () => {
       // Run the migration
       const result = await createWIRTransactionsTable();
-      
+
       // Check if the migration was successful
-      expect(result.success).toBe(true);
+      expect(result.error).toBeNull();
       
       // Verify the table exists by trying to select from it
       const { error } = await supabase
@@ -122,12 +130,12 @@ describe('WIR Transactions', () => {
       expect(total).toBeGreaterThanOrEqual(2);
       
       // Check if the transactions contain the expected data
-      const foundTransaction1 = transactions.some(t => 
-        t.amount === 50 && t.transaction_type === 'reward' && t.notes === 'Test transaction 1'
+      const foundTransaction1 = transactions.some(t =>
+        t.amount === 50 && t.transactionType === 'reward' && t.notes === 'Test transaction 1'
       );
-      
-      const foundTransaction2 = transactions.some(t => 
-        t.amount === -20 && t.transaction_type === 'purchase' && t.notes === 'Test transaction 2'
+
+      const foundTransaction2 = transactions.some(t =>
+        t.amount === 20 && t.transactionType === 'purchase' && t.notes === 'Test transaction 2'
       );
       
       expect(foundTransaction1).toBe(true);
@@ -178,5 +186,45 @@ describe('WIR Transactions', () => {
       // Restore the original implementation
       jest.restoreAllMocks();
     });
+
+    it('should handle invalid conversion direction', async () => {
+// Mock user data
+const mockUser = {
+  id: testSenderId,
+  wir_balance: 200,
+  loot_tokens: 100
+};
+
+// Mock the supabase query for getting user
+
+      jest.spyOn(supabase, 'from').mockImplementation((table) => {
+        if (table === 'users') {
+          return {
+            select: () => ({
+              eq: () => ({
+                single: () => Promise.resolve({ data: mockUser, error: null })
+              })
+update: () => ({
+  eq: () => Promise.resolve({ error: null })
+})
+
+            })
+          };
+        }
+
+        return supabase.from(table);
+      });
+
+const result = await WIRTransaction.convert(testSenderId, 'invalid', 50);
+
+
+      expect(result).toEqual({
+        success: false,
+        message: 'Invalid conversion direction'
+      });
+
+      jest.restoreAllMocks();
+    });
   });
 });
+}

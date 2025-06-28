@@ -1,4 +1,5 @@
 const { supabase, supabaseAdmin } = require('../utils/database');
+const { clearCache } = require('../utils/performance');
 
 /**
  * ScrapyardItem model for Supabase
@@ -45,8 +46,9 @@ class ScrapyardItem {
         throw error;
       }
 
-      // Convert back to camelCase for app use
-      return ScrapyardItem.formatItem(data);
+      const formatted = ScrapyardItem.formatItem(data);
+      clearCache(/^feed:/);
+      return formatted;
     } catch (error) {
       console.error('Error creating scrapyard item:', error);
       throw error;
@@ -258,7 +260,7 @@ class ScrapyardItem {
 
       // Update this instance with the returned data
       Object.assign(this, ScrapyardItem.formatItem(data));
-
+      clearCache(/^feed:/);
       return this;
     } catch (error) {
       console.error('Error saving scrapyard item:', error);
@@ -343,16 +345,22 @@ class ScrapyardItem {
         throw error;
       }
 
-      let formattedItems = data.map(item => ScrapyardItem.formatItem(item));
+      let formattedItems = data.map(item => {
+        const formatted = ScrapyardItem.formatItem(item);
+        formatted.voteScore =
+          (formatted.votes.upvotes?.length || 0) -
+          (formatted.votes.downvotes?.length || 0);
+        return formatted;
+      });
 
       // Handle vote score sorting in memory
       if (options.sort && options.sort.voteScore) {
         const direction = options.sort.voteScore;
-        formattedItems.sort((a, b) => {
-          const scoreA = a.getVoteScore();
-          const scoreB = b.getVoteScore();
-          return direction === 1 ? scoreA - scoreB : scoreB - scoreA;
-        });
+        formattedItems.sort((a, b) =>
+          direction === 1
+            ? a.voteScore - b.voteScore
+            : b.voteScore - a.voteScore
+        );
       }
 
       return formattedItems;

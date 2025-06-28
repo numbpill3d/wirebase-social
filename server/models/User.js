@@ -1,5 +1,6 @@
 const { supabase, supabaseAdmin } = require('../utils/database');
 const bcrypt = require('bcrypt');
+const { clearCache } = require('../utils/performance');
 
 /**
  * User model for Supabase
@@ -223,7 +224,9 @@ class User {
         throw error;
       }
 
-      return User.formatUser(data);
+      const formatted = User.formatUser(data);
+      clearCache(/^feed:/);
+      return formatted;
     } catch (error) {
       console.error('Error updating user:', error);
       throw error;
@@ -278,7 +281,7 @@ class User {
 
       // Update this instance with the returned data
       Object.assign(this, User.formatUser(data));
-
+      clearCache(/^feed:/);
       return this;
     } catch (error) {
       console.error('Error saving user:', error);
