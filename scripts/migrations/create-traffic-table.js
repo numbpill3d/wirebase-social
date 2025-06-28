@@ -31,16 +31,9 @@ async function createTrafficTable() {
     if (!exists) {
       console.log('Creating site_visits table...');
 
-      await supabaseAdmin.rpc('execute_sql', { sql: `
-        CREATE TABLE site_visits (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          path TEXT NOT NULL,
-          visited_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-        );
-
-        CREATE INDEX idx_site_visits_path ON site_visits(path);
-        CREATE INDEX idx_site_visits_visited_at ON site_visits(visited_at);
-      ` });
+// Example using SQL template files
+const createTableSql = fs.readFileSync('create_table.sql', 'utf8');
+await supabaseAdmin.rpc('execute_sql', { sql: createTableSql });
 
       console.log('site_visits table created successfully!');
     } else {
