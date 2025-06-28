@@ -2,9 +2,9 @@ const ScrapyardItem = require('../../../server/models/ScrapyardItem');
 
 jest.mock('../../../server/utils/database', () => {
   const mockData = [
-    { id: '1', upvotes: ['u1', 'u2', 'u3'], downvotes: [] },
-    { id: '2', upvotes: ['u1'], downvotes: ['d1'] },
-    { id: '3', upvotes: ['u1', 'u2'], downvotes: ['d1', 'd2', 'd3'] }
+    { id: '1', votes: { upvotes: ['u1', 'u2', 'u3'], downvotes: [] } },
+    { id: '2', votes: { upvotes: ['u1'], downvotes: ['d1'] } },
+    { id: '3', votes: { upvotes: ['u1', 'u2'], downvotes: ['d1', 'd2', 'd3'] } }
   ];
 
   const builder = {
