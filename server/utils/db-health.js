@@ -94,6 +94,12 @@ const checkHealth = async (knex = null) => {
  */
 const getHealthStatus = (knex = null) => {
   const kInstance = knex || knexInstance || global.knex;
+
+  if (!kInstance) {
+    console.warn('WARN: No knex instance available to get health status');
+    return { ...healthCheckStatus, poolStatus: null };
+  }
+
   return {
     ...healthCheckStatus,
     poolStatus: dbMonitor.getPoolStatus(kInstance)
@@ -126,16 +132,20 @@ const performMaintenance = async (knex = null) => {
 
       // Destroy and recreate the pool
       await kInstance.destroy();
-      await kInstance.initialize();
+
+      // Recreate knex instance using original configuration
+      const newKnex = require('knex')(kInstance.client.config);
+      knexInstance = newKnex;
+      global.knex = newKnex;
 
       // Reset health check status
       healthCheckStatus.consecutiveFailures = 0;
       dbMonitor.resetMetrics();
-      dbMonitor.setupPoolMonitoring(kInstance);
+      dbMonitor.setupPoolMonitoring(newKnex);
     }
 
     // Get pool status after maintenance
-    const afterStatus = dbMonitor.getPoolStatus(kInstance);
+    const afterStatus = dbMonitor.getPoolStatus(knexInstance);
 
     return {
       success: true,
@@ -157,14 +167,14 @@ const performMaintenance = async (knex = null) => {
  * Start periodic health checks
  * @param {Object} knexInstance - The knex instance to use
  * @param {number} interval - Check interval in milliseconds
- * @returns {Object} Timer object
+ * @returns {Object} Object containing the timer and a stop function
  */
 const startPeriodicHealthChecks = (knex = null, interval = 60000) => {
   const kInstance = knex || knexInstance || global.knex;
 
   if (!kInstance) {
     console.error('ERROR: No knex instance available for health checks');
-    return null;
+    return { timer: null, stop: () => {} };
   }
 
   // Store the instance for future use
@@ -187,7 +197,12 @@ const startPeriodicHealthChecks = (knex = null, interval = 60000) => {
 
   console.log(`Database health checks started (interval: ${interval}ms)`);
 
-  return timer;
+  const stop = () => {
+    clearInterval(timer);
+    console.log('Database health checks stopped');
+  };
+
+  return { timer, stop };
 };
 
 /**

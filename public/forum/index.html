@@ -11,6 +11,19 @@
     <link rel="stylesheet" href="../css/optimizations.css">
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <script src="../js/laincore-loader.js"></script>
+    <style>
+        .cyber-window-controls {
+            display: flex;
+        }
+        .cyber-window-control {
+            margin-left: 8px;
+            color: var(--accent-color);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font: inherit;
+        }
+    </style>
 </head>
 <body>
     <header class="main-header">
@@ -39,9 +52,9 @@
             <div class="cyber-window-header">
                 <span class="cyber-window-title">system.assembly</span>
                 <div class="cyber-window-controls">
-                    <span class="cyber-window-control">_</span>
-                    <span class="cyber-window-control">□</span>
-                    <span class="cyber-window-control">×</span>
+                    <button type="button" class="cyber-window-control" aria-label="minimize">_</button>
+                    <button type="button" class="cyber-window-control" aria-label="maximize">□</button>
+                    <button type="button" class="cyber-window-control" aria-label="close">×</button>
                 </div>
             </div>
             <div class="cyber-window-content">
@@ -66,7 +79,7 @@
                             <div class="thread">
                                 <div class="thread-icon">📢</div>
                                 <div class="thread-info">
-                                    <a href="#" class="thread-title">Welcome to wirebase.city</a>
+                                    <a href="/forum/thread/1" class="thread-title">Welcome to wirebase.city</a>
                                     <div class="thread-meta">
                                         <span class="thread-author">SystemAdmin</span>
                                         <span class="thread-date">2025-05-01</span>
@@ -80,7 +93,7 @@
                             <div class="thread">
                                 <div class="thread-icon">📢</div>
                                 <div class="thread-info">
-                                    <a href="#" class="thread-title">Network Maintenance Schedule</a>
+                                    <a href="/forum/thread/2" class="thread-title">Network Maintenance Schedule</a>
                                     <div class="thread-meta">
                                         <span class="thread-author">SystemAdmin</span>
                                         <span class="thread-date">2025-05-10</span>
@@ -103,7 +116,7 @@
                             <div class="thread">
                                 <div class="thread-icon">💻</div>
                                 <div class="thread-info">
-                                    <a href="#" class="thread-title">HTML/CSS Tips for Digital Shells</a>
+                                    <a href="/forum/thread/3" class="thread-title">HTML/CSS Tips for Digital Shells</a>
                                     <div class="thread-meta">
                                         <span class="thread-author">Node_4231</span>
                                         <span class="thread-date">2025-05-12</span>
@@ -117,7 +130,7 @@
                             <div class="thread">
                                 <div class="thread-icon">💻</div>
                                 <div class="thread-info">
-                                    <a href="#" class="thread-title">Glitch Effect Tutorial</a>
+                                    <a href="/forum/thread/4" class="thread-title">Glitch Effect Tutorial</a>
                                     <div class="thread-meta">
                                         <span class="thread-author">GlitchHunter</span>
                                         <span class="thread-date">2025-05-08</span>
@@ -140,7 +153,7 @@
                             <div class="thread">
                                 <div class="thread-icon">🔌</div>
                                 <div class="thread-info">
-                                    <a href="#" class="thread-title">Best Widgets for Your Shell</a>
+                                    <a href="/forum/thread/5" class="thread-title">Best Widgets for Your Shell</a>
                                     <div class="thread-meta">
                                         <span class="thread-author">DataNode</span>
                                         <span class="thread-date">2025-05-14</span>
@@ -154,7 +167,7 @@
                             <div class="thread">
                                 <div class="thread-icon">🔌</div>
                                 <div class="thread-info">
-                                    <a href="#" class="thread-title">Resource Request Thread</a>
+                                    <a href="/forum/thread/6" class="thread-title">Resource Request Thread</a>
                                     <div class="thread-meta">
                                         <span class="thread-author">PixelArtist</span>
                                         <span class="thread-date">2025-05-05</span>
@@ -198,10 +211,10 @@
                 <span>wirebase.city</span>
             </div>
             <div class="footer-links">
-                <a href="#">About</a>
-                <a href="#">Terms</a>
-                <a href="#">Privacy</a>
-                <a href="#">Contact</a>
+                <a href="/about">About</a>
+                <a href="/terms">Terms</a>
+                <a href="/privacy">Privacy</a>
+                <a href="mailto:admin@wirebase.city">Contact</a>
             </div>
         </div>
         <div class="footer-copyright">

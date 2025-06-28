@@ -1,0 +1,537 @@
+<div class="profile-container">
+    <div class="cyber-window profile-window">
+        <div class="cyber-window-header">
+            <span class="cyber-window-title">{{profileUser.displayName}}'s Shell {{#if isOwner}}(Your Identity){{/if}}</span>
+            <div class="cyber-window-controls">
+                <span class="cyber-window-control">_</span>
+                <span class="cyber-window-control">□</span>
+                <span class="cyber-window-control">×</span>
+            </div>
+        </div>
+        <div class="cyber-window-content">
+            <div class="profile-header">
+                <div class="profile-avatar-container">
+                    <img src="{{profileUser.avatar}}" alt="{{profileUser.displayName}}" class="profile-avatar">
+                    <span class="profile-glyph">{{profileUser.customGlyph}}</span>
+                </div>
+                <div class="profile-info">
+                    <h1>{{profileUser.displayName}}</h1>
+                    <div class="profile-stats">
+                        <div class="stat">
+                            <span class="stat-label">Status</span>
+                            <span class="stat-value">{{profileUser.statusMessage}}</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Member Since</span>
+                            <span class="stat-value">{{memberSince profileUser.createdAt}}</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Bandwidth Credits</span>
+                            <span class="stat-value loot">{{formatLoot profileUser.lootTokens}}</span>
+                        </div>
+                    </div>
+                </div>
+                {{#if isOwner}}
+                    <div class="profile-actions">
+                        <a href="/profile/edit/html" class="cyber-button">Edit HTML</a>
+                        <a href="/profile/edit/css" class="cyber-button">Edit CSS</a>
+                        <a href="/profile/edit/theme" class="cyber-button">Theme</a>
+                        <a href="/profile/terminal" class="cyber-button">Terminal Mode</a>
+                    </div>
+                {{/if}}
+            </div>
+            
+            <div class="profile-main">
+                <div class="profile-custom-content">
+                    <!-- User's custom HTML content -->
+                    <style>
+                        {{{profileUser.profileCss}}}
+                    </style>
+                    {{{allowedHTML profileUser.profileHtml}}}
+                </div>
+                
+                <div class="profile-sidebar">
+                    <div class="profile-badges-container">
+                        <div class="cyber-window">
+                            <div class="cyber-window-header">
+                                <span class="cyber-window-title">Validation Imprints</span>
+                                <div class="cyber-window-controls">
+                                    <span class="cyber-window-control">_</span>
+                                </div>
+                            </div>
+                            <div class="cyber-window-content">
+                                <div class="badges-list">
+                                    {{#if profileUser.badges.length}}
+                                        {{#each profileUser.badges}}
+                                            <div class="badge" title="{{this.description}}">
+                                                <span class="badge-icon">{{this.icon}}</span>
+                                                <span class="badge-name">{{this.name}}</span>
+                                            </div>
+                                        {{/each}}
+                                    {{else}}
+                                        <div class="no-badges">No badges earned yet</div>
+                                    {{/if}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-streetpass">
+                        <streetpass-widget username="{{profileUser.username}}" profile-id="{{profileUser._id}}" max-visitors="5" theme="dungeon"></streetpass-widget>
+                    </div>
+                    
+                    <div class="profile-feed">
+                        <div class="cyber-window">
+                            <div class="cyber-window-header">
+                                <span class="cyber-window-title">Data Stream</span>
+                                <div class="cyber-window-controls">
+                                    <span class="cyber-window-control">_</span>
+                                </div>
+                            </div>
+                            <div class="cyber-window-content">
+                                <div class="feed-info">
+                                    <p>Subscribe to {{profileUser.displayName}}'s updates:</p>
+                                    <div class="feed-options">
+                                        <a href="/feed/user/{{profileUser.username}}?format=rss" class="feed-option" target="_blank">
+                                            <span class="feed-icon">📡</span>
+                                            <span>RSS</span>
+                                        </a>
+                                        <a href="/feed/user/{{profileUser.username}}?format=atom" class="feed-option" target="_blank">
+                                            <span class="feed-icon">📡</span>
+                                            <span>ATOM</span>
+                                        </a>
+                                        <a href="/feed/user/{{profileUser.username}}?format=json" class="feed-option" target="_blank">
+                                            <span class="feed-icon">📡</span>
+                                            <span>JSON</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    <div class="profile-visitors">
+                        <div class="cyber-window">
+                            <div class="cyber-window-header">
+                                <span class="cyber-window-title">Recent Visitors</span>
+                                <div class="cyber-window-controls">
+                                    <span class="cyber-window-control">_</span>
+                                </div>
+                            </div>
+                            <div class="cyber-window-content">
+                                {{#if visitors.length}}
+                                <ul class="visitors-list">
+                                    {{#each visitors}}
+                                    <li class="visitor-item">
+                                        <img src="{{this.visitor.avatar}}" alt="{{this.visitor.displayName}}" class="visitor-avatar">
+                                        <span class="visitor-name">{{this.visitor.displayName}}</span>
+                                        <span class="visitor-emote">{{this.emote}}</span>
+                                        <span class="visitor-time">{{timeAgo this.visitedAt}}</span>
+                                    </li>
+                                    {{/each}}
+                                </ul>
+                                {{else}}
+                                <div class="no-visitors">No recent visitors yet</div>
+                                {{/if}}
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            
+            {{#if userItems.length}}
+            <div class="profile-scrapyard">
+                <div class="cyber-window">
+                    <div class="cyber-window-header">
+                        <span class="cyber-window-title">Nullspace Contributions</span>
+                        <div class="cyber-window-controls">
+                            <span class="cyber-window-control">_</span>
+                        </div>
+                    </div>
+                    <div class="cyber-window-content">
+                        <div class="scrapyard-items">
+                            {{#each userItems}}
+                                <a href="/scrapyard/item/{{this._id}}" class="scrapyard-item">
+                                    <div class="item-preview">
+                                        <img src="{{this.previewImage}}" alt="{{this.title}}" class="item-image">
+                                        <span class="item-category">{{categoryName}}</span>
+                                    </div>
+                                    <div class="item-details">
+                                        <span class="item-title">{{this.title}}</span>
+                                        <span class="item-stats">⬆️ {{this.votes.upvotes.length}} | ⬇️ {{this.votes.downvotes.length}}</span>
+                                    </div>
+                                </a>
+                            {{/each}}
+                        </div>
+                        <div class="scrapyard-link">
+                            <a href="/scrapyard" class="cyber-button">Access Nullspace</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+</div>
+
+<style>
+    .profile-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .profile-window {
+        margin-bottom: 30px;
+    }
+    
+    .profile-header {
+        display: flex;
+        align-items: flex-start;
+        padding: 20px;
+        border-bottom: 2px solid var(--cyber-purple);
+        background-color: var(--cyber-dark);
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    
+    .profile-avatar-container {
+        position: relative;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border: 3px solid var(--cyber-purple);
+        border-radius: 8px;
+        box-shadow: 0 0 20px var(--cyber-glow);
+    }
+    
+    .profile-glyph {
+        position: absolute;
+        bottom: -10px;
+        right: -10px;
+        background-color: var(--cyber-dark);
+        border: 2px solid var(--cyber-purple);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+    
+    .profile-info {
+        flex: 1;
+    }
+    
+    .profile-info h1 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: var(--cyber-silver);
+        font-family: 'PixelOperator', 'VT323', monospace;
+        text-shadow: 0 0 10px var(--cyber-glow);
+        font-size: 2rem;
+    }
+    
+    .profile-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+    }
+    
+    .stat {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        color: var(--cyber-gray);
+    }
+    
+    .stat-value {
+        font-size: 1.1rem;
+    }
+    
+    .stat-value.loot {
+        color: var(--cyber-green);
+    }
+    
+    .profile-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .profile-main {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        padding: 20px;
+    }
+    
+    .profile-custom-content {
+        background-color: var(--cyber-dark);
+        border: 2px solid var(--cyber-purple);
+        padding: 20px;
+        min-height: 300px;
+        overflow: auto;
+        max-height: 500px;
+    }
+    
+    .profile-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .badges-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .badge {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: var(--cyber-dark);
+        border: 1px solid var(--cyber-purple);
+        border-radius: 5px;
+        padding: 10px;
+        width: 80px;
+    }
+    
+    .badge-icon {
+        font-size: 1.5rem;
+        margin-bottom: 5px;
+    }
+    
+    .badge-name {
+        font-size: 0.8rem;
+        text-align: center;
+    }
+    
+    .no-badges {
+        color: var(--stone-gray);
+        font-style: italic;
+        text-align: center;
+        padding: 10px;
+    }
+    
+    .feed-info {
+        text-align: center;
+    }
+    
+    .feed-options {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 10px;
+    }
+    
+    .feed-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        color: var(--cyber-light);
+    }
+    
+    .feed-icon {
+        font-size: 1.5rem;
+        margin-bottom: 5px;
+    }
+    .profile-visitors .visitors-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .visitor-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 0;
+        border-bottom: 1px solid var(--cyber-gray);
+    }
+
+    .visitor-item:last-child {
+        border-bottom: none;
+    }
+
+    .visitor-avatar {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+    }
+
+    .visitor-name {
+        flex: 1;
+    }
+
+    .visitor-emote {
+        font-size: 1.2rem;
+    }
+
+    .visitor-time {
+        font-size: 0.8rem;
+        color: var(--cyber-gray);
+    }
+    
+    .profile-scrapyard {
+        padding: 0 20px 20px;
+    }
+    
+    .scrapyard-items {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .scrapyard-item {
+        border: 1px solid var(--cyber-purple);
+        text-decoration: none;
+        color: inherit;
+        background-color: var(--cyber-dark);
+        transition: transform 0.2s;
+    }
+    
+    .scrapyard-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .item-preview {
+        position: relative;
+        height: 100px;
+        overflow: hidden;
+    }
+    
+    .item-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .item-category {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background-color: var(--cyber-purple);
+        color: var(--cyber-light);
+        font-size: 0.7rem;
+        padding: 2px 5px;
+        border-radius: 3px;
+    }
+    
+    .item-details {
+        padding: 8px;
+    }
+    
+    .item-title {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .item-stats {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--cyber-gray);
+    }
+    
+    .scrapyard-link {
+        text-align: center;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .profile-main {
+            grid-template-columns: 1fr;
+        }
+        
+        .profile-header {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .profile-stats {
+            grid-template-columns: 1fr;
+        }
+        
+        .profile-actions {
+            justify-content: center;
+            margin-top: 15px;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle windows
+        const windowControls = document.querySelectorAll('.cyber-window-control');
+        
+        windowControls.forEach(control => {
+            control.addEventListener('click', function() {
+                const windowContent = this.closest('.cyber-window').querySelector('.cyber-window-content');
+                if (windowContent) {
+                    windowContent.style.display = windowContent.style.display === 'none' ? 'block' : 'none';
+                }
+            });
+        });
+        
+        // Add custom profile image upload capability
+        const isOwner = {{#if isOwner}}true{{else}}false{{/if}};
+        
+        if (isOwner) {
+            const profileAvatar = document.querySelector('.profile-avatar');
+            if (profileAvatar) {
+                profileAvatar.style.cursor = 'pointer';
+                profileAvatar.title = 'Click to change your profile image';
+                
+                profileAvatar.addEventListener('click', function() {
+                    // Show file upload dialog
+                    const fileInput = document.createElement('input');
+                    fileInput.type = 'file';
+                    fileInput.accept = 'image/*';
+                    fileInput.click();
+                    
+                    // Handle file selection
+                    fileInput.addEventListener('change', function() {
+                        if (fileInput.files && fileInput.files[0]) {
+                            const formData = new FormData();
+                            formData.append('avatar', fileInput.files[0]);
+                            
+                            // Upload avatar
+                            fetch('/api/user/avatar', {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    // Update avatar on page
+                                    profileAvatar.src = data.avatarUrl + '?t=' + new Date().getTime();
+                                } else {
+                                    alert('Failed to upload avatar: ' + data.error);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error uploading avatar:', error);
+                                alert('Error uploading avatar');
+                            });
+                        }
+                    });
+                });
+            }
+        }
+    });
+</script>
