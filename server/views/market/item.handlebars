@@ -842,7 +842,7 @@
     const viewSourceButton = document.getElementById('view-source-button');
     const sourceCodeModal = document.getElementById('source-code-modal');
 
-    if (viewSourceButton) {
+    if (viewSourceButton && sourceCodeModal) {
       viewSourceButton.addEventListener('click', function(e) {
         e.preventDefault();
         sourceCodeModal.style.display = 'block';
