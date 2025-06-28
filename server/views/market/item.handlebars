@@ -185,6 +185,31 @@
   </div>
 </div>
 
+<!-- New Collection Modal -->
+<div id="new-collection-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Create New Collection</h2>
+    <form id="create-collection-form">
+      <div class="form-group">
+        <label for="collection-name">Collection Name <span class="required">*</span></label>
+        <input type="text" id="collection-name" name="name" required>
+      </div>
+      <div class="form-group">
+        <label for="collection-description">Description</label>
+        <textarea id="collection-description" name="description"></textarea>
+      </div>
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="collection-public" name="isPublic" checked>
+          <label for="collection-public">Make collection public</label>
+        </div>
+      </div>
+      <button type="submit" class="action-button">Create Collection</button>
+    </form>
+  </div>
+</div>
+
 <style>
   /* Vivid Market Item Detail Styles */
   .vivid-market.item-detail-page {
@@ -788,6 +813,58 @@
         });
       });
     });
+
+    // New collection modal handling
+    const createCollectionTrigger = document.getElementById('create-collection-trigger');
+    const newCollectionModal = document.getElementById('new-collection-modal');
+    const createCollectionForm = document.getElementById('create-collection-form');
+
+    if (createCollectionTrigger) {
+      createCollectionTrigger.addEventListener('click', function(e) {
+        e.preventDefault();
+        newCollectionModal.style.display = 'block';
+      });
+    }
+
+    window.addEventListener('click', function(event) {
+      if (event.target === newCollectionModal) {
+        newCollectionModal.style.display = 'none';
+      }
+    });
+
+    if (createCollectionForm) {
+      createCollectionForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = {
+          name: document.getElementById('collection-name').value,
+          description: document.getElementById('collection-description').value,
+          isPublic: document.getElementById('collection-public').checked
+        };
+
+        fetch('/market/user/collections/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showNotification('Collection created', 'success');
+            newCollectionModal.style.display = 'none';
+            setTimeout(() => window.location.reload(), 1000);
+          } else {
+            showNotification(data.message || 'Failed to create collection', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showNotification('An error occurred', 'error');
+        });
+      });
+    }
     
     // Wishlist functionality
     const wishlistButton = document.getElementById('wishlist-button');

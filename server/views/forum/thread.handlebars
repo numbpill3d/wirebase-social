@@ -1,3 +1,5 @@
+{{!< layouts/main}}
+
 <div class="forum-container">
   <!-- Sidebar Navigation -->
   <div class="forum-sidebar">
@@ -42,13 +44,11 @@
   </div>
 
   <div class="forum-header">
-    <h1 class="cyber-header glitch-text" data-text="Thread Title">Thread Title</h1>
-
-    <!-- Improved Breadcrumbs -->
+    <h1 class="cyber-header glitch-text" data-text="{{thread.title}}">{{thread.title}}</h1>
     <div class="breadcrumbs">
       <a href="/forum">Assembly</a>
       <span class="separator">»</span>
-      <a href="/forum/category/general">General</a>
+      <a href="/forum/category/{{thread.category}}">{{thread.category}}</a>
       <span class="separator">»</span>
       <span>Thread</span>
     </div>
@@ -62,80 +62,46 @@
       <div class="cyber-window-content">
         <div class="post-header">
           <div class="post-author">
-            <img src="/images/laincore/default-avatar.svg" alt="Avatar" class="author-avatar">
+            <img src="{{thread.creator.avatar}}" alt="Avatar" class="author-avatar">
             <div class="author-info">
-              <div class="author-name">system_admin</div>
-              <div class="author-title">Administrator</div>
+              <div class="author-name">{{thread.creator.username}}</div>
             </div>
           </div>
           <div class="post-meta">
-            <span class="post-date">Posted 2 days ago</span>
+            <span class="post-date">{{formatDate thread.createdAt 'relative'}}</span>
           </div>
         </div>
         <div class="post-content">
-          <p>Welcome to the Wirebase Assembly forum! This is a place for community discussion about all things Wirebase.</p>
-          <p>Please follow these guidelines:</p>
-          <ul>
-            <li>Be respectful to other users</li>
-            <li>Stay on topic in each category</li>
-            <li>Use code blocks for sharing code</li>
-            <li>Report any issues to the moderators</li>
-          </ul>
-          <p>Happy posting!</p>
+          {{{thread.content}}}
         </div>
       </div>
     </div>
 
     <div class="thread-replies">
       <h3 class="replies-header">Replies</h3>
-
-      <div class="reply cyber-window">
-        <div class="cyber-window-header">
-          <span class="cyber-window-title">Reply #1</span>
-        </div>
-        <div class="cyber-window-content">
-          <div class="post-header">
-            <div class="post-author">
-              <img src="/images/laincore/default-avatar.svg" alt="Avatar" class="author-avatar">
-              <div class="author-info">
-                <div class="author-name">tech_support</div>
-                <div class="author-title">Moderator</div>
+      {{#each thread.replies}}
+        <div class="reply cyber-window">
+          <div class="cyber-window-header">
+            <span class="cyber-window-title">Reply</span>
+          </div>
+          <div class="cyber-window-content">
+            <div class="post-header">
+              <div class="post-author">
+                <img src="{{this.creator.avatar}}" alt="Avatar" class="author-avatar">
+                <div class="author-info">
+                  <div class="author-name">{{this.creator.username}}</div>
+                </div>
+              </div>
+              <div class="post-meta">
+                <span class="post-date">{{formatDate this.createdAt 'relative'}}</span>
               </div>
             </div>
-            <div class="post-meta">
-              <span class="post-date">Posted 1 day ago</span>
+            <div class="post-content">
+              {{{this.content}}}
             </div>
           </div>
-          <div class="post-content">
-            <p>Thanks for setting this up! I'm looking forward to the technical discussions we'll have here.</p>
-            <p>For anyone new to the forum, don't hesitate to ask questions in the appropriate category.</p>
-          </div>
         </div>
-      </div>
-
-      <div class="reply cyber-window">
-        <div class="cyber-window-header">
-          <span class="cyber-window-title">Reply #2</span>
-        </div>
-        <div class="cyber-window-content">
-          <div class="post-header">
-            <div class="post-author">
-              <img src="/images/laincore/default-avatar.svg" alt="Avatar" class="author-avatar">
-              <div class="author-info">
-                <div class="author-name">wirebase_fan</div>
-                <div class="author-title">Member</div>
-              </div>
-            </div>
-            <div class="post-meta">
-              <span class="post-date">Posted 12 hours ago</span>
-            </div>
-          </div>
-          <div class="post-content">
-            <p>Hello everyone! New member here. I'm excited to join the community.</p>
-            <p>I've been exploring Wirebase for a few days now and I'm really impressed with the cyberschizo aesthetic.</p>
-          </div>
-        </div>
-      </div>
+      {{/each}}
     </div>
 
     {{#if isAuthenticated}}
@@ -144,39 +110,9 @@
           <span class="cyber-window-title">Post Reply</span>
         </div>
         <div class="cyber-window-content">
-          <form action="/forum/thread/{{threadId}}/reply" method="POST">
+          <form action="/forum/thread/{{thread.id}}/reply" method="POST">
             <input type="hidden" name="_csrf" value="{{csrfToken}}">
-            <!-- WYSIWYG Editor -->
-            <div class="wysiwyg-editor">
-              <div class="wysiwyg-toolbar">
-                <button type="button" class="wysiwyg-button" data-command="bold" title="Bold">
-                  <i class="fas fa-bold"></i>
-                </button>
-                <button type="button" class="wysiwyg-button" data-command="italic" title="Italic">
-                  <i class="fas fa-italic"></i>
-                </button>
-                <button type="button" class="wysiwyg-button" data-command="link" title="Link">
-                  <i class="fas fa-link"></i>
-                </button>
-                <button type="button" class="wysiwyg-button" data-command="code" title="Code">
-                  <i class="fas fa-code"></i>
-                </button>
-                <button type="button" class="wysiwyg-button" data-command="quote" title="Quote">
-                  <i class="fas fa-quote-right"></i>
-                </button>
-                <button type="button" class="wysiwyg-button" data-command="list-ul" title="Bullet List">
-                  <i class="fas fa-list-ul"></i>
-                </button>
-                <button type="button" class="wysiwyg-button" data-command="list-ol" title="Numbered List">
-                  <i class="fas fa-list-ol"></i>
-                </button>
-                <button type="button" class="wysiwyg-button" data-command="mention" title="Mention User">
-                  <i class="fas fa-at"></i>
-                </button>
-              </div>
-              <div class="wysiwyg-content" contenteditable="true" id="reply-content"></div>
-              <input type="hidden" name="content" id="hidden-content">
-            </div>
+            <textarea name="content" class="cyber-textarea" rows="5" required></textarea>
             <div class="form-actions">
               <button type="submit" class="cyber-button">Post Reply</button>
             </div>
@@ -193,234 +129,7 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Initialize glitch effect on headers
     const headers = document.querySelectorAll('.glitch-text');
-    headers.forEach(header => {
-      const text = header.textContent;
-      header.setAttribute('data-text', text);
-    });
-
-    // WYSIWYG Editor functionality
-    const buttons = document.querySelectorAll('.wysiwyg-button');
-    const editor = document.querySelector('.wysiwyg-content');
-    const hiddenInput = document.getElementById('hidden-content');
-
-    if (buttons.length > 0 && editor && hiddenInput) {
-      buttons.forEach(button => {
-        button.addEventListener('click', function() {
-          const command = this.getAttribute('data-command');
-
-          try {
-            switch(command) {
-              case 'bold':
-                document.execCommand('bold', false, null);
-                break;
-              case 'italic':
-                document.execCommand('italic', false, null);
-                break;
-              case 'link':
-                const url = prompt('Enter the URL:');
-                if (url) {
-                  document.execCommand('createLink', false, url);
-                }
-                break;
-              case 'code':
-                const selection = window.getSelection();
-                if (selection && selection.toString().length > 0) {
-                  try {
-                    const range = selection.getRangeAt(0);
-                    const codeElement = document.createElement('code');
-                    codeElement.textContent = selection.toString();
-                    range.deleteContents();
-                    range.insertNode(codeElement);
-                  } catch (selectionError) {
-                    console.error('Selection error:', selectionError);
-                    document.execCommand('insertHTML', false, '<code>code here</code>');
-                  }
-                } else {
-                  document.execCommand('insertHTML', false, '<code>code here</code>');
-                }
-                break;
-              case 'quote':
-                document.execCommand('insertHTML', false, '<blockquote>quote here</blockquote>');
-                break;
-              case 'list-ul':
-                document.execCommand('insertUnorderedList', false, null);
-                break;
-              case 'list-ol':
-                document.execCommand('insertOrderedList', false, null);
-                break;
-              case 'mention':
-                // Show user mention dialog
-                showUserMentionDialog();
-                break;
-            }
-          } catch (editorError) {
-            console.error('WYSIWYG editor error:', editorError);
-            alert('An error occurred while formatting. Please try again.');
-          }
-
-          // Update hidden input with HTML content
-          hiddenInput.value = editor.innerHTML;
-        });
-      });
-
-      // Update hidden input on content change
-      editor.addEventListener('input', function() {
-        hiddenInput.value = editor.innerHTML;
-      });
-
-      // Set initial value
-      hiddenInput.value = editor.innerHTML;
-
-      // User mention functionality
-      function showUserMentionDialog() {
-        // Create a modal dialog for user mentions
-        const dialog = document.createElement('div');
-        dialog.className = 'mention-dialog';
-
-        // Add dialog content
-        dialog.innerHTML = `
-          <div class="mention-dialog-content">
-            <div class="mention-dialog-header">
-              <h3>Mention User</h3>
-              <button type="button" class="mention-dialog-close">&times;</button>
-            </div>
-            <div class="mention-dialog-body">
-              <input type="text" class="mention-search cyber-input" placeholder="Search for users...">
-              <div class="mention-results">
-                <div class="mention-user" data-username="system_admin">
-                  <img src="/images/laincore/default-avatar.svg" alt="Avatar" class="mention-avatar">
-                  <div class="mention-user-info">
-                    <div class="mention-username">system_admin</div>
-                    <div class="mention-role">Administrator</div>
-                  </div>
-                </div>
-                <div class="mention-user" data-username="tech_support">
-                  <img src="/images/laincore/default-avatar.svg" alt="Avatar" class="mention-avatar">
-                  <div class="mention-user-info">
-                    <div class="mention-username">tech_support</div>
-                    <div class="mention-role">Moderator</div>
-                  </div>
-                </div>
-                <div class="mention-user" data-username="wirebase_fan">
-                  <img src="/images/laincore/default-avatar.svg" alt="Avatar" class="mention-avatar">
-                  <div class="mention-user-info">
-                    <div class="mention-username">wirebase_fan</div>
-                    <div class="mention-role">Member</div>
-                  </div>
-                </div>
-                <div class="mention-user" data-username="design_guru">
-                  <img src="/images/laincore/default-avatar.svg" alt="Avatar" class="mention-avatar">
-                  <div class="mention-user-info">
-                    <div class="mention-username">design_guru</div>
-                    <div class="mention-role">Member</div>
-                  </div>
-                </div>
-                <div class="mention-user" data-username="power_user">
-                  <img src="/images/laincore/default-avatar.svg" alt="Avatar" class="mention-avatar">
-                  <div class="mention-user-info">
-                    <div class="mention-username">power_user</div>
-                    <div class="mention-role">Member</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-
-        // Add dialog to the page
-        document.body.appendChild(dialog);
-
-        // Focus the search input
-        const searchInput = dialog.querySelector('.mention-search');
-        searchInput.focus();
-
-        // Handle search filtering
-        searchInput.addEventListener('input', function() {
-          const searchTerm = this.value.toLowerCase();
-          const users = dialog.querySelectorAll('.mention-user');
-
-          users.forEach(user => {
-            const username = user.getAttribute('data-username').toLowerCase();
-            if (username.includes(searchTerm)) {
-              user.style.display = 'flex';
-            } else {
-              user.style.display = 'none';
-            }
-          });
-        });
-
-        // Handle user selection
-        const users = dialog.querySelectorAll('.mention-user');
-        users.forEach(user => {
-          user.addEventListener('click', function() {
-            const username = this.getAttribute('data-username');
-            insertMention(username);
-            closeDialog();
-          });
-        });
-
-        // Handle close button
-        const closeButton = dialog.querySelector('.mention-dialog-close');
-        closeButton.addEventListener('click', closeDialog);
-
-        // Close when clicking outside
-        dialog.addEventListener('click', function(e) {
-          if (e.target === dialog) {
-            closeDialog();
-          }
-        });
-
-        // Close dialog function
-        function closeDialog() {
-          document.body.removeChild(dialog);
-        }
-
-        // Insert mention into editor
-        function insertMention(username) {
-          const mentionHTML = `<span class="user-mention" data-username="${username}">@${username}</span>`;
-          document.execCommand('insertHTML', false, mentionHTML + '&nbsp;');
-
-          // Update hidden input
-          hiddenInput.value = editor.innerHTML;
-        }
-      }
-
-      // Handle @username detection in editor
-      editor.addEventListener('keyup', function(e) {
-        if (e.key === '@') {
-          // Show a small hint that you can mention users
-          const hint = document.createElement('div');
-          hint.className = 'mention-hint';
-          hint.textContent = 'Type a username or click the @ button to mention someone';
-
-          // Position the hint near the cursor
-          const selection = window.getSelection();
-          if (selection.rangeCount > 0) {
-            const range = selection.getRangeAt(0);
-            const rect = range.getBoundingClientRect();
-
-            hint.style.position = 'absolute';
-            hint.style.left = rect.left + 'px';
-            hint.style.top = (rect.bottom + 5) + 'px';
-
-            document.body.appendChild(hint);
-
-            // Remove hint after 3 seconds
-            setTimeout(() => {
-              if (document.body.contains(hint)) {
-                document.body.removeChild(hint);
-              }
-            }, 3000);
-          }
-        }
-      });
-    }
+    headers.forEach(h => h.setAttribute('data-text', h.textContent));
   });
 </script>
-
-<!-- Link to the new forum CSS file -->
-<link rel="stylesheet" href="/css/forum.css">
-<!-- Font Awesome for icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
