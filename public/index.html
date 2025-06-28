@@ -257,6 +257,9 @@
             margin-left: 8px;
             color: var(--accent-color);
             cursor: pointer;
+            background: none;
+            border: none;
+            font: inherit;
         }
 
         .cyber-window-content {
@@ -794,9 +797,9 @@
                         <div class="cyber-window-header">
                             <span class="cyber-window-title">> system.connection.established</span>
                             <div class="cyber-window-controls">
-                                <span class="cyber-window-control">_</span>
-                                <span class="cyber-window-control">□</span>
-                                <span class="cyber-window-control">×</span>
+                                <button type="button" class="cyber-window-control" aria-label="minimize">_</button>
+                                <button type="button" class="cyber-window-control" aria-label="maximize">□</button>
+                                <button type="button" class="cyber-window-control" aria-label="close">×</button>
                             </div>
                         </div>
                         <div class="cyber-window-content">
@@ -830,9 +833,9 @@
                         <div class="cyber-window-header">
                             <span class="cyber-window-title">> system.nullspace</span>
                             <div class="cyber-window-controls">
-                                <span class="cyber-window-control">_</span>
-                                <span class="cyber-window-control">□</span>
-                                <span class="cyber-window-control">×</span>
+                                <button type="button" class="cyber-window-control" aria-label="minimize">_</button>
+                                <button type="button" class="cyber-window-control" aria-label="maximize">□</button>
+                                <button type="button" class="cyber-window-control" aria-label="close">×</button>
                             </div>
                         </div>
                         <div class="cyber-window-content">
@@ -889,9 +892,9 @@
                         <div class="cyber-window-header">
                             <span class="cyber-window-title">> system.protocols</span>
                             <div class="cyber-window-controls">
-                                <span class="cyber-window-control">_</span>
-                                <span class="cyber-window-control">□</span>
-                                <span class="cyber-window-control">×</span>
+                                <button type="button" class="cyber-window-control" aria-label="minimize">_</button>
+                                <button type="button" class="cyber-window-control" aria-label="maximize">□</button>
+                                <button type="button" class="cyber-window-control" aria-label="close">×</button>
                             </div>
                         </div>
                         <div class="cyber-window-content">
@@ -916,9 +919,9 @@
                         <div class="cyber-window-header">
                             <span class="cyber-window-title">> system.identity.uploader</span>
                             <div class="cyber-window-controls">
-                                <span class="cyber-window-control">_</span>
-                                <span class="cyber-window-control">□</span>
-                                <span class="cyber-window-control">×</span>
+                                <button type="button" class="cyber-window-control" aria-label="minimize">_</button>
+                                <button type="button" class="cyber-window-control" aria-label="maximize">□</button>
+                                <button type="button" class="cyber-window-control" aria-label="close">×</button>
                             </div>
                         </div>
                         <div class="cyber-window-content">
@@ -986,9 +989,9 @@
                         <div class="cyber-window-header">
                             <span class="cyber-window-title">> system.economy</span>
                             <div class="cyber-window-controls">
-                                <span class="cyber-window-control">_</span>
-                                <span class="cyber-window-control">□</span>
-                                <span class="cyber-window-control">×</span>
+                                <button type="button" class="cyber-window-control" aria-label="minimize">_</button>
+                                <button type="button" class="cyber-window-control" aria-label="maximize">□</button>
+                                <button type="button" class="cyber-window-control" aria-label="close">×</button>
                             </div>
                         </div>
                         <div class="cyber-window-content">
@@ -1024,10 +1027,10 @@
                 <span>wirebase.city</span>
             </div>
             <div class="footer-links">
-                <a href="#">About</a>
-                <a href="#">Terms</a>
-                <a href="#">Privacy</a>
-                <a href="#">Contact</a>
+                <a href="/about">About</a>
+                <a href="/terms">Terms</a>
+                <a href="/privacy">Privacy</a>
+                <a href="mailto:admin@wirebase.city">Contact</a>
             </div>
         </div>
         <div class="footer-copyright">

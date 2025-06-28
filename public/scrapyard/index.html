@@ -11,6 +11,19 @@
     <link rel="stylesheet" href="../css/optimizations.css">
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <script src="../js/laincore-loader.js"></script>
+    <style>
+        .cyber-window-controls {
+            display: flex;
+        }
+        .cyber-window-control {
+            margin-left: 8px;
+            color: var(--accent-color);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font: inherit;
+        }
+    </style>
 </head>
 <body>
     <header class="main-header">
@@ -39,9 +52,9 @@
             <div class="cyber-window-header">
                 <span class="cyber-window-title">system.nullspace</span>
                 <div class="cyber-window-controls">
-                    <span class="cyber-window-control">_</span>
-                    <span class="cyber-window-control">□</span>
-                    <span class="cyber-window-control">×</span>
+                    <button type="button" class="cyber-window-control" aria-label="minimize">_</button>
+                    <button type="button" class="cyber-window-control" aria-label="maximize">□</button>
+                    <button type="button" class="cyber-window-control" aria-label="close">×</button>
                 </div>
             </div>
             <div class="cyber-window-content">
@@ -151,6 +164,7 @@
     </footer>
 
     <script src="../js/main.js"></script>
+    <script src="../js/scrapyard.js"></script>
     <script src="../js/laincore.js"></script>
 </body>
 </html>
