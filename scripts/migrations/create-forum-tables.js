@@ -20,6 +20,7 @@ async function createForumTables() {
       
       const { error: createError } = await supabaseAdmin.rpc('sql', {
         q: `
+          BEGIN;
           CREATE TABLE forum_threads (
             id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
             title TEXT NOT NULL,
@@ -39,6 +40,7 @@ async function createForumTables() {
           CREATE INDEX idx_forum_threads_creator_id ON forum_threads(creator_id);
           CREATE INDEX idx_forum_threads_created_at ON forum_threads(created_at);
           CREATE INDEX idx_forum_threads_updated_at ON forum_threads(updated_at);
+          COMMIT;
         `
       });
 
