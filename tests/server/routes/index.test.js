@@ -7,12 +7,17 @@ const express = require('express');
 // Mock dependencies
 jest.mock('../../../server/models/User', () => ({
   findRecent: jest.fn().mockResolvedValue([
-    { username: 'testuser1', displayName: 'Test User 1' },
-    { username: 'testuser2', displayName: 'Test User 2' }
+    { username: 'testuser1', displayName: 'Test User 1', lastActive: new Date() },
+    { username: 'testuser2', displayName: 'Test User 2', lastActive: new Date() }
+  ]),
+  countDocuments: jest.fn().mockResolvedValue(2),
+  find: jest.fn().mockResolvedValue([
+    { username: 'active1', lastActive: new Date() },
+    { username: 'active2', lastActive: new Date() }
   ])
 }));
 
-jest.mock('../../../server/models/Item', () => ({
+jest.mock('../../../server/models/ScrapyardItem', () => ({
   findRecent: jest.fn().mockResolvedValue([
     { id: 1, title: 'Test Item 1' },
     { id: 2, title: 'Test Item 2' }
@@ -20,8 +25,29 @@ jest.mock('../../../server/models/Item', () => ({
   findFeatured: jest.fn().mockResolvedValue([
     { id: 3, title: 'Featured Item 1' },
     { id: 4, title: 'Featured Item 2' }
-  ])
+  ]),
+  countDocuments: jest.fn().mockResolvedValue(2)
 }));
+
+jest.mock('../../../server/models/Visit', () => ({
+  record: jest.fn().mockResolvedValue(),
+  getHourlyCounts: jest.fn().mockResolvedValue(
+    Array.from({ length: 24 }, (_, i) => ({ hour: i, count: 0 }))
+  )
+}));
+
+jest.mock('../../../server/models/Thread', () => ({
+  countDocuments: jest.fn().mockResolvedValue(5)
+}));
+
+jest.mock('../../../server/models/Reply', () => ({
+  countDocuments: jest.fn().mockResolvedValue(10)
+}));
+
+const Visit = require('../../../server/models/Visit');
+const Thread = require('../../../server/models/Thread');
+const Reply = require('../../../server/models/Reply');
+
 
 // Mock express-handlebars
 jest.mock('express-handlebars', () => ({
@@ -49,13 +75,15 @@ describe('Index Routes', () => {
   describe('GET /', () => {
     it('should render the index page with correct data', async () => {
       const response = await request(app).get('/');
-      
+
       expect(response.status).toBe(200);
       expect(response.body.view).toBe('index');
       expect(response.body.options).toHaveProperty('title');
       expect(response.body.options).toHaveProperty('recentUsers');
       expect(response.body.options).toHaveProperty('recentItems');
       expect(response.body.options).toHaveProperty('featuredItems');
+      expect(Visit.record).toHaveBeenCalled();
+      expect(Visit.getHourlyCounts).toHaveBeenCalled();
     });
   });
 });

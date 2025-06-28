@@ -4,6 +4,7 @@
         <p class="cyber-text">Share your digital artifacts with the network.</p>
 
         <form action="/scrapyard/submit" method="POST" enctype="multipart/form-data" class="cyber-form">
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
             <div class="form-group">
                 <label for="title" class="cyber-label">Title *</label>
                 <input type="text" id="title" name="title" class="cyber-input" required maxlength="100">
