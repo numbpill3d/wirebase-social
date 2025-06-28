@@ -236,13 +236,14 @@ router.get('/item/:id', async (req, res, next) => {
     await ScrapyardItem.findByIdAndUpdate(req.params.id, { $inc: { usageCount: 1 } });
 
     // Get similar items
-    let similarItems = await ScrapyardItem.find(
-      { category: item.category },
-      { sort: { createdAt: -1 }, limit: 5 }
-    );
-    similarItems = similarItems
-      .filter(sim => sim._id !== item._id)
-      .slice(0, 4);
+const similarItems = await ScrapyardItem.find(
+  { 
+    category: item.category,
+    _id: { $ne: item._id }
+  },
+  { sort: { createdAt: -1 }, limit: 4 }
+);
+
 
     res.render('scrapyard/item', {
       title: `${item.title} - Wirebase Scrapyard`,
@@ -528,33 +529,30 @@ router.get('/search', async (req, res, next) => {
       return res.redirect('/scrapyard');
     }
 
-    // Build search filter
-    const filter = {
-      $or: [
-        { title: { $regex: query, $options: 'i' } },
-        { description: { $regex: query, $options: 'i' } },
-        { tags: { $regex: query, $options: 'i' } }
-      ]
-    };
-
-    if (category !== 'all') {
-      filter.category = category;
-    }
+    // Build search filter using Supabase's full-text search
 
     // Pagination
     const page = parseInt(req.query.page) || 1;
     const limit = 12;
     const skip = (page - 1) * limit;
 
-    // Execute search
-    const items = await ScrapyardItem.find(filter, {
-      sort: { createdAt: -1 },
-      skip,
-      limit
-    });
+// Execute search using the new query method
+const queryOptions = {
+  filter: { search: query },
+  sort: { createdAt: -1 },
+  limit,
+  offset: skip
+};
+
+if (category !== 'all') {
+  queryOptions.filter.category = category;
+}
+
+const items = await ScrapyardItem.query(queryOptions);
+
 
     // Count total results for pagination
-    const total = await ScrapyardItem.countDocuments(filter);
+    const total = await ScrapyardItem.count({ filter: queryOptions.filter });
     const totalPages = Math.ceil(total / limit);
 
     res.render('scrapyard/search', {

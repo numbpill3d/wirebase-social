@@ -11,6 +11,7 @@
     </div>
 
     <form id="submit-form" class="submit-form">
+      <input type="hidden" name="_csrf" value="{{csrfToken}}">
       <div class="form-section">
         <h2>Basic Information</h2>
         
@@ -180,8 +181,9 @@
   <div class="modal-content">
     <span class="close-modal">&times;</span>
     <h2>Create New Collection</h2>
-    <form id="create-collection-form">
-      <div class="form-group">
+  <form id="create-collection-form">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <div class="form-group">
         <label for="collection-name">Collection Name <span class="required">*</span></label>
         <input type="text" id="collection-name" name="name" required>
       </div>

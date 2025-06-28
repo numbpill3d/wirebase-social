@@ -4,6 +4,10 @@ const User = require('../models/User');
 const ScrapyardItem = require('../models/ScrapyardItem');
 const MarketItem = require('../models/MarketItem');
 const Streetpass = require('../models/Streetpass');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
 
 // Middleware to ensure user is authenticated
 const ensureAuthenticated = (req, res, next) => {
@@ -171,6 +175,53 @@ router.get('/market/items/:id', async (req, res) => {
   }
 });
 
+// Upload a new avatar for the current user
+const avatarStorage = multer.diskStorage({
+  destination: function (_req, _file, cb) {
+    const dir = path.join(__dirname, '../../public/uploads/avatars');
+fs.mkdir(dir, { recursive: true }, (err) => cb(err, dir));
+  },
+  filename: function (_req, file, cb) {
+    // Remove validation from filename function - handle in main route
+    cb(null, Date.now() + '-' + file.originalname.replace(/[^a-zA-Z0-9.]/g, '_'));
+    cb(null, Date.now() + '-' + file.originalname.replace(/[^a-zA-Z0-9.]/g, '_'));
+  }
+});
+
+const uploadAvatar = multer({
+  storage: avatarStorage,
+  limits: {
+    fileSize: process.env.MAX_UPLOAD_SIZE || 5242880,
+    limits: {
+      fileSize: parseInt(process.env.MAX_UPLOAD_SIZE) || 5242880,
+      files: 1
+
+router.post('/user/avatar', ensureAuthenticated, uploadAvatar.single('avatar'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+
+    const relativePath = `/uploads/avatars/${path.basename(req.file.path)}`;
+
+    await User.findByIdAndUpdate(req.user.id, { avatar: relativePath });
+
+
+const user = await User.findByIdAndUpdate(req.user.id, { avatar: relativePath });
+if (!user) {
+  fs.unlink(req.file.path, () => {});
+  throw new Error('User not found');
+}
+    console.error('Error uploading avatar:', error);
+    if (req.file) fs.unlink(req.file.path, () => {});
+    res.status(500).json({
+      success: false,
+      message: 'Failed to upload avatar',
+      error: process.env.NODE_ENV !== 'production' ? error.message : 'Server error'
+    });
+  }
+});
+
 // === Streetpass API Endpoints ===
 
 /**
@@ -256,6 +307,42 @@ router.put('/streetpass/emote', ensureAuthenticated, async (req, res) => {
       error: process.env.NODE_ENV !== 'production' ? error.message : 'Server error'
     });
   }
+});
+
+/**
+ * POST /api/user/avatar
+ * Upload a new avatar for the authenticated user
+ */
+router.post('/user/avatar', ensureAuthenticated, (req, res) => {
+  const {upload} = req.app.locals;
+  upload.single('avatar')(req, res, async err => {
+    if (err) {
+      console.error('Avatar upload error:', err);
+      return res.status(400).json({ success: false, error: err.message });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'No file uploaded' });
+    }
+
+    try {
+      const relativePath = `/uploads/${req.user.id}/${req.file.filename}`;
+      const updatedUser = await User.findByIdAndUpdate(req.user.id, { avatar: relativePath }, { new: true });
+  
+      if (!updatedUser) {
+        return res.status(404).json({ success: false, error: 'User not found' });
+      }
+  
+      res.json({ success: true, avatarUrl: relativePath });
+    } catch (error) {
+      console.error('Error updating avatar:', error);
+      res.status(500).json({
+        success: false,
+        error:
+          process.env.NODE_ENV !== 'production' ? error.message : 'Server error'
+      });
+    }
+  });
 });
 
 // Health check endpoint

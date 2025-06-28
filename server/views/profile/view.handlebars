@@ -1,7 +1,7 @@
 <div class="profile-container">
     <div class="cyber-window profile-window">
         <div class="cyber-window-header">
-            <span class="cyber-window-title">{{user.displayName}}'s Shell {{#if isOwner}}(Your Identity){{/if}}</span>
+            <span class="cyber-window-title">{{profileUser.displayName}}'s Shell {{#if isOwner}}(Your Identity){{/if}}</span>
             <div class="cyber-window-controls">
                 <span class="cyber-window-control">_</span>
                 <span class="cyber-window-control">□</span>
@@ -11,23 +11,23 @@
         <div class="cyber-window-content">
             <div class="profile-header">
                 <div class="profile-avatar-container">
-                    <img src="{{user.avatar}}" alt="{{user.displayName}}" class="profile-avatar">
-                    <span class="profile-glyph">{{user.customGlyph}}</span>
+                    <img src="{{profileUser.avatar}}" alt="{{profileUser.displayName}}" class="profile-avatar">
+                    <span class="profile-glyph">{{profileUser.customGlyph}}</span>
                 </div>
                 <div class="profile-info">
-                    <h1>{{user.displayName}}</h1>
+                    <h1>{{profileUser.displayName}}</h1>
                     <div class="profile-stats">
                         <div class="stat">
                             <span class="stat-label">Status</span>
-                            <span class="stat-value">{{user.statusMessage}}</span>
+                            <span class="stat-value">{{profileUser.statusMessage}}</span>
                         </div>
                         <div class="stat">
                             <span class="stat-label">Member Since</span>
-                            <span class="stat-value">{{memberSince user.createdAt}}</span>
+                            <span class="stat-value">{{memberSince profileUser.createdAt}}</span>
                         </div>
                         <div class="stat">
                             <span class="stat-label">Bandwidth Credits</span>
-                            <span class="stat-value loot">{{formatLoot user.lootTokens}}</span>
+                            <span class="stat-value loot">{{formatLoot profileUser.lootTokens}}</span>
                         </div>
                     </div>
                 </div>
@@ -45,9 +45,9 @@
                 <div class="profile-custom-content">
                     <!-- User's custom HTML content -->
                     <style>
-                        {{{user.profileCss}}}
+                        {{{profileUser.profileCss}}}
                     </style>
-                    {{{allowedHTML user.profileHtml}}}
+                    {{{allowedHTML profileUser.profileHtml}}}
                 </div>
                 
                 <div class="profile-sidebar">
@@ -61,8 +61,8 @@
                             </div>
                             <div class="cyber-window-content">
                                 <div class="badges-list">
-                                    {{#if user.badges.length}}
-                                        {{#each user.badges}}
+                                    {{#if profileUser.badges.length}}
+                                        {{#each profileUser.badges}}
                                             <div class="badge" title="{{this.description}}">
                                                 <span class="badge-icon">{{this.icon}}</span>
                                                 <span class="badge-name">{{this.name}}</span>
@@ -77,7 +77,7 @@
                     </div>
                     
                     <div class="profile-streetpass">
-                        <streetpass-widget username="{{user.username}}" profile-id="{{user._id}}" max-visitors="5" theme="dungeon"></streetpass-widget>
+                        <streetpass-widget username="{{profileUser.username}}" profile-id="{{profileUser._id}}" max-visitors="5" theme="dungeon"></streetpass-widget>
                     </div>
                     
                     <div class="profile-feed">
@@ -90,17 +90,17 @@
                             </div>
                             <div class="cyber-window-content">
                                 <div class="feed-info">
-                                    <p>Subscribe to {{user.displayName}}'s updates:</p>
+                                    <p>Subscribe to {{profileUser.displayName}}'s updates:</p>
                                     <div class="feed-options">
-                                        <a href="/feed/user/{{user.username}}?format=rss" class="feed-option" target="_blank">
+                                        <a href="/feed/user/{{profileUser.username}}?format=rss" class="feed-option" target="_blank">
                                             <span class="feed-icon">📡</span>
                                             <span>RSS</span>
                                         </a>
-                                        <a href="/feed/user/{{user.username}}?format=atom" class="feed-option" target="_blank">
+                                        <a href="/feed/user/{{profileUser.username}}?format=atom" class="feed-option" target="_blank">
                                             <span class="feed-icon">📡</span>
                                             <span>ATOM</span>
                                         </a>
-                                        <a href="/feed/user/{{user.username}}?format=json" class="feed-option" target="_blank">
+                                        <a href="/feed/user/{{profileUser.username}}?format=json" class="feed-option" target="_blank">
                                             <span class="feed-icon">📡</span>
                                             <span>JSON</span>
                                         </a>
@@ -110,6 +110,32 @@
                         </div>
                     </div>
                 </div>
+                    <div class="profile-visitors">
+                        <div class="cyber-window">
+                            <div class="cyber-window-header">
+                                <span class="cyber-window-title">Recent Visitors</span>
+                                <div class="cyber-window-controls">
+                                    <span class="cyber-window-control">_</span>
+                                </div>
+                            </div>
+                            <div class="cyber-window-content">
+                                {{#if visitors.length}}
+                                <ul class="visitors-list">
+                                    {{#each visitors}}
+                                    <li class="visitor-item">
+                                        <img src="{{this.visitor.avatar}}" alt="{{this.visitor.displayName}}" class="visitor-avatar">
+                                        <span class="visitor-name">{{this.visitor.displayName}}</span>
+                                        <span class="visitor-emote">{{this.emote}}</span>
+                                        <span class="visitor-time">{{timeAgo this.visitedAt}}</span>
+                                    </li>
+                                    {{/each}}
+                                </ul>
+                                {{else}}
+                                <div class="no-visitors">No recent visitors yet</div>
+                                {{/if}}
+                            </div>
+                        </div>
+                    </div>
             </div>
             
             {{#if userItems.length}}
@@ -317,6 +343,42 @@
         font-size: 1.5rem;
         margin-bottom: 5px;
     }
+    .profile-visitors .visitors-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .visitor-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 0;
+        border-bottom: 1px solid var(--cyber-gray);
+    }
+
+    .visitor-item:last-child {
+        border-bottom: none;
+    }
+
+    .visitor-avatar {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+    }
+
+    .visitor-name {
+        flex: 1;
+    }
+
+    .visitor-emote {
+        font-size: 1.2rem;
+    }
+
+    .visitor-time {
+        font-size: 0.8rem;
+        color: var(--cyber-gray);
+    }
     
     .profile-scrapyard {
         padding: 0 20px 20px;
@@ -448,24 +510,16 @@
                             const formData = new FormData();
                             formData.append('avatar', fileInput.files[0]);
                             
-                            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
                             // Upload avatar
                             fetch('/api/user/avatar', {
                                 method: 'POST',
-                                headers: { 'CSRF-Token': csrfToken },
                                 body: formData
                             })
                             .then(response => response.json())
                             .then(data => {
                                 if (data.success) {
                                     // Update avatar on page
-                                    const newUrl = data.avatarUrl + '?t=' + new Date().getTime();
-                                    profileAvatar.src = newUrl;
-                                    const smallAvatar = document.querySelector('.user-avatar-small');
-                                    if (smallAvatar) {
-                                        smallAvatar.src = newUrl;
-                                    }
+                                    profileAvatar.src = data.avatarUrl + '?t=' + new Date().getTime();
                                 } else {
                                     alert('Failed to upload avatar: ' + data.error);
                                 }

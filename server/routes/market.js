@@ -265,6 +265,7 @@ router.get('/item/:id/download', ensureAuthenticated, async (req, res) => {
  */
 router.post('/item/:id/purchase', ensureAuthenticated, async (req, res) => {
   try {
+    const { _csrf } = req.body; // ensure CSRF token is read
     const itemId = req.params.id;
     const userId = req.user.id;
 
@@ -331,6 +332,12 @@ router.post('/item/:id/purchase', ensureAuthenticated, async (req, res) => {
       });
     }
   } catch (error) {
+    if (error.code === 'EBADCSRFTOKEN') {
+      return res.status(403).json({
+        success: false,
+        message: 'Invalid CSRF token'
+      });
+    }
     console.error('Error purchasing item:', error);
     res.status(500).json({
       success: false,
@@ -475,6 +482,7 @@ router.get('/collections/:id', async (req, res) => {
  */
 router.post('/collections/:id/follow', ensureAuthenticated, async (req, res) => {
   try {
+    const { _csrf } = req.body; // ensure CSRF token is read
     const collectionId = req.params.id;
     const userId = req.user.id;
 
@@ -496,6 +504,12 @@ router.post('/collections/:id/follow', ensureAuthenticated, async (req, res) => 
       message: 'Collection followed successfully'
     });
   } catch (error) {
+    if (error.code === 'EBADCSRFTOKEN') {
+      return res.status(403).json({
+        success: false,
+        message: 'Invalid CSRF token'
+      });
+    }
     console.error('Error following collection:', error);
     res.status(500).json({
       success: false,
@@ -610,6 +624,7 @@ router.get('/submit', ensureAuthenticated, async (req, res) => {
  */
 router.post('/submit', ensureAuthenticated, async (req, res) => {
   try {
+    const { _csrf } = req.body; // ensure CSRF token is read
     const userId = req.user.id;
     const {
       title,
@@ -706,6 +721,12 @@ router.post('/submit', ensureAuthenticated, async (req, res) => {
       });
     }
   } catch (error) {
+    if (error.code === 'EBADCSRFTOKEN') {
+      return res.status(403).json({
+        success: false,
+        message: 'Invalid CSRF token'
+      });
+    }
     console.error('Error submitting item:', error);
     res.status(500).json({
       success: false,
@@ -747,6 +768,7 @@ router.get('/user/wishlist', ensureAuthenticated, async (req, res) => {
  */
 router.post('/user/wishlist/add/:id', ensureAuthenticated, async (req, res) => {
   try {
+    const { _csrf } = req.body; // ensure CSRF token is read
     const itemId = req.params.id;
     const userId = req.user.id;
 
@@ -777,6 +799,12 @@ router.post('/user/wishlist/add/:id', ensureAuthenticated, async (req, res) => {
       message: 'Item added to wishlist'
     });
   } catch (error) {
+    if (error.code === 'EBADCSRFTOKEN') {
+      return res.status(403).json({
+        success: false,
+        message: 'Invalid CSRF token'
+      });
+    }
     console.error('Error adding to wishlist:', error);
     res.status(500).json({
       success: false,
@@ -843,8 +871,8 @@ router.get('/wir', ensureAuthenticated, async (req, res) => {
  */
 router.post('/wir/convert', ensureAuthenticated, async (req, res) => {
   try {
+    const { _csrf, direction, amount } = req.body; // read CSRF token
     const userId = req.user.id;
-    const { direction, amount } = req.body;
 
     // Validate input
     if (!direction || !amount || isNaN(amount) || amount <= 0) {
@@ -875,6 +903,12 @@ router.post('/wir/convert', ensureAuthenticated, async (req, res) => {
       });
     }
   } catch (error) {
+    if (error.code === 'EBADCSRFTOKEN') {
+      return res.status(403).json({
+        success: false,
+        message: 'Invalid CSRF token'
+      });
+    }
     console.error('Error converting currency:', error);
     res.status(500).json({
       success: false,

@@ -222,7 +222,6 @@ app.use(session({
   rolling: false, // Disable rolling to reduce database writes
   name: 'wirebase.sid', // Custom cookie name for better security
   cookie: {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     httpOnly: true, // Prevent client-side JS from accessing cookie
@@ -301,6 +300,7 @@ require('./server/utils/passport-config')(passport);
 app.use((req, res, next) => {
   res.locals.user = req.user || null;
   res.locals.isAuthenticated = req.isAuthenticated();
+  res.locals.isProduction = process.env.NODE_ENV === 'production';
   next();
 });
 

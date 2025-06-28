@@ -690,6 +690,17 @@
   margin-top: 20px;
 }
 
+.item-html-container {
+  max-height: 60vh;
+  overflow-y: auto;
+  background-color: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  padding: 15px;
+  margin-top: 10px;
+  font-family: monospace;
+  color: var(--text-light);
+}
+
 /* Notification */
 .toast-container {
   position: fixed;

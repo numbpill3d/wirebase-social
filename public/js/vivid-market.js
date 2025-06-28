@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
   initializeNotifications();
   initializeModalHandlers();
   initializePurchaseFlow();
+  initializeItemHtmlViewer();
 });
 
 /**
@@ -391,4 +392,61 @@ function initializePurchaseFlow() {
  */
 function isUserLoggedIn() {
   return document.body.classList.contains('user-logged-in');
+}
+
+/**
+ * Initialize item HTML viewer buttons
+ */
+function initializeItemHtmlViewer() {
+  const htmlButtons = document.querySelectorAll('.view-html-button');
+  if (!htmlButtons.length) return;
+
+  htmlButtons.forEach(button => {
+    button.addEventListener('click', async function(e) {
+      e.preventDefault();
+
+      const {itemId} = this.dataset;
+      const modalId = this.dataset.modalTarget;
+      if (!itemId) return;
+
+      try {
+        const response = await fetch(`/api/market/items/${itemId}`);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.message || 'Error loading item');
+        }
+
+        const htmlContent = data.item.content || '<p>No HTML available.</p>';
+
+        if (modalId) {
+          const modal = document.getElementById(modalId);
+          if (modal) {
+            const container = modal.querySelector('.item-html-container');
+            if (container) container.textContent = htmlContent;
+            modal.style.display = 'block';
+          }
+        } else {
+          let container = this.closest('.market-item');
+          if (container) {
+            let htmlEl = container.querySelector('.item-html-container');
+            if (!htmlEl) {
+              htmlEl = document.createElement('div');
+              htmlEl.className = 'item-html-container';
+              container.appendChild(htmlEl);
+            }
+            htmlEl.textContent = htmlContent;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading item HTML:', error);
+        showNotification('Error loading item HTML', 'error');
+      }
+    });
+  });
 }
