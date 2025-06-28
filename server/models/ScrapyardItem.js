@@ -1,4 +1,5 @@
 const { supabase, supabaseAdmin } = require('../utils/database');
+const { clearCache } = require('../utils/performance');
 
 /**
  * ScrapyardItem model for Supabase
@@ -45,8 +46,9 @@ class ScrapyardItem {
         throw error;
       }
 
-      // Convert back to camelCase for app use
-      return ScrapyardItem.formatItem(data);
+      const formatted = ScrapyardItem.formatItem(data);
+      clearCache(/^feed:/);
+      return formatted;
     } catch (error) {
       console.error('Error creating scrapyard item:', error);
       throw error;
@@ -258,7 +260,7 @@ class ScrapyardItem {
 
       // Update this instance with the returned data
       Object.assign(this, ScrapyardItem.formatItem(data));
-
+      clearCache(/^feed:/);
       return this;
     } catch (error) {
       console.error('Error saving scrapyard item:', error);
