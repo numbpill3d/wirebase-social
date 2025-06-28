@@ -18,6 +18,9 @@ if (!validateEnv()) {
   process.exit(1);
 }
 
+// Verify required environment variables
+require('./server/utils/env-check')();
+
 // Import performance optimization utilities
 const {
   compressionMiddleware,

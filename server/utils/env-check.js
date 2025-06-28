@@ -13,12 +13,12 @@ const requiredVars = [
 ];
 
 /**
- * Validate environment variables
+ * Validate environment variables (non-fatal)
  * @param {string[]} vars - List of variables to validate
  * @returns {boolean} - True if all variables are present
  */
 const validateEnv = (vars = requiredVars) => {
-  const missing = vars.filter((v) => !process.env[v]);
+  const missing = vars.filter((v) => !process.env[v] || !process.env[v].trim());
   if (missing.length) {
     console.error(`Missing required environment variables: ${missing.join(', ')}`);
     return false;
@@ -26,7 +26,20 @@ const validateEnv = (vars = requiredVars) => {
   return true;
 };
 
+/**
+ * Check and throw if required variables are missing (fatal)
+ */
+const checkRequiredEnv = (vars = requiredVars) => {
+  const missing = vars.filter((v) => !process.env[v] || !process.env[v].trim());
+  if (missing.length) {
+    const error = new Error(`Missing required environment variables: ${missing.join(', ')}`);
+    console.error(error.message);
+    throw error;
+  }
+};
+
 module.exports = {
   validateEnv,
+  checkRequiredEnv,
   requiredVars
 };
