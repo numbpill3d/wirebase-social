@@ -64,10 +64,10 @@ const upload = multer({
 // Helper functions for fetching items
 const getTopItems = async (limit = 8) => {
   try {
-    const items = await ScrapyardItem.find()
-      .sort({ usageCount: -1, createdAt: -1 })
-      .limit(limit)
-      .populate('creator', 'username displayName avatar customGlyph');
+    const items = await ScrapyardItem.find(
+      {},
+      { sort: { usageCount: -1, createdAt: -1 }, limit }
+    );
 
     return { rows: items };
   } catch (error) {
@@ -82,10 +82,13 @@ const getRecentItems = async (limit = 12) => {
     const recentItems = {};
 
     for (const category of categories) {
-      recentItems[category] = await ScrapyardItem.find({ category })
-        .sort({ createdAt: -1 })
-        .limit(Math.ceil(limit / categories.length))
-        .populate('creator', 'username displayName avatar customGlyph');
+      recentItems[category] = await ScrapyardItem.find(
+        { category },
+        {
+          sort: { createdAt: -1 },
+          limit: Math.ceil(limit / categories.length)
+        }
+      );
     }
 
     return recentItems;
@@ -97,10 +100,10 @@ const getRecentItems = async (limit = 12) => {
 
 const getFeaturedItems = async (limit = 6) => {
   try {
-    return await ScrapyardItem.find({ featured: true })
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .populate('creator', 'username displayName avatar customGlyph');
+    return await ScrapyardItem.find(
+      { featured: true },
+      { sort: { createdAt: -1 }, limit }
+    );
   } catch (error) {
     console.error('Error getting featured items:', error);
     return [];
@@ -170,11 +173,10 @@ router.get('/category/:category', async (req, res, next) => {
     const sort = sortOptions[req.query.sort] || sortOptions.newest;
 
     // Query items
-    const items = await ScrapyardItem.find({ category })
-      .sort(sort)
-      .skip(skip)
-      .limit(limit)
-      .populate('creator', 'username displayName avatar customGlyph');
+    const items = await ScrapyardItem.find(
+      { category },
+      { sort, skip, limit }
+    );
 
     // Count total items for pagination
     const total = await ScrapyardItem.countDocuments({ category });
@@ -209,9 +211,7 @@ router.get('/category/:category', async (req, res, next) => {
 router.get('/item/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
-    const item = await ScrapyardItem.findById(id)
-      .populate('creator', 'username displayName avatar customGlyph statusMessage')
-      .populate('comments.user', 'username displayName avatar customGlyph');
+    const item = await ScrapyardItem.findById(id);
 
     if (!item) {
       return res.status(404).render('error', {
@@ -236,13 +236,13 @@ router.get('/item/:id', async (req, res, next) => {
     await ScrapyardItem.findByIdAndUpdate(req.params.id, { $inc: { usageCount: 1 } });
 
     // Get similar items
-    const similarItems = await ScrapyardItem.find({
-      category: item.category,
-      _id: { $ne: item._id }
-    })
-    .sort({ createdAt: -1 })
-    .limit(4)
-    .populate('creator', 'username displayName');
+    const similarItems = await ScrapyardItem.find(
+      { 
+        category: item.category,
+        _id: { $ne: item._id }
+      },
+      { sort: { createdAt: -1 }, limit: 4 }
+    );
 
     res.render('scrapyard/item', {
       title: `${item.title} - Wirebase Scrapyard`,
@@ -528,33 +528,26 @@ router.get('/search', async (req, res, next) => {
       return res.redirect('/scrapyard');
     }
 
-    // Build search filter
-    const filter = {
-      $or: [
-        { title: { $regex: query, $options: 'i' } },
-        { description: { $regex: query, $options: 'i' } },
-        { tags: { $regex: query, $options: 'i' } }
-      ]
-    };
-
-    if (category !== 'all') {
-      filter.category = category;
-    }
+    // Build search filter using Supabase's full-text search
 
     // Pagination
     const page = parseInt(req.query.page) || 1;
     const limit = 12;
     const skip = (page - 1) * limit;
 
-    // Execute search
-    const items = await ScrapyardItem.find(filter)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .populate('creator', 'username displayName avatar customGlyph');
+    // Execute search using the new query method
+    const queryOptions = {
+      filter: { search: query },
+      sort: { createdAt: -1 },
+      limit,
+      offset: skip
+    };
+    if (category !== 'all') queryOptions.filter.category = category;
+
+    const items = await ScrapyardItem.query(queryOptions);
 
     // Count total results for pagination
-    const total = await ScrapyardItem.countDocuments(filter);
+    const total = await ScrapyardItem.count({ filter: queryOptions.filter });
     const totalPages = Math.ceil(total / limit);
 
     res.render('scrapyard/search', {

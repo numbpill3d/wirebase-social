@@ -25,9 +25,10 @@ router.get('/', ensureAuthenticated, async (req, res, next) => {
     const visitors = await Streetpass.getVisitors(user.id, 10);
     
     // User's items in the Scrapyard
-    const userItems = await ScrapyardItem.find({ creator: user._id })
-      .sort({ createdAt: -1 })
-      .limit(5);
+    const userItems = await ScrapyardItem.find(
+      { creator: user._id },
+      { sort: { createdAt: -1 }, limit: 5 }
+    );
     
     res.render('profile/profile', {
       title: `${user.displayName} - Wirebase Profile`,
@@ -67,10 +68,10 @@ router.get('/:username', async (req, res, next) => {
     }
     
     // Get user's items in the Scrapyard
-    const userItems = await ScrapyardItem.find({ creator: profileUser._id })
-      .sort({ createdAt: -1 })
-      .limit(5)
-      .catch(err => {
+    const userItems = await ScrapyardItem.find(
+      { creator: profileUser._id },
+      { sort: { createdAt: -1 }, limit: 5 }
+    ).catch(err => {
         console.error('Failed to fetch user items:', err);
         return []; // Return empty array instead of failing
       });
@@ -185,9 +186,10 @@ router.get('/:username/feed', async (req, res, next) => {
     }
     
     // Find user's items in the Scrapyard
-    const userItems = await ScrapyardItem.find({ creator: user._id })
-      .sort({ createdAt: -1 })
-      .limit(20);
+    const userItems = await ScrapyardItem.find(
+      { creator: user._id },
+      { sort: { createdAt: -1 }, limit: 20 }
+    );
     
     // Create feed
     const feed = new Feed({
