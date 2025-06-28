@@ -30,6 +30,10 @@ class Visit {
       const cached = cache.get(cacheKey);
       if (cached) return cached;
 
+      if (!Number.isInteger(hours) || hours < 1 || hours > 168) {
+        throw new Error('Invalid hours parameter');
+      }
+
       const { data, error } = await supabaseAdmin.rpc('execute_sql', { sql: `
         SELECT EXTRACT(HOUR FROM visited_at) AS hour,
                COUNT(*)::integer AS count
