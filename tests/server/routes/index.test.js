@@ -4,20 +4,26 @@
 const request = require('supertest');
 const express = require('express');
 
-// Mock dependencies
-jest.mock('../../../server/models/User', () => ({
+jest.mock("../../../server/models/User", () => ({
   findRecent: jest.fn().mockResolvedValue([
-    { username: 'testuser1', displayName: 'Test User 1', lastActive: new Date() },
-    { username: 'testuser2', displayName: 'Test User 2', lastActive: new Date() }
+jest.mock('../../../server/models/Item', () => ({
+  find: jest.fn().mockResolvedValue([
+    { username: "testuser1", displayName: "Test User 1" },
+    { username: "testuser2", displayName: "Test User 2" }
   ]),
   countDocuments: jest.fn().mockResolvedValue(2),
+  findActive: jest.fn().mockResolvedValue([
+    { lastActive: new Date().toISOString() }
+  ])
+}));
+
+jest.mock('../../../server/models/ScrapyardItem', () => ({
   find: jest.fn().mockResolvedValue([
     { username: 'active1', lastActive: new Date() },
     { username: 'active2', lastActive: new Date() }
   ])
 }));
 
-jest.mock('../../../server/models/ScrapyardItem', () => ({
   findRecent: jest.fn().mockResolvedValue([
     { id: 1, title: 'Test Item 1' },
     { id: 2, title: 'Test Item 2' }
@@ -42,6 +48,19 @@ jest.mock('../../../server/models/Thread', () => ({
 
 jest.mock('../../../server/models/Reply', () => ({
   countDocuments: jest.fn().mockResolvedValue(10)
+}));
+
+// The index route uses ScrapyardItem, so mock it as well
+jest.mock('../../../server/models/ScrapyardItem', () => ({
+  findRecent: jest.fn().mockResolvedValue([
+    { id: 1, title: 'Test Item 1' },
+    { id: 2, title: 'Test Item 2' }
+  ]),
+  findFeatured: jest.fn().mockResolvedValue([
+    { id: 3, title: 'Featured Item 1' },
+    { id: 4, title: 'Featured Item 2' }
+  ]),
+  countDocuments: jest.fn().mockResolvedValue(2)
 }));
 
 const Visit = require('../../../server/models/Visit');

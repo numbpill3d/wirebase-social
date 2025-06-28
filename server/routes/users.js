@@ -50,7 +50,13 @@ router.post('/register', async (req, res, next) => {
     errors.push({ msg: 'Password should be at least 6 characters' });
   }
 
-  // Check username format and length
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (email && !emailRegex.test(email)) {
+    errors.push({ msg: 'Please enter a valid email address' });
+  }
+
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
   if (username && (username.length < 3 || username.length > 20)) {
     errors.push({ msg: 'Username must be between 3 and 20 characters' });
   }
@@ -210,37 +216,42 @@ router.post('/settings', ensureAuthenticated, async (req, res, next) => {
   const { displayName, email, statusMessage, customGlyph } = req.body;
   const errors = [];
 
-  // Validate inputs
-  if (displayName && displayName.length < 3) {
-    errors.push({ msg: 'Display name must be at least 3 characters' });
-  }
+// Validate inputs
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  if (email && !/^\S+@\S+\.\S+$/.test(email)) {
-    errors.push({ msg: 'Please enter a valid email address' });
-  }
+if (displayName && displayName.length < 3) {
+  errors.push({ msg: 'Display name must be at least 3 characters' });
+}
 
-  if (customGlyph && customGlyph.length > 2) {
-    errors.push({ msg: 'Custom glyph must be at most 2 characters' });
-  }
+if (email && !emailRegex.test(email)) {
+  errors.push({ msg: 'Please enter a valid email address' });
+}
 
-  // Check if new email already exists
-  if (email && email !== req.user.email) {
-    const existing = await User.findOne({ email });
-    if (existing) {
-      errors.push({ msg: 'Email is already registered' });
-    }
+if (customGlyph && customGlyph.length > 2) {
+  errors.push({ msg: 'Custom glyph must be at most 2 characters' });
+}
+
+// Check if new email already exists
+if (email && email !== req.user.email) {
+  const existing = await User.findOne({ email });
+  if (existing) {
+    errors.push({ msg: 'Email is already registered' });
   }
+}
 
   if (errors.length > 0) {
     return res.render('users/settings', {
       title: 'Account Settings - Wirebase',
       user: req.user,
       errors,
-      displayName,
-      email,
-      customGlyph,
-      statusMessage,
-      pageTheme: 'dark-dungeon'
+pageTheme: 'dark-dungeon',
+form: {
+  displayName,
+  email,
+  statusMessage,
+  customGlyph
+}
+
     });
   }
 
