@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const passport = require('passport');
 const User = require('../models/User');
 const { ensureAuthenticated } = require('../utils/auth-helpers');
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const emailRegex = /^[^\s@]+@([^\s@.]+\.)+[^\s@.]{2,}$/;
 
 // Login page
 router.get('/login', (req, res) => {
