@@ -211,7 +211,13 @@ router.post('/settings', ensureAuthenticated, async (req, res) => {
       title: 'Account Settings - Wirebase',
       user: req.user,
       errors,
-      pageTheme: 'dark-dungeon'
+      pageTheme: 'dark-dungeon',
+      form: {
+        displayName,
+        email,
+        statusMessage,
+        customGlyph
+      }
     });
   }
 
