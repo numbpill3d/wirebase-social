@@ -56,7 +56,7 @@ router.post('/register', async (req, res, next) => {
     errors.push({ msg: 'Please enter a valid email address' });
   }
 
-  // Check username format and length
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
   if (username && (username.length < 3 || username.length > 20)) {
     errors.push({ msg: 'Username must be between 3 and 20 characters' });
   }
