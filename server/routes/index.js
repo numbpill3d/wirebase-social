@@ -2,8 +2,10 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const ScrapyardItem = require('../models/ScrapyardItem');
+const Visit = require('../models/Visit');
 const Thread = require('../models/Thread');
 const Reply = require('../models/Reply');
+
 
 // Enhanced error middleware
 const errorHandler = (err, req, res, next) => {
@@ -30,6 +32,8 @@ const errorHandler = (err, req, res, next) => {
 // Home page route
 router.get('/', async (req, res) => {
   try {
+    await Visit.record(req.path);
+
     // Get data for widgets and main content
     const [
       recentUsers,
@@ -69,15 +73,9 @@ router.get('/', async (req, res) => {
     else if (activeUsers > 2) siteMood = 'calm';
     else siteMood = 'quiet';
 
-    // Generate hourly traffic data (mock data for now)
-    const hourlyTraffic = Array.from({ length: 24 }, (_, i) => {
-      // Generate random but somewhat realistic traffic pattern
-      let value = Math.floor(Math.random() * 10);
-      // Increase values during typical high-traffic hours
-      if (i >= 8 && i <= 11) value += 5; // Morning peak
-      if (i >= 19 && i <= 22) value += 8; // Evening peak
-      return { hour: i, value };
-    });
+    // Get hourly traffic data from visits
+    const visitCounts = await Visit.getHourlyCounts();
+    const hourlyTraffic = visitCounts.map(v => ({ hour: v.hour, value: v.count }));
 
     res.render('index', {
       title: 'Wirebase - Medieval Dungeon Fantasy Social Platform',
