@@ -49,9 +49,12 @@ const { supabase, supabaseAdmin } = require('./server/utils/database');
 
 // Configure Knex with optimized connection pooling and better error handling
 // Make knex instance globally available for utilities
+// Prefer the full database connection string if provided (e.g. from Render)
+// to avoid constructing credentials manually from Supabase values. This helps
+// prevent connection failures during deployment.
 global.knex = require('knex')({
   client: 'pg',
-  connection: {
+  connection: process.env.DATABASE_URL || {
     host: new URL(process.env.SUPABASE_URL).hostname,
     port: 5432,
     user: 'postgres',
