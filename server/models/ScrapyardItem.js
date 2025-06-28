@@ -345,16 +345,22 @@ class ScrapyardItem {
         throw error;
       }
 
-      let formattedItems = data.map(item => ScrapyardItem.formatItem(item));
+      let formattedItems = data.map(item => {
+        const formatted = ScrapyardItem.formatItem(item);
+        formatted.voteScore =
+          (formatted.votes.upvotes?.length || 0) -
+          (formatted.votes.downvotes?.length || 0);
+        return formatted;
+      });
 
       // Handle vote score sorting in memory
       if (options.sort && options.sort.voteScore) {
         const direction = options.sort.voteScore;
-        formattedItems.sort((a, b) => {
-          const scoreA = a.getVoteScore();
-          const scoreB = b.getVoteScore();
-          return direction === 1 ? scoreA - scoreB : scoreB - scoreA;
-        });
+        formattedItems.sort((a, b) =>
+          direction === 1
+            ? a.voteScore - b.voteScore
+            : b.voteScore - a.voteScore
+        );
       }
 
       return formattedItems;
