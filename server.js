@@ -489,40 +489,6 @@ process.on('SIGINT', gracefulShutdown);
 let healthCheckTimer;
 let leakDetectionTimers;
 
-// Helper function to start the server after verifying DB connection
-let server; // will hold HTTP server instance for graceful shutdown
-
-const startServer = async () => {
-  try {
-    const verified = await verifyDatabaseConnection();
-    if (!verified) {
-      console.error('Database connection could not be verified. Exiting...');
-      process.exit(1);
-    }
-
-    server = app.listen(PORT, () => {
-      console.log(`Wirebase server running in ${NODE_ENV} mode on port ${PORT}`);
-
-      // Start database monitoring after server starts
-      console.log('Starting database monitoring...');
-
-      // Start memory monitor
-      memoryMonitor.start();
-
-      // Start health checks (every 60 seconds)
-      healthCheckTimer = dbHealth.startPeriodicHealthChecks(60000);
-
-      // Start leak detection (check every 30 seconds, fix every 5 minutes)
-      leakDetectionTimers = dbLeakDetector.startLeakDetection(null, 30000, 300000);
-    });
-
-    // Add server timeout to prevent hanging connections
-    server.timeout = 120000; // 2 minutes
-  } catch (err) {
-    console.error('Failed to initialize and start server:', err);
-    process.exit(1);
-  }
-};
 
 // Start server after verifying database connection
 startServer();
