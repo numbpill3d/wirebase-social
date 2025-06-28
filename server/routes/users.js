@@ -6,6 +6,7 @@ const User = require('../models/User');
 const { ensureAuthenticated } = require('../utils/auth-helpers');
 const emailRegex = /^[^\s@]+@([^\s@.]+\.)+[^\s@.]{2,}$/;
 
+
 // Login page
 router.get('/login', (req, res) => {
   if (req.isAuthenticated()) {
@@ -33,7 +34,15 @@ router.get('/register', (req, res) => {
 
 // Handle user registration
 router.post('/register', async (req, res, next) => {
-  const { username, email, password, password2, displayName, customGlyph, statusMessage } = req.body;
+  const {
+    username,
+    email,
+    password,
+    password2,
+    displayName,
+    customGlyph,
+    statusMessage
+  } = req.body;
   const errors = [];
 
   // Check required fields
@@ -181,7 +190,7 @@ router.post('/forgot-password', async (req, res, next) => {
     const { supabaseAdmin } = require('../utils/database');
     // Request Supabase to send a password recovery email
     await supabaseAdmin.auth.resetPasswordForEmail(email, {
-redirectTo: `${req.protocol}://${req.get('host')}/users/reset-password`
+      redirectTo: `${req.protocol}://${req.get('host')}/users/reset-password`
     });
   } catch (err) {
     console.error(err);
@@ -189,7 +198,10 @@ redirectTo: `${req.protocol}://${req.get('host')}/users/reset-password`
   }
 
   // Always show the same message for security
-  req.flash('success_msg', 'If an account with that email exists, a password reset link has been sent');
+  req.flash(
+    'success_msg',
+    'If an account with that email exists, a password reset link has been sent'
+  );
   res.redirect('/users/login');
 });
 
@@ -211,40 +223,41 @@ router.post('/settings', ensureAuthenticated, async (req, res, next) => {
   const { displayName, email, statusMessage, customGlyph } = req.body;
   const errors = [];
 
-// Validate inputs
+  // Validate inputs
 
-if (displayName && displayName.length < 3) {
-  errors.push({ msg: 'Display name must be at least 3 characters' });
-}
 
-if (email && !emailRegex.test(email)) {
-  errors.push({ msg: 'Please enter a valid email address' });
-}
-
-if (customGlyph && customGlyph.length > 2) {
-  errors.push({ msg: 'Custom glyph must be at most 2 characters' });
-}
-
-// Check if new email already exists
-if (email && email !== req.user.email) {
-  const existing = await User.findOne({ email });
-  if (existing) {
-    errors.push({ msg: 'Email is already registered' });
+  if (displayName && displayName.length < 3) {
+    errors.push({ msg: 'Display name must be at least 3 characters' });
   }
-}
+
+  if (email && !emailRegex.test(email)) {
+    errors.push({ msg: 'Please enter a valid email address' });
+  }
+
+  if (customGlyph && customGlyph.length > 2) {
+    errors.push({ msg: 'Custom glyph must be at most 2 characters' });
+  }
+
+  // Check if new email already exists
+  if (email && email !== req.user.email) {
+    const existing = await User.findOne({ email });
+    if (existing) {
+      errors.push({ msg: 'Email is already registered' });
+    }
+  }
 
   if (errors.length > 0) {
     return res.render('users/settings', {
       title: 'Account Settings - Wirebase',
       user: req.user,
       errors,
-pageTheme: 'dark-dungeon',
-form: {
-  displayName,
-  email,
-  statusMessage,
-  customGlyph
-}
+      pageTheme: 'dark-dungeon',
+      form: {
+        displayName,
+        email,
+        statusMessage,
+        customGlyph
+      }
 
     });
   }
@@ -274,17 +287,17 @@ form: {
 router.post('/change-password', ensureAuthenticated, async (req, res, next) => {
   const { currentPassword, newPassword, confirmPassword } = req.body;
   const errors = [];
-  
+
   // Check password match
   if (newPassword !== confirmPassword) {
     errors.push({ msg: 'New passwords do not match' });
   }
-  
+
   // Check password length
   if (newPassword.length < 6) {
     errors.push({ msg: 'Password should be at least 6 characters' });
   }
-  
+
   if (errors.length > 0) {
     return res.render('users/settings', {
       title: 'Account Settings - Wirebase',
@@ -293,14 +306,14 @@ router.post('/change-password', ensureAuthenticated, async (req, res, next) => {
       pageTheme: 'dark-dungeon'
     });
   }
-  
+
   try {
     // Get user with password for verification
     const user = await User.findByIdWithPassword(req.user.id);
-    
+
     // Check current password
     const isMatch = await bcrypt.compare(currentPassword, user.password);
-    
+
     if (!isMatch) {
       errors.push({ msg: 'Current password is incorrect' });
       return res.render('users/settings', {
@@ -310,10 +323,10 @@ router.post('/change-password', ensureAuthenticated, async (req, res, next) => {
         pageTheme: 'dark-dungeon'
       });
     }
-    
+
     // Update with new password - hashing will be handled by the User model
     await User.findByIdAndUpdate(req.user.id, { password: newPassword });
-    
+
     req.flash('success_msg', 'Password updated successfully');
     res.redirect('/users/settings');
   } catch (err) {
