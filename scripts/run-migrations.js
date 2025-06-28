@@ -5,6 +5,7 @@
 const createStreetpassTable = require('./migrations/create-streetpass-table');
 const createForumTables = require('./migrations/create-forum-tables');
 const createWIRTransactionsTable = require('./migrations/create-wir-transactions-table');
+const createTrafficTable = require('./migrations/create-traffic-table');
 
 async function runMigrations() {
   console.log('Running database migrations...');
@@ -27,6 +28,11 @@ async function runMigrations() {
     const wirResult = await createWIRTransactionsTable();
     console.log('Result:', wirResult);
     if (wirResult.error) {
+
+    // Run Traffic table migration
+    console.log('\n=== Running Traffic table migration ===');
+    const trafficResult = await createTrafficTable();
+    console.log('Result:', trafficResult);
 
     // Add more migrations here as needed
 

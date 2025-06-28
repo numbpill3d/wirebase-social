@@ -18,41 +18,46 @@ async function createWIRTransactionsTable() {
       // Table doesn't exist, create it
       console.log('Creating market_wir_transactions table...');
       
-      const { error: createError } = await supabaseAdmin.rpc('sql', {
-        q: `
-          CREATE TABLE market_wir_transactions (
-            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-            user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-            amount INTEGER NOT NULL,
-            transaction_type TEXT NOT NULL,
-            reference_id UUID,
-            notes TEXT,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+const { error: createError } = await supabaseAdmin.rpc('execute_sql', {
+  sql: `
+    BEGIN;
+    CREATE TABLE market_wir_transactions (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      amount INTEGER NOT NULL,
+      transaction_type TEXT NOT NULL,
+      reference_id UUID,
+      notes TEXT,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 
-            -- Add constraints
-            CONSTRAINT valid_transaction_type CHECK (
-              transaction_type IN (
-                'purchase',
-                'sale',
-                'transfer',
-                'reward',
-                'listing_fee',
-                'featured_fee',
-                'loot_to_wir_conversion',
-                'wir_to_loot_conversion'
-              )
-            )
-          );
+      -- Add constraints
+      CONSTRAINT valid_transaction_type CHECK (
+        transaction_type IN (
+          'purchase',
+          'sale',
+          'transfer',
+          'reward',
+          'listing_fee',
+          'featured_fee',
+          'loot_to_wir_conversion',
+          'wir_to_loot_conversion'
+        )
+      )
+    );
 
-          -- Create indexes
-          CREATE INDEX idx_wir_transactions_user_id ON market_wir_transactions(user_id);
-          CREATE INDEX idx_wir_transactions_reference_id ON market_wir_transactions(reference_id);
-          CREATE INDEX idx_wir_transactions_created_at ON market_wir_transactions(created_at);
-          CREATE INDEX idx_wir_transactions_type ON market_wir_transactions(transaction_type);
-        `
-      });
+    -- Create indexes
+    CREATE INDEX idx_wir_transactions_user_id ON market_wir_transactions(user_id);
+    CREATE INDEX idx_wir_transactions_reference_id ON market_wir_transactions(reference_id);
+    CREATE INDEX idx_wir_transactions_created_at ON market_wir_transactions(created_at);
+    CREATE INDEX idx_wir_transactions_type ON market_wir_transactions(transaction_type);
+    COMMIT;
+  `
+});
 
-      if (createError) {
+if (createError) {
+  throw new Error(`market_wir_transactions migration failed: ${createError.message}`);
+}
+
       
       console.log('market_wir_transactions table created successfully!');
     } else {

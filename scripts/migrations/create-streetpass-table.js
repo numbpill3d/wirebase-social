@@ -18,28 +18,33 @@ async function createStreetpassTable() {
       // Table doesn't exist, create it
       console.log('Creating streetpass_visits table...');
       
-      const { error: createError } = await supabaseAdmin.rpc('sql', {
-        q: `
-          CREATE TABLE streetpass_visits (
-            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-            visitor_id UUID NOT NULL REFERENCES users(id),
-            profile_id UUID NOT NULL REFERENCES users(id),
-            emote TEXT,
-            visited_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+const { error: createError } = await supabaseAdmin.rpc('execute_sql', {
+  sql: `
+    BEGIN;
+    CREATE TABLE streetpass_visits (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      visitor_id UUID NOT NULL REFERENCES users(id),
+      profile_id UUID NOT NULL REFERENCES users(id),
+      emote TEXT,
+      visited_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 
-            -- Add constraints
-            CONSTRAINT unique_visitor_profile UNIQUE (visitor_id, profile_id),
-            CONSTRAINT no_self_visits CHECK (visitor_id != profile_id)
-          );
+      -- Add constraints
+      CONSTRAINT unique_visitor_profile UNIQUE (visitor_id, profile_id),
+      CONSTRAINT no_self_visits CHECK (visitor_id != profile_id)
+    );
 
-          -- Create indexes
-          CREATE INDEX idx_streetpass_visits_profile_id ON streetpass_visits(profile_id);
-          CREATE INDEX idx_streetpass_visits_visitor_id ON streetpass_visits(visitor_id);
-          CREATE INDEX idx_streetpass_visits_visited_at ON streetpass_visits(visited_at);
-        `
-      });
+    -- Create indexes
+    CREATE INDEX idx_streetpass_visits_profile_id ON streetpass_visits(profile_id);
+    CREATE INDEX idx_streetpass_visits_visitor_id ON streetpass_visits(visitor_id);
+    CREATE INDEX idx_streetpass_visits_visited_at ON streetpass_visits(visited_at);
+    COMMIT;
+  `
+});
 
-      if (createError) {
+if (createError) {
+  throw new Error(\`Streetpass visits table migration failed: \${createError.message}\`);
+}
+
       
       console.log('streetpass_visits table created successfully!');
     } else {

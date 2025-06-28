@@ -18,33 +18,36 @@ async function createForumTables() {
       // Table doesn't exist, create it
       console.log('Creating forum_threads table...');
       
-      const { error: createError } = await supabaseAdmin.rpc('sql', {
-        q: `
-          BEGIN;
-          CREATE TABLE forum_threads (
-            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-            title TEXT NOT NULL,
-            content TEXT NOT NULL,
-            category TEXT NOT NULL,
-            creator_id UUID NOT NULL REFERENCES users(id),
-            tags JSONB DEFAULT '[]'::jsonb,
-            views INTEGER DEFAULT 0,
-            is_pinned BOOLEAN DEFAULT false,
-            is_locked BOOLEAN DEFAULT false,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-            updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-          );
+const { error: createError } = await supabaseAdmin.rpc('execute_sql', {
+  sql: `
+    BEGIN;
+    CREATE TABLE forum_threads (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      title TEXT NOT NULL,
+      content TEXT NOT NULL,
+      category TEXT NOT NULL,
+      creator_id UUID NOT NULL REFERENCES users(id),
+      tags JSONB DEFAULT '[]'::jsonb,
+      views INTEGER DEFAULT 0,
+      is_pinned BOOLEAN DEFAULT false,
+      is_locked BOOLEAN DEFAULT false,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+      updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    );
 
-          -- Create indexes
-          CREATE INDEX idx_forum_threads_category ON forum_threads(category);
-          CREATE INDEX idx_forum_threads_creator_id ON forum_threads(creator_id);
-          CREATE INDEX idx_forum_threads_created_at ON forum_threads(created_at);
-          CREATE INDEX idx_forum_threads_updated_at ON forum_threads(updated_at);
-          COMMIT;
-        `
-      });
+    -- Create indexes
+    CREATE INDEX idx_forum_threads_category ON forum_threads(category);
+    CREATE INDEX idx_forum_threads_creator_id ON forum_threads(creator_id);
+    CREATE INDEX idx_forum_threads_created_at ON forum_threads(created_at);
+    CREATE INDEX idx_forum_threads_updated_at ON forum_threads(updated_at);
+    COMMIT;
+  `
+});
 
-      if (createError) {
+if (createError) {
+  throw new Error(`Migration failed: ${createError.message}`);
+}
+
       
       console.log('forum_threads table created successfully!');
     } else {
@@ -61,25 +64,30 @@ async function createForumTables() {
       // Table doesn't exist, create it
       console.log('Creating forum_replies table...');
       
-      const { error: replyCreateError } = await supabaseAdmin.rpc('sql', {
-        q: `
-          CREATE TABLE forum_replies (
-            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-            thread_id UUID NOT NULL REFERENCES forum_threads(id) ON DELETE CASCADE,
-            content TEXT NOT NULL,
-            creator_id UUID NOT NULL REFERENCES users(id),
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-            updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-          );
+const { error: replyCreateError } = await supabaseAdmin.rpc('execute_sql', {
+  sql: `
+    BEGIN;
+    CREATE TABLE forum_replies (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      thread_id UUID NOT NULL REFERENCES forum_threads(id) ON DELETE CASCADE,
+      content TEXT NOT NULL,
+      creator_id UUID NOT NULL REFERENCES users(id),
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+      updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    );
 
-          -- Create indexes
-          CREATE INDEX idx_forum_replies_thread_id ON forum_replies(thread_id);
-          CREATE INDEX idx_forum_replies_creator_id ON forum_replies(creator_id);
-          CREATE INDEX idx_forum_replies_created_at ON forum_replies(created_at);
-        `
-      });
+    -- Create indexes
+    CREATE INDEX idx_forum_replies_thread_id ON forum_replies(thread_id);
+    CREATE INDEX idx_forum_replies_creator_id ON forum_replies(creator_id);
+    CREATE INDEX idx_forum_replies_created_at ON forum_replies(created_at);
+    COMMIT;
+  `
+});
 
-      if (replyCreateError) {
+if (replyCreateError) {
+  throw new Error(`Reply table migration failed: ${replyCreateError.message}`);
+}
+
       
       console.log('forum_replies table created successfully!');
     } else {
@@ -96,24 +104,29 @@ async function createForumTables() {
       // Table doesn't exist, create it
       console.log('Creating forum_categories table...');
       
-      const { error: catCreateError } = await supabaseAdmin.rpc('sql', {
-        q: `
-          CREATE TABLE forum_categories (
-            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-            name TEXT NOT NULL UNIQUE,
-            description TEXT,
-            icon TEXT,
-            display_order INTEGER DEFAULT 0,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-            updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-          );
+const { error: catCreateError } = await supabaseAdmin.rpc('execute_sql', {
+  sql: `
+    BEGIN;
+    CREATE TABLE forum_categories (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      name TEXT NOT NULL UNIQUE,
+      description TEXT,
+      icon TEXT,
+      display_order INTEGER DEFAULT 0,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+      updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    );
 
-          -- Create index
-          CREATE INDEX idx_forum_categories_display_order ON forum_categories(display_order);
-        `
-      });
+    -- Create index
+    CREATE INDEX idx_forum_categories_display_order ON forum_categories(display_order);
+    COMMIT;
+  `
+});
 
-      if (catCreateError) {
+if (catCreateError) {
+  throw new Error(\`Category table migration failed: \${catCreateError.message}\`);
+}
+
       
       // Insert default categories
       await supabaseAdmin.from('forum_categories').insert([
