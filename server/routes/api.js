@@ -181,11 +181,9 @@ router.get('/market/items/:id', async (req, res) => {
 const avatarStorage = multer.diskStorage({
   destination: function (_req, _file, cb) {
     const dir = path.join(__dirname, '../../public/uploads/avatars');
-fs.mkdir(dir, { recursive: true }, (err) => cb(err, dir));
+    fs.mkdir(dir, { recursive: true }, err => cb(err, dir));
   },
   filename: function (_req, file, cb) {
-    // Remove validation from filename function - handle in main route
-    cb(null, Date.now() + '-' + file.originalname.replace(/[^a-zA-Z0-9.]/g, '_'));
     cb(null, Date.now() + '-' + file.originalname.replace(/[^a-zA-Z0-9.]/g, '_'));
   }
 });
@@ -193,36 +191,45 @@ fs.mkdir(dir, { recursive: true }, (err) => cb(err, dir));
 const uploadAvatar = multer({
   storage: avatarStorage,
   limits: {
-    fileSize: process.env.MAX_UPLOAD_SIZE || 5242880,
-    limits: {
-      fileSize: parseInt(process.env.MAX_UPLOAD_SIZE) || 5242880,
-      files: 1
-
-router.post('/user/avatar', ensureAuthenticated, uploadAvatar.single('avatar'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ success: false, message: 'No file uploaded' });
-    }
-
-    const relativePath = `/uploads/avatars/${path.basename(req.file.path)}`;
-
-    await User.findByIdAndUpdate(req.user.id, { avatar: relativePath });
-
-
-const user = await User.findByIdAndUpdate(req.user.id, { avatar: relativePath });
-if (!user) {
-  fs.unlink(req.file.path, () => {});
-  throw new Error('User not found');
-}
-    console.error('Error uploading avatar:', error);
-    if (req.file) fs.unlink(req.file.path, () => {});
-    res.status(500).json({
-      success: false,
-      message: 'Failed to upload avatar',
-      error: process.env.NODE_ENV !== 'production' ? error.message : 'Server error'
-    });
+    fileSize: parseInt(process.env.MAX_UPLOAD_SIZE) || 5242880,
+    files: 1
   }
 });
+
+router.post(
+  '/user/avatar',
+  ensureAuthenticated,
+  uploadAvatar.single('avatar'),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ success: false, message: 'No file uploaded' });
+      }
+
+      const relativePath = `/uploads/avatars/${path.basename(req.file.path)}`;
+      const user = await User.findByIdAndUpdate(
+        req.user.id,
+        { avatar: relativePath },
+        { new: true }
+      );
+
+      if (!user) {
+        fs.unlink(req.file.path, () => {});
+        return res.status(404).json({ success: false, message: 'User not found' });
+      }
+
+      res.json({ success: true, avatarUrl: relativePath });
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      if (req.file) fs.unlink(req.file.path, () => {});
+      res.status(500).json({
+        success: false,
+        message: 'Failed to upload avatar',
+        error: process.env.NODE_ENV !== 'production' ? error.message : 'Server error'
+      });
+    }
+  }
+);
 
 // === Streetpass API Endpoints ===
 
