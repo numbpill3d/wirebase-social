@@ -1,7 +1,12 @@
-/**
- * Simple Item model used for tests
- */
-module.exports = {
-  findRecent: async () => [],
-  findFeatured: async () => []
-};
+class Item {
+  static async findRecent() {
+    return [];
+  }
+
+  static async findFeatured() {
+    return [];
+  }
+}
+
+module.exports = Item;
+
