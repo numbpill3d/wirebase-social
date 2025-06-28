@@ -34,12 +34,13 @@ const memoryMonitor = {
 // Start monitoring memory usage
 const start = (interval = 300000, threshold = 80) => {
   if (timer) {
-    return timer;
+    console.warn('Memory monitor is already running');
+    return false;
   }
   timer = setInterval(() => {
     memoryMonitor.logMemoryUsage(threshold);
   }, interval);
-  return timer;
+  return true;
 };
 
 // Stop monitoring memory usage
