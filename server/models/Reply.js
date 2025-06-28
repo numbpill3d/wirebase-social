@@ -234,7 +234,7 @@ class Reply {
         .select('id', { count: 'exact' });
 
       Object.entries(query).forEach(([key, value]) => {
-        const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+        const snakeKey = key.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
         supabaseQuery = supabaseQuery.eq(snakeKey, value);
       });
 
