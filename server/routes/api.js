@@ -68,7 +68,7 @@ router.get('/scrapyard', async (req, res) => {
 
     const items = await ScrapyardItem.find(
       query,
-      { sort: { createdAt: -1 }, limit: 20 }
+      { sort: { createdAt: -1 }, limit: 20, populate: { path: 'creator', select: 'username displayName avatar customGlyph' } }
     );
 
     res.json(items);
