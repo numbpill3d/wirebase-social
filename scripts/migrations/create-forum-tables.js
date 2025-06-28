@@ -113,7 +113,7 @@ async function createForumTables() {
         `
       });
 
-      if (catCreateError) throw catCreateError;
+      if (catCreateError) {
       
       // Insert default categories
       await supabaseAdmin.from('forum_categories').insert([
