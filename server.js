@@ -143,7 +143,7 @@ const startServer = async () => {
     // Add server timeout to prevent hanging connections
     server.timeout = 120000; // 2 minutes
   } catch (err) {
-    console.error('Error verifying database connection:', err);
+    console.error('Failed to initialize and start server:', err);
     process.exit(1);
   }
 };
