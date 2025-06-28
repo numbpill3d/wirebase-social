@@ -14,8 +14,9 @@ try {
 
 const { validateEnv } = require('./server/utils/env-check');
 if (!validateEnv()) {
-  console.error('Environment validation failed. Exiting.');
-  process.exit(1);
+  console.error('Environment validation failed. Starting minimal server instead.');
+  require('./minimal-server');
+  return;
 }
 
 // Verify required environment variables

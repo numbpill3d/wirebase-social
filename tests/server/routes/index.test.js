@@ -4,12 +4,17 @@
 const request = require('supertest');
 const express = require('express');
 
-jest.mock("../../../server/models/User", () => ({
+jest.mock('../../../server/models/User', () => ({
   findRecent: jest.fn().mockResolvedValue([
+    { username: 'user1', displayName: 'User 1' },
+    { username: 'user2', displayName: 'User 2' }
+  ])
+}));
+
 jest.mock('../../../server/models/Item', () => ({
   find: jest.fn().mockResolvedValue([
-    { username: "testuser1", displayName: "Test User 1" },
-    { username: "testuser2", displayName: "Test User 2" }
+    { username: 'user1', displayName: 'User 1' },
+    { username: 'user2', displayName: 'User 2' }
   ]),
   countDocuments: jest.fn().mockResolvedValue(2),
   findActive: jest.fn().mockResolvedValue([
@@ -18,12 +23,6 @@ jest.mock('../../../server/models/Item', () => ({
 }));
 
 jest.mock('../../../server/models/ScrapyardItem', () => ({
-  find: jest.fn().mockResolvedValue([
-    { username: 'active1', lastActive: new Date() },
-    { username: 'active2', lastActive: new Date() }
-  ])
-}));
-
   findRecent: jest.fn().mockResolvedValue([
     { id: 1, title: 'Test Item 1' },
     { id: 2, title: 'Test Item 2' }
@@ -32,7 +31,11 @@ jest.mock('../../../server/models/ScrapyardItem', () => ({
     { id: 3, title: 'Featured Item 1' },
     { id: 4, title: 'Featured Item 2' }
   ]),
-  countDocuments: jest.fn().mockResolvedValue(2)
+  countDocuments: jest.fn().mockResolvedValue(2),
+  find: jest.fn().mockResolvedValue([
+    { username: 'active1', lastActive: new Date() },
+    { username: 'active2', lastActive: new Date() }
+  ])
 }));
 
 jest.mock('../../../server/models/Visit', () => ({
@@ -50,35 +53,16 @@ jest.mock('../../../server/models/Reply', () => ({
   countDocuments: jest.fn().mockResolvedValue(10)
 }));
 
-// The index route uses ScrapyardItem, so mock it as well
-jest.mock('../../../server/models/ScrapyardItem', () => ({
-  findRecent: jest.fn().mockResolvedValue([
-    { id: 1, title: 'Test Item 1' },
-    { id: 2, title: 'Test Item 2' }
-  ]),
-  findFeatured: jest.fn().mockResolvedValue([
-    { id: 3, title: 'Featured Item 1' },
-    { id: 4, title: 'Featured Item 2' }
-  ]),
-  countDocuments: jest.fn().mockResolvedValue(2)
-}));
-
 const Visit = require('../../../server/models/Visit');
-const Thread = require('../../../server/models/Thread');
-const Reply = require('../../../server/models/Reply');
 
-
-// Mock express-handlebars
 jest.mock('express-handlebars', () => ({
   engine: () => jest.fn()
 }));
 
-// Create a mock Express app
 const app = express();
 app.set('view engine', 'handlebars');
 app.set('views', './server/views');
 
-// Mock render function
 app.use((req, res, next) => {
   res.render = jest.fn().mockImplementation((view, options) => {
     res.send({ view, options });
@@ -86,7 +70,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Import the router
 const indexRouter = require('../../../server/routes/index');
 app.use('/', indexRouter);
 

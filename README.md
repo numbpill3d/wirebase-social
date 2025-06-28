@@ -152,6 +152,14 @@ Users can create their profiles with raw HTML/CSS, either through:
 See [docs/API.md](docs/API.md) for a summary of available `/api` routes.
 
 ## Environment Setup
+Create a `.env` file by copying the provided example:
+
+```bash
+cp .env.example .env
+```
+
+Then update the values inside `.env`:
+
 ```bash
 # Required environment variables
 SUPABASE_URL=your-supabase-url
