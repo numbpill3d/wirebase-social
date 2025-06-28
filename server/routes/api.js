@@ -4,7 +4,10 @@ const User = require('../models/User');
 const ScrapyardItem = require('../models/ScrapyardItem');
 const MarketItem = require('../models/MarketItem');
 const Streetpass = require('../models/Streetpass');
+const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
+
 
 // Middleware to ensure user is authenticated
 const ensureAuthenticated = (req, res, next) => {
@@ -168,6 +171,53 @@ router.get('/market/items/:id', async (req, res) => {
         process.env.NODE_ENV !== 'production'
           ? error.message
           : 'An error occurred while fetching the marketplace item'
+    });
+  }
+});
+
+// Upload a new avatar for the current user
+const avatarStorage = multer.diskStorage({
+  destination: function (_req, _file, cb) {
+    const dir = path.join(__dirname, '../../public/uploads/avatars');
+fs.mkdir(dir, { recursive: true }, (err) => cb(err, dir));
+  },
+  filename: function (_req, file, cb) {
+    // Remove validation from filename function - handle in main route
+    cb(null, Date.now() + '-' + file.originalname.replace(/[^a-zA-Z0-9.]/g, '_'));
+    cb(null, Date.now() + '-' + file.originalname.replace(/[^a-zA-Z0-9.]/g, '_'));
+  }
+});
+
+const uploadAvatar = multer({
+  storage: avatarStorage,
+  limits: {
+    fileSize: process.env.MAX_UPLOAD_SIZE || 5242880,
+    limits: {
+      fileSize: parseInt(process.env.MAX_UPLOAD_SIZE) || 5242880,
+      files: 1
+
+router.post('/user/avatar', ensureAuthenticated, uploadAvatar.single('avatar'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+
+    const relativePath = `/uploads/avatars/${path.basename(req.file.path)}`;
+
+    await User.findByIdAndUpdate(req.user.id, { avatar: relativePath });
+
+
+const user = await User.findByIdAndUpdate(req.user.id, { avatar: relativePath });
+if (!user) {
+  fs.unlink(req.file.path, () => {});
+  throw new Error('User not found');
+}
+    console.error('Error uploading avatar:', error);
+    if (req.file) fs.unlink(req.file.path, () => {});
+    res.status(500).json({
+      success: false,
+      message: 'Failed to upload avatar',
+      error: process.env.NODE_ENV !== 'production' ? error.message : 'Server error'
     });
   }
 });
