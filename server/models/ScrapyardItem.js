@@ -349,8 +349,8 @@ class ScrapyardItem {
       if (options.sort && options.sort.voteScore) {
         const direction = options.sort.voteScore;
         formattedItems.sort((a, b) => {
-          const scoreA = (a.votes.upvotes?.length || 0) - (a.votes.downvotes?.length || 0);
-          const scoreB = (b.votes.upvotes?.length || 0) - (b.votes.downvotes?.length || 0);
+          const scoreA = a.getVoteScore();
+          const scoreB = b.getVoteScore();
           return direction === 1 ? scoreA - scoreB : scoreB - scoreA;
         });
       }
