@@ -49,7 +49,7 @@ class StreetpassWidget extends HTMLElement {
                     throw new Error('Invalid visitor data structure');
                 }
                 return {
-                    id: visitor.id,
+                    timestamp: visitor.visitedAt ? new Date(visitor.visitedAt).getTime() : Date.now(),
                     username: visitor.visitor.username,
                     displayName: visitor.visitor.displayName,
                     glyph: visitor.visitor.customGlyph,
