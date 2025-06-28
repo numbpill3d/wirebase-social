@@ -182,10 +182,8 @@ const avatarStorage = multer.diskStorage({
     cb(null, dir);
   },
   filename: function (_req, file, cb) {
-    const allowed = ['image/jpeg', 'image/png', 'image/gif'];
-    if (!allowed.includes(file.mimetype)) {
-      return cb(new Error('Invalid file type'));
-    }
+    // Remove validation from filename function - handle in main route
+    cb(null, Date.now() + '-' + file.originalname.replace(/[^a-zA-Z0-9.]/g, '_'));
     cb(null, Date.now() + '-' + file.originalname.replace(/[^a-zA-Z0-9.]/g, '_'));
   }
 });
