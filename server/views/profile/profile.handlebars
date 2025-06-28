@@ -456,7 +456,12 @@
                             .then(data => {
                                 if (data.success) {
                                     // Update avatar on page
-                                    profileAvatar.src = data.avatarUrl + '?t=' + new Date().getTime();
+                                    const newUrl = data.avatarUrl + '?t=' + new Date().getTime();
+                                    profileAvatar.src = newUrl;
+                                    const smallAvatar = document.querySelector('.user-avatar-small');
+                                    if (smallAvatar) {
+                                        smallAvatar.src = newUrl;
+                                    }
                                 } else {
                                     alert('Failed to upload avatar: ' + data.error);
                                 }
