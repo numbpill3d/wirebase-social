@@ -204,11 +204,11 @@ const mockUser = {
               eq: () => ({
                 single: () => Promise.resolve({ data: mockUser, error: null })
               })
-update: () => ({
-  eq: () => Promise.resolve({ error: null })
-})
-
+            }),
+            update: () => ({
+              eq: () => Promise.resolve({ error: null })
             })
+
           };
         }
 
