@@ -236,11 +236,13 @@ router.get('/item/:id', async (req, res, next) => {
     await ScrapyardItem.findByIdAndUpdate(req.params.id, { $inc: { usageCount: 1 } });
 
     // Get similar items
-    let similarItems = await ScrapyardItem.find(
-      { category: item.category },
-      { sort: { createdAt: -1 }, limit: 5 }
+    const similarItems = await ScrapyardItem.find(
+      { 
+        category: item.category,
+        _id: { $ne: item._id }
+      },
+      { sort: { createdAt: -1 }, limit: 4 }
     );
-    similarItems = similarItems.filter(sim => sim.id !== item.id).slice(0, 4);
 
     res.render('scrapyard/item', {
       title: `${item.title} - Wirebase Scrapyard`,
