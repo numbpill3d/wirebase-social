@@ -77,7 +77,7 @@ async function createForumTables() {
         `
       });
 
-      if (replyCreateError) throw replyCreateError;
+      if (replyCreateError) {
       
       console.log('forum_replies table created successfully!');
     } else {
