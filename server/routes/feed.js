@@ -59,7 +59,24 @@ router.get('/', async (req, res, next) => {
         .limit(20)
         .select('username displayName avatar customGlyph statusMessage lastActive'),
         
-      ScrapyardItem.find({}, { sort: { createdAt: -1 }, limit: 20 })
+const { data: items, error } = await supabase
+  .from('scrapyard_items')
+  .select(`
+    title,
+    category,
+    description,
+    previewImage,
+    createdAt,
+    creator:users (
+      username,
+      displayName,
+      avatar,
+      customGlyph
+    )
+  `)
+  .order('createdAt', { ascending: false })
+  .limit(20);
+
     ]);
 
     // Add recent user updates to feed
@@ -236,10 +253,12 @@ router.get('/scrapyard/:category', async (req, res, next) => {
     const query = category === 'all' ? {} : { category: category };
     
     // Get recent items
-    const items = await ScrapyardItem.find(query, {
-      sort: { createdAt: -1 },
-      limit: 30
-    });
+const { data: items, error } = await supabase
+  .from('scrapyard_items')
+  .select('*') // or specify fields
+  .order('createdAt', { ascending: false })
+  .limit(30);
+
     
     // Add items to feed
     items.forEach(item => {

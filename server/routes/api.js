@@ -74,9 +74,11 @@ router.get('/scrapyard', async (req, res) => {
     const category = req.query.category;
     const query = category ? { category } : {};
 
-    const items = await ScrapyardItem.find(query)
-      .sort({ createdAt: -1 })
-      .limit(20);
+const items = await ScrapyardItem.find(query)
+  .sort({ createdAt: -1 })
+  .limit(20)
+  .populate('creator', 'username displayName avatar customGlyph');
+
 
     res.json(items);
   } catch (err) {

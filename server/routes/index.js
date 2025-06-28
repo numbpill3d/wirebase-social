@@ -150,7 +150,7 @@ ScrapyardItem.find(
     skip,
     limit
   }
-)
+);
 
     ]);
 
