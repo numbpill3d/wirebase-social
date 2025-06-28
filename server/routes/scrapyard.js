@@ -545,7 +545,7 @@ router.get('/search', async (req, res, next) => {
     const items = await ScrapyardItem.query(queryOptions);
 
     // Count total results for pagination
-    const total = (await ScrapyardItem.query({ filter: queryOptions.filter })).length;
+    const total = await ScrapyardItem.count({ filter: queryOptions.filter });
     const totalPages = Math.ceil(total / limit);
 
     res.render('scrapyard/search', {
