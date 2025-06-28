@@ -59,13 +59,13 @@ You can use these accounts to explore the platform:
 
 ### Prerequisites
 - Node.js (v16 or higher)
-- MongoDB (local or remote)
+- Supabase project credentials
 
 ### Installation
 
 1. Clone the repository
    ```
-   git clone https://github.com/yourusername/wirebase.git
+   git clone https://github.com/yourusername/wirebase-social.git
    cd wirebase
    ```
 
@@ -77,14 +77,16 @@ You can use these accounts to explore the platform:
 3. Create a `.env` file in the root directory with the following variables:
    ```
    PORT=3000
-   MONGODB_URI=mongodb://localhost:27017/wirebase
+   SUPABASE_URL=your-supabase-url
+   SUPABASE_KEY=your-anon-key
+   SUPABASE_SERVICE_KEY=your-service-role-key
    SESSION_SECRET=your-session-secret
    NODE_ENV=development
    ```
 
 4. Seed the database with initial data
    ```
-   node scripts/seed.js
+   node scripts/seed-defaults.js
    ```
 
 5. Start the development server
@@ -118,9 +120,9 @@ You can use these accounts to explore the platform:
    - `NODE_ENV`: `production`
    - `SESSION_SECRET`: (generate a random string)
    - `PORT`: `10000` (or use Render assigned port)
-   - `MONGODB_URI`: (your MongoDB connection string)
-
-3. Create a MongoDB database and connect it to your service
+   - `SUPABASE_URL`: your Supabase project URL
+   - `SUPABASE_KEY`: your Supabase anon key
+   - `SUPABASE_SERVICE_KEY`: your service role key
 
 ## Customization
 
@@ -145,6 +147,10 @@ Users can create their profiles with raw HTML/CSS, either through:
 - **Authentication**: Passport.js with Supabase Auth
 - **Templates**: Handlebars
 
+## API Documentation
+
+See [docs/API.md](docs/API.md) for a summary of available `/api` routes.
+
 ## Environment Setup
 ```bash
 # Required environment variables
@@ -156,6 +162,16 @@ PORT=3000
 NODE_ENV=development
 ```
 
+## Continuous Integration
+
+Run the following commands in your CI pipeline:
+
+```bash
+npm ci
+npm run lint
+npm test
+```
+
 ## License
 
 This project is available under the MIT License. See the [LICENSE](LICENSE) file for details.
@@ -163,4 +179,4 @@ This project is available under the MIT License. See the [LICENSE](LICENSE) file
 ## Acknowledgements
 
 - Design inspired by Windows 98 UI and medieval fantasy aesthetics, as well as by the Ethos and Feeling of the Wired, from Serial Experiments Lain. Temple OS also.
-- Built with Express.js, MongoDB, and Handlebars
+- Built with Express.js, Supabase, and Handlebars

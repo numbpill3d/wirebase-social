@@ -223,6 +223,33 @@ class Reply {
   }
 
   /**
+   * Count replies that match a query
+   * @param {Object} query - Query filters
+   * @returns {Promise<number>} - Count of matching replies
+   */
+  static async countDocuments(query = {}) {
+    try {
+      let supabaseQuery = supabase
+        .from('forum_replies')
+        .select('*', { count: 'exact', head: true });
+
+      Object.entries(query).forEach(([key, value]) => {
+        const snakeKey = key.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
+        supabaseQuery = supabaseQuery.eq(snakeKey, value);
+      });
+
+      const { count, error } = await supabaseQuery;
+
+      if (error) throw error;
+
+      return count || 0;
+    } catch (error) {
+      console.error('Error counting replies:', error);
+      return 0;
+    }
+  }
+
+  /**
    * Format a reply object from database to application format
    * @param {Object} dbReply - Reply object from database
    * @returns {Object} Formatted reply object
