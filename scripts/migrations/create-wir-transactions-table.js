@@ -52,7 +52,7 @@ async function createWIRTransactionsTable() {
         `
       });
 
-      if (createError) throw createError;
+      if (createError) {
       
       console.log('market_wir_transactions table created successfully!');
     } else {
