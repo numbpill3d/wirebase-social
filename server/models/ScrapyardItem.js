@@ -459,8 +459,8 @@ class ScrapyardItem {
       if (options.sort && Object.keys(options.sort)[0] === 'voteScore') {
         const direction = Object.values(options.sort)[0];
         result.sort((a, b) => {
-          const scoreA = (a.votes.upvotes?.length || 0) - (a.votes.downvotes?.length || 0);
-          const scoreB = (b.votes.upvotes?.length || 0) - (b.votes.downvotes?.length || 0);
+          const scoreA = a.getVoteScore();
+          const scoreB = b.getVoteScore();
           return direction === 1 ? scoreA - scoreB : scoreB - scoreA;
         });
       }
