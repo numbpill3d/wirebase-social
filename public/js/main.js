@@ -630,7 +630,7 @@ function showConnectionNotification() {
     emoteButtons.forEach(button => {
         button.addEventListener('click', () => {
             const emote = button.textContent;
-            recordEmote(emote);
+            recordEmote(emote, window.currentVisitId);
             playSound('click');
             fadeOutElement(notification, () => notification.remove());
 
@@ -650,24 +650,36 @@ function showConnectionNotification() {
 /**
  * Record an emote for the Streetpass system
  */
-function recordEmote(emote) {
-    // In a real app, this would send the data to the server
-
-    // Show notification that emote was recorded
-    const toast = document.createElement('div');
-    toast.className = 'emote-toast';
-    toast.innerHTML = `
-        <div class="emote-icon">${emote}</div>
-        <div class="emote-message">Signal transmitted!</div>
-    `;
-
-    document.body.appendChild(toast);
-
-    // Remove after 3 seconds
-    setTimeout(() => {
-        toast.classList.add('fade-out');
-        setTimeout(() => toast.remove(), 500);
-    }, 3000);
+function recordEmote(emote, visitId) {
+    fetch('/api/streetpass/emote', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ emote, visitId })
+    })
+        .then(async response => {
+            const data = await response.json().catch(() => ({}));
+            if (response.ok && data.success) {
+                const toast = document.createElement('div');
+                toast.className = 'emote-toast';
+                toast.innerHTML = `
+                    <div class="emote-icon">${emote}</div>
+                    <div class="emote-message">Signal transmitted!</div>
+                `;
+                document.body.appendChild(toast);
+                setTimeout(() => {
+                    toast.classList.add('fade-out');
+                    setTimeout(() => toast.remove(), 500);
+                }, 3000);
+            } else {
+                throw new Error(data.message || 'Failed to record emote');
+            }
+        })
+        .catch(error => {
+            console.error('Error recording emote:', error);
+            showErrorToast(error.message || 'Failed to record emote');
+        });
 }
 
 /**
