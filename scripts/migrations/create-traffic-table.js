@@ -8,13 +8,27 @@ async function createTrafficTable() {
   try {
     console.log('Checking if site_visits table exists...');
 
-    // Check if table exists
-    const { error } = await supabaseAdmin
-      .from('site_visits')
-      .select('id')
-      .limit(1);
+    // Check if table exists using information_schema
+    const { data: tableExistsData, error: tableExistsError } = await supabaseAdmin
+      .rpc('execute_sql', { sql: `
+        SELECT EXISTS (
+          SELECT 1
+          FROM information_schema.tables 
+          WHERE table_schema = 'public'
+          AND table_name = 'site_visits'
+        ) AS exists;
+      ` });
 
-    if (error && error.code === '42P01') {
+    if (tableExistsError) {
+      throw tableExistsError;
+    }
+
+    // The result may be in different formats depending on the driver, so check accordingly
+    const exists = Array.isArray(tableExistsData)
+      ? (tableExistsData[0]?.exists === true || tableExistsData[0]?.exists === 't')
+      : false;
+
+    if (!exists) {
       console.log('Creating site_visits table...');
 
       await supabaseAdmin.rpc('execute_sql', { sql: `
