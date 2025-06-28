@@ -19,7 +19,8 @@ if (!validateEnv()) {
 }
 
 // Verify required environment variables
-require('./server/utils/env-check')();
+const { checkRequiredEnv } = require('./server/utils/env-check');
+checkRequiredEnv();
 
 // Import performance optimization utilities
 const {
