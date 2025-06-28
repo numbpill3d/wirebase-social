@@ -20,20 +20,26 @@ describe('ScrapyardItem.find', () => {
       {
         id: '1',
         title: 'Item 1',
-        upvotes: ['a', 'b', 'c'],
-        downvotes: []
+        votes: {
+          upvotes: ['a', 'b', 'c'],
+          downvotes: []
+        }
       },
       {
         id: '2',
         title: 'Item 2',
-        upvotes: ['a'],
-        downvotes: ['x', 'y']
+        votes: {
+          upvotes: ['a'],
+          downvotes: ['x', 'y']
+        }
       },
       {
         id: '3',
         title: 'Item 3',
-        upvotes: [],
-        downvotes: []
+        votes: {
+          upvotes: [],
+          downvotes: []
+        }
       }
     ];
 
