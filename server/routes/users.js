@@ -56,7 +56,6 @@ router.post('/register', async (req, res, next) => {
     errors.push({ msg: 'Please enter a valid email address' });
   }
 
-  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
   if (username && (username.length < 3 || username.length > 20)) {
     errors.push({ msg: 'Username must be between 3 and 20 characters' });
   }
@@ -134,29 +133,25 @@ router.post('/login', (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
     if (err) { return next(err); }
     if (!user) {
-if (!user) {
-  req.flash('error_msg', info?.message || 'Invalid credentials');
-  req.flash('email', req.body.email);
-  return res.redirect('/users/login');
-}
+      req.flash('error_msg', info?.message || 'Invalid credentials');
+      req.flash('email', req.body.email);
+      return res.redirect('/users/login');
+    }
 
-req.logIn(user, (err) => {
-  if (err) return next(err);
+    req.logIn(user, (err) => {
+      if (err) return next(err);
 
-  const rememberMe = req.body.remember === 'on' || req.body.remember === true;
+      const rememberMe = req.body.remember === 'on' || req.body.remember === true;
 
-  if (rememberMe) {
-    // Persist session for 30 days
-    req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
-  } else {
-    // Session expires on browser close
-    req.session.cookie.expires = false;
-  }
+      if (rememberMe) {
+        // Persist session for 30 days
+        req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
+      } else {
+        // Session expires on browser close
+        req.session.cookie.expires = false;
+      }
 
-  return res.redirect('/dashboard');
-});
-
-      return res.redirect('/profile');
+      return res.redirect('/dashboard');
     });
   })(req, res, next);
 });
