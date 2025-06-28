@@ -630,7 +630,12 @@ function showConnectionNotification() {
     emoteButtons.forEach(button => {
         button.addEventListener('click', () => {
             const emote = button.textContent;
-            recordEmote(emote, window.currentVisitId);
+            if (window.currentVisitId) {
+                recordEmote(emote, window.currentVisitId);
+            } else {
+                console.warn('No visit ID available for emote recording');
+                showErrorToast('Unable to record emote - no active visit');
+            }
             playSound('click');
             fadeOutElement(notification, () => notification.remove());
 
