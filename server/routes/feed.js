@@ -31,7 +31,12 @@ router.get('/', async (req, res) => {
         .limit(20)
         .select('username displayName avatar customGlyph statusMessage lastActive'),
         
-      ScrapyardItem.find({}, { sort: { createdAt: -1 }, limit: 20 })
+      ScrapyardItem.find({}, { 
+        sort: { createdAt: -1 }, 
+        limit: 20,
+        select: 'title category description previewImage createdAt creator',
+        populate: { path: 'creator', select: 'username displayName avatar customGlyph' }
+      })
     ]);
 
     // Add recent user updates to feed
