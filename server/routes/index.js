@@ -139,12 +139,11 @@ router.get('/discover', async (req, res) => {
         .select('username displayName avatar customGlyph statusMessage lastActive'),
 
       // Recent Scrapyard submissions
-      ScrapyardItem.find()
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .populate('creator', 'username displayName avatar customGlyph')
-        .select('title category previewImage createdAt creator')
+      ScrapyardItem.find({}, {
+        sort: { createdAt: -1 },
+        skip,
+        limit
+      })
     ]);
 
     // Count total documents for pagination
