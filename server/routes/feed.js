@@ -71,7 +71,15 @@ router.get('/', async (req, res, next) => {
         .limit(20)
     ]);
 
-    if (itemsRes.error) throw itemsRes.error;
+    if (itemsRes.error) {
+        // Log the original error for debugging (optional, ensure logs are secure)
+        console.error('Supabase error in feed:', itemsRes.error);
+
+        // Throw a sanitized error to avoid leaking sensitive details
+        const err = new Error('Failed to fetch recent items.');
+        err.status = 500;
+        throw err;
+    }
     const recentItems = (itemsRes.data || []).map(item => ScrapyardItem.formatItem(item));
 
     // Add recent user updates to feed
