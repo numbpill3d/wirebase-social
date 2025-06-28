@@ -26,7 +26,7 @@ async function runMigrations() {
     console.log('\n=== Running WIR transactions table migration ===');
     const wirResult = await createWIRTransactionsTable();
     console.log('Result:', wirResult);
-    if (wirResult.error) throw new Error(wirResult.error);
+    if (wirResult.error) {
 
     // Add more migrations here as needed
 
