@@ -6,7 +6,7 @@ function checkRequiredEnv() {
     'SESSION_SECRET'
   ];
 
-  const missing = requiredVars.filter(v => !process.env[v]);
+  const missing = requiredVars.filter(v => !process.env[v] || !process.env[v].trim());
 
   if (missing.length > 0) {
     console.error(`Missing required environment variables: ${missing.join(', ')}`);
