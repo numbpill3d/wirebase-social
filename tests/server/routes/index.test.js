@@ -36,7 +36,18 @@ jest.mock('../../../server/models/Visit', () => ({
   )
 }));
 
+jest.mock('../../../server/models/Thread', () => ({
+  countDocuments: jest.fn().mockResolvedValue(5)
+}));
+
+jest.mock('../../../server/models/Reply', () => ({
+  countDocuments: jest.fn().mockResolvedValue(10)
+}));
+
 const Visit = require('../../../server/models/Visit');
+const Thread = require('../../../server/models/Thread');
+const Reply = require('../../../server/models/Reply');
+
 
 // Mock express-handlebars
 jest.mock('express-handlebars', () => ({

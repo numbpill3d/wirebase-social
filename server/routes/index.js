@@ -3,6 +3,9 @@ const router = express.Router();
 const User = require('../models/User');
 const ScrapyardItem = require('../models/ScrapyardItem');
 const Visit = require('../models/Visit');
+const Thread = require('../models/Thread');
+const Reply = require('../models/Reply');
+
 
 // Enhanced error middleware
 const errorHandler = (err, req, res, next) => {
@@ -38,6 +41,8 @@ router.get('/', async (req, res) => {
       featuredItems,
       userCount,
       itemCount,
+      threadCount,
+      commentCount,
       recentActivity
     ] = await Promise.all([
       User.findRecent(),
@@ -45,6 +50,8 @@ router.get('/', async (req, res) => {
       ScrapyardItem.findFeatured(),
       User.countDocuments(),
       ScrapyardItem.countDocuments(),
+      Thread.countDocuments(),
+      Reply.countDocuments(),
       User.find({}, { sort: { lastActive: -1 }, limit: 10 })
     ]).catch(err => {
       throw new Error('Failed to fetch homepage data: ' + err.message);
@@ -80,8 +87,8 @@ router.get('/', async (req, res) => {
       stats: {
         userCount,
         itemCount,
-        threadCount: Math.floor(itemCount * 1.5), // Mock data for now
-        commentCount: Math.floor(itemCount * 4.2) // Mock data for now
+        threadCount,
+        commentCount
       },
       traffic: {
         hourlyData: hourlyTraffic,

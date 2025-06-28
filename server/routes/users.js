@@ -10,9 +10,12 @@ router.get('/login', (req, res) => {
   if (req.isAuthenticated()) {
     return res.redirect('/profile');
   }
+  const errorMsg = req.flash('error')[0] || req.flash('error_msg')[0];
   res.render('users/login', {
     title: 'Login - Wirebase',
-    pageTheme: 'dark-dungeon'
+    pageTheme: 'dark-dungeon',
+    error_msg: errorMsg,
+    email: req.flash('email')[0]
   });
 });
 
@@ -122,10 +125,33 @@ router.post('/register', async (req, res, next) => {
 
 // Handle login process
 router.post('/login', (req, res, next) => {
-  passport.authenticate('local', {
-    successRedirect: '/profile',
-    failureRedirect: '/users/login',
-    failureFlash: true
+  passport.authenticate('local', (err, user, info) => {
+    if (err) { return next(err); }
+    if (!user) {
+if (!user) {
+  req.flash('error_msg', info?.message || 'Invalid credentials');
+  req.flash('email', req.body.email);
+  return res.redirect('/users/login');
+}
+
+req.logIn(user, (err) => {
+  if (err) return next(err);
+
+  const rememberMe = req.body.remember === 'on' || req.body.remember === true;
+
+  if (rememberMe) {
+    // Persist session for 30 days
+    req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
+  } else {
+    // Session expires on browser close
+    req.session.cookie.expires = false;
+  }
+
+  return res.redirect('/dashboard');
+});
+
+      return res.redirect('/profile');
+    });
   })(req, res, next);
 });
 
@@ -149,17 +175,21 @@ router.get('/forgot-password', (req, res) => {
 // Handle password reset request
 router.post('/forgot-password', async (req, res, next) => {
   const { email } = req.body;
-  
+
   try {
-    const user = await User.findOne({ email });
-    
-    // Don't reveal if user exists or not for security
-    req.flash('success_msg', 'If an account with that email exists, a password reset link has been sent');
-    res.redirect('/users/login');
+    const { supabaseAdmin } = require('../utils/database');
+    // Request Supabase to send a password recovery email
+    await supabaseAdmin.auth.resetPasswordForEmail(email, {
+redirectTo: `${req.protocol}://${req.get('host')}/users/reset-password`
+    });
   } catch (err) {
     console.error(err);
-    next(err);
+    // Ignore errors to avoid revealing whether the email exists
   }
+
+  // Always show the same message for security
+  req.flash('success_msg', 'If an account with that email exists, a password reset link has been sent');
+  res.redirect('/users/login');
 });
 
 // Account settings page
@@ -167,6 +197,10 @@ router.get('/settings', ensureAuthenticated, (req, res) => {
   res.render('users/settings', {
     title: 'Account Settings - Wirebase',
     user: req.user,
+    displayName: req.user.displayName,
+    email: req.user.email,
+    customGlyph: req.user.customGlyph,
+    statusMessage: req.user.statusMessage,
     pageTheme: 'dark-dungeon'
   });
 });
@@ -174,22 +208,55 @@ router.get('/settings', ensureAuthenticated, (req, res) => {
 // Update account settings
 router.post('/settings', ensureAuthenticated, async (req, res, next) => {
   const { displayName, email, statusMessage, customGlyph } = req.body;
-  
+  const errors = [];
+
+  // Validate inputs
+  if (displayName && displayName.length < 3) {
+    errors.push({ msg: 'Display name must be at least 3 characters' });
+  }
+
+  if (email && !/^\S+@\S+\.\S+$/.test(email)) {
+    errors.push({ msg: 'Please enter a valid email address' });
+  }
+
+  if (customGlyph && customGlyph.length > 2) {
+    errors.push({ msg: 'Custom glyph must be at most 2 characters' });
+  }
+
+  // Check if new email already exists
+  if (email && email !== req.user.email) {
+    const existing = await User.findOne({ email });
+    if (existing) {
+      errors.push({ msg: 'Email is already registered' });
+    }
+  }
+
+  if (errors.length > 0) {
+    return res.render('users/settings', {
+      title: 'Account Settings - Wirebase',
+      user: req.user,
+      errors,
+      displayName,
+      email,
+      customGlyph,
+      statusMessage,
+      pageTheme: 'dark-dungeon'
+    });
+  }
+
   try {
-    // Prepare update data
     const updateData = {
       displayName: displayName || req.user.displayName,
       email: email || req.user.email,
       statusMessage: statusMessage || req.user.statusMessage
     };
-    
-    if (customGlyph && customGlyph.length <= 2) {
+
+    if (customGlyph) {
       updateData.customGlyph = customGlyph;
     }
-    
-    // Use Supabase method to update
+
     await User.findByIdAndUpdate(req.user.id, updateData);
-    
+
     req.flash('success_msg', 'Account settings updated');
     res.redirect('/users/settings');
   } catch (err) {
