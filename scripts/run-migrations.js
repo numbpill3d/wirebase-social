@@ -14,7 +14,7 @@ async function runMigrations() {
     console.log('\n=== Running Streetpass table migration ===');
     const streetpassResult = await createStreetpassTable();
     console.log('Result:', streetpassResult);
-    if (streetpassResult.error) throw new Error(streetpassResult.error);
+    if (streetpassResult.error) {
 
     // Run Forum tables migration
     console.log('\n=== Running Forum tables migration ===');
