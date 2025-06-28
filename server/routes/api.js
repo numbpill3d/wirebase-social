@@ -191,9 +191,9 @@ const uploadAvatar = multer({
   storage: avatarStorage,
   limits: {
     fileSize: process.env.MAX_UPLOAD_SIZE || 5242880,
-    files: 1
-  }
-});
+    limits: {
+      fileSize: parseInt(process.env.MAX_UPLOAD_SIZE) || 5242880,
+      files: 1
 
 router.post('/user/avatar', ensureAuthenticated, uploadAvatar.single('avatar'), async (req, res) => {
   try {
