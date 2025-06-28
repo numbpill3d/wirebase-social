@@ -345,11 +345,9 @@ class ScrapyardItem {
 
       let formattedItems = data.map(item => {
         const formatted = ScrapyardItem.formatItem(item);
-        if (options.sort && options.sort.voteScore) {
-          formatted.voteScore =
-            (formatted.votes.upvotes?.length || 0) -
-            (formatted.votes.downvotes?.length || 0);
-        }
+        formatted.voteScore =
+          (formatted.votes.upvotes?.length || 0) -
+          (formatted.votes.downvotes?.length || 0);
         return formatted;
       });
 
