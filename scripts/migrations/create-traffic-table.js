@@ -3,6 +3,7 @@
  */
 
 const { supabaseAdmin } = require('../../server/utils/database');
+const fs = require('fs');
 
 async function createTrafficTable() {
   try {
