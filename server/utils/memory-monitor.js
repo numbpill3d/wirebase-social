@@ -46,7 +46,9 @@ const memoryMonitor = {
     if (monitorTimer) {
       clearInterval(monitorTimer);
       monitorTimer = null;
+      return true;
     }
+    return false;
   }
 };
 
