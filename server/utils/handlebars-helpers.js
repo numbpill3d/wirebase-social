@@ -3,6 +3,8 @@
  */
 // Import DOMPurify for HTML sanitization
 let DOMPurify;
+// Flag to ensure fallback warning only logs once
+let fallbackWarningShown = false;
 try {
   // DOMPurify requires a DOM environment, so we need to use jsdom in Node.js
   const createDOMPurify = require('dompurify');
@@ -11,10 +13,14 @@ try {
   DOMPurify = createDOMPurify(window);
   console.log('DOMPurify initialized with JSDOM');
 } catch (err) {
-  console.warn('DOMPurify module not found, using fallback implementation:', err.message);
+  const warningMessage = 'DOMPurify module not found, using fallback implementation: ' + err.message;
   // Simple fallback implementation
   DOMPurify = {
     sanitize: function(content, options) {
+      if (!fallbackWarningShown) {
+        console.warn(warningMessage);
+        fallbackWarningShown = true;
+      }
       // Basic sanitization - in a real app, use a proper HTML sanitizer
       return content
         .replace(/&/g, '&amp;')

@@ -35,6 +35,7 @@
                     <div class="profile-actions">
                         <a href="/profile/edit/html" class="cyber-button">Edit HTML</a>
                         <a href="/profile/edit/css" class="cyber-button">Edit CSS</a>
+                        <a href="/profile/edit/theme" class="cyber-button">Theme</a>
                         <a href="/profile/terminal" class="cyber-button">Terminal Mode</a>
                     </div>
                 {{/if}}
@@ -447,16 +448,24 @@
                             const formData = new FormData();
                             formData.append('avatar', fileInput.files[0]);
                             
+                            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
                             // Upload avatar
                             fetch('/api/user/avatar', {
                                 method: 'POST',
+                                headers: { 'CSRF-Token': csrfToken },
                                 body: formData
                             })
                             .then(response => response.json())
                             .then(data => {
                                 if (data.success) {
                                     // Update avatar on page
-                                    profileAvatar.src = data.avatarUrl + '?t=' + new Date().getTime();
+                                    const newUrl = data.avatarUrl + '?t=' + new Date().getTime();
+                                    profileAvatar.src = newUrl;
+                                    const smallAvatar = document.querySelector('.user-avatar-small');
+                                    if (smallAvatar) {
+                                        smallAvatar.src = newUrl;
+                                    }
                                 } else {
                                     alert('Failed to upload avatar: ' + data.error);
                                 }

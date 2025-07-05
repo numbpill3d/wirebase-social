@@ -3,10 +3,39 @@ const router = express.Router();
 const { Feed } = require('feed');
 const User = require('../models/User');
 const ScrapyardItem = require('../models/ScrapyardItem');
+const { cache } = require('../utils/performance');
+const { supabase } = require('../utils/database');
+
+// Helper to get content type from format
+const getContentType = format => {
+  switch (format) {
+    case 'atom':
+      return 'application/atom+xml';
+    case 'json':
+      return 'application/json';
+    default:
+      return 'application/rss+xml';
+  }
+};
+
+const buildFeedOutput = (feed, format) => {
+  if (format === 'atom') return feed.atom1();
+  if (format === 'json') return feed.json1();
+  return feed.rss2();
+};
 
 // Global site feed
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
   try {
+    const format = req.query.format || 'rss';
+    const cacheKey = `feed:global:${format}`;
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      res.set('Content-Type', getContentType(format));
+      res.set('X-Cache', 'HIT');
+      return res.send(cached);
+    }
+
     // Create main site feed
     const feed = new Feed({
       title: 'Wirebase - Medieval Dungeon Fantasy Social Platform',
@@ -25,18 +54,33 @@ router.get('/', async (req, res) => {
     });
 
     // Get recent updates - both users and items
-    const [recentUsers, recentItems] = await Promise.all([
+    const [recentUsers, itemsRes] = await Promise.all([
       User.find()
         .sort({ lastActive: -1 })
         .limit(20)
         .select('username displayName avatar customGlyph statusMessage lastActive'),
-        
-      ScrapyardItem.find()
-        .sort({ createdAt: -1 })
+      supabase
+        .from('scrapyard_items')
+        .select(`
+          *,
+          creator:creator (
+            id, username, display_name, avatar, custom_glyph
+          )
+        `)
+        .order('created_at', { ascending: false })
         .limit(20)
-        .populate('creator', 'username displayName avatar customGlyph')
-        .select('title category description previewImage createdAt creator')
     ]);
+
+    if (itemsRes.error) {
+        // Log the original error for debugging (optional, ensure logs are secure)
+        console.error('Supabase error in feed:', itemsRes.error);
+
+        // Throw a sanitized error to avoid leaking sensitive details
+        const err = new Error('Failed to fetch recent items.');
+        err.status = 500;
+        throw err;
+    }
+    const recentItems = (itemsRes.data || []).map(item => ScrapyardItem.formatItem(item));
 
     // Add recent user updates to feed
     recentUsers.forEach(user => {
@@ -79,29 +123,29 @@ router.get('/', async (req, res) => {
       });
     });
 
-    // Determine format based on query parameter or Accept header
-    const format = req.query.format || 'rss';
-    
-    // Set content type and send feed
-    if (format === 'atom') {
-      res.set('Content-Type', 'application/atom+xml');
-      res.send(feed.atom1());
-    } else if (format === 'json') {
-      res.set('Content-Type', 'application/json');
-      res.send(feed.json1());
-    } else {
-      res.set('Content-Type', 'application/rss+xml');
-      res.send(feed.rss2());
-    }
+    const output = buildFeedOutput(feed, format);
+    cache.set(cacheKey, output, 300);
+    res.set('Content-Type', getContentType(format));
+    res.set('X-Cache', 'MISS');
+    res.send(output);
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error generating feed');
+    next(err);
   }
 });
 
 // User-specific feed
-router.get('/user/:username', async (req, res) => {
+router.get('/user/:username', async (req, res, next) => {
   try {
+    const format = req.query.format || 'rss';
+    const cacheKey = `feed:user:${req.params.username}:${format}`;
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      res.set('Content-Type', getContentType(format));
+      res.set('X-Cache', 'HIT');
+      return res.send(cached);
+    }
+
     // Find user
     const user = await User.findOne({ username: req.params.username });
     
@@ -127,9 +171,10 @@ router.get('/user/:username', async (req, res) => {
     });
     
     // Get user's items in the Scrapyard
-    const userItems = await ScrapyardItem.find({ creator: user._id })
-      .sort({ createdAt: -1 })
-      .limit(20);
+    const userItems = await ScrapyardItem.find(
+      { creator: user._id },
+      { sort: { createdAt: -1 }, limit: 20 }
+    );
     
     // Add items to feed
     userItems.forEach(item => {
@@ -150,30 +195,30 @@ router.get('/user/:username', async (req, res) => {
       });
     });
     
-    // Determine format based on query parameter or Accept header
-    const format = req.query.format || 'rss';
-    
-    // Set content type and send feed
-    if (format === 'atom') {
-      res.set('Content-Type', 'application/atom+xml');
-      res.send(feed.atom1());
-    } else if (format === 'json') {
-      res.set('Content-Type', 'application/json');
-      res.send(feed.json1());
-    } else {
-      res.set('Content-Type', 'application/rss+xml');
-      res.send(feed.rss2());
-    }
+    const output = buildFeedOutput(feed, format);
+    cache.set(cacheKey, output, 300);
+    res.set('Content-Type', getContentType(format));
+    res.set('X-Cache', 'MISS');
+    res.send(output);
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error generating feed');
+    next(err);
   }
 });
 
 // Category-specific feed for Scrapyard
-router.get('/scrapyard/:category', async (req, res) => {
+router.get('/scrapyard/:category', async (req, res, next) => {
   try {
+    const format = req.query.format || 'rss';
     const category = req.params.category;
+    const cacheKey = `feed:scrapyard:${category}:${format}`;
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      res.set('Content-Type', getContentType(format));
+      res.set('X-Cache', 'HIT');
+      return res.send(cached);
+    }
+
     const validCategories = ['widget', 'template', 'icon', 'banner', 'gif', 'all'];
     
     if (!validCategories.includes(category)) {
@@ -207,15 +252,26 @@ router.get('/scrapyard/:category', async (req, res) => {
       }
     });
     
-    // Query for items
-    const query = category === 'all' ? {} : { category: category };
-    
-    // Get recent items
-    const items = await ScrapyardItem.find(query)
-      .sort({ createdAt: -1 })
-      .limit(30)
-      .populate('creator', 'username displayName');
-    
+    // Build query for items
+    let itemQuery = supabase
+      .from('scrapyard_items')
+      .select(`
+        *,
+        creator:creator (
+          id, username, display_name, avatar, custom_glyph
+        )
+      `)
+      .order('created_at', { ascending: false })
+      .limit(30);
+
+    if (category !== 'all') {
+      itemQuery = itemQuery.eq('category', category);
+    }
+
+    const { data, error } = await itemQuery;
+    if (error) throw error;
+    const items = (data || []).map(item => ScrapyardItem.formatItem(item));
+
     // Add items to feed
     items.forEach(item => {
       feed.addItem({
@@ -235,23 +291,14 @@ router.get('/scrapyard/:category', async (req, res) => {
       });
     });
     
-    // Determine format based on query parameter or Accept header
-    const format = req.query.format || 'rss';
-    
-    // Set content type and send feed
-    if (format === 'atom') {
-      res.set('Content-Type', 'application/atom+xml');
-      res.send(feed.atom1());
-    } else if (format === 'json') {
-      res.set('Content-Type', 'application/json');
-      res.send(feed.json1());
-    } else {
-      res.set('Content-Type', 'application/rss+xml');
-      res.send(feed.rss2());
-    }
+    const output = buildFeedOutput(feed, format);
+    cache.set(cacheKey, output, 300);
+    res.set('Content-Type', getContentType(format));
+    res.set('X-Cache', 'MISS');
+    res.send(output);
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error generating feed');
+    next(err);
   }
 });
 

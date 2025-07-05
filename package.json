@@ -23,6 +23,7 @@
     "compression": "^1.7.4",
     "connect-session-knex": "^3.0.1",
     "connect-timeout": "^1.9.0",
+    "csurf": "^1.11.0",
     "dompurify": "^3.0.8",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
@@ -39,16 +40,17 @@
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
     "pg": "^8.11.3",
+    "sharp": "^0.34.2",
     "three": "^0.152.2",
     "uuid": "^9.0.1",
     "v8": "^0.1.0",
-    "wirebase": "file:",
     "xss": "^1.0.14",
     "xss-clean": "^0.1.4"
   },
   "devDependencies": {
     "eslint": "^8.38.0",
     "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "nodemon": "^2.0.22",
     "supertest": "^6.3.3"
   },

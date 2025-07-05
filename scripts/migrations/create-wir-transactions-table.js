@@ -18,47 +18,56 @@ async function createWIRTransactionsTable() {
       // Table doesn't exist, create it
       console.log('Creating market_wir_transactions table...');
       
-      await supabaseAdmin.query(`
-        CREATE TABLE market_wir_transactions (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-          amount INTEGER NOT NULL,
-          transaction_type TEXT NOT NULL,
-          reference_id UUID,
-          notes TEXT,
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-          
-          -- Add constraints
-          CONSTRAINT valid_transaction_type CHECK (
-            transaction_type IN (
-              'purchase', 
-              'sale', 
-              'transfer', 
-              'reward', 
-              'listing_fee', 
-              'featured_fee',
-              'loot_to_wir_conversion',
-              'wir_to_loot_conversion'
-            )
-          )
-        );
-        
-        -- Create indexes
-        CREATE INDEX idx_wir_transactions_user_id ON market_wir_transactions(user_id);
-        CREATE INDEX idx_wir_transactions_reference_id ON market_wir_transactions(reference_id);
-        CREATE INDEX idx_wir_transactions_created_at ON market_wir_transactions(created_at);
-        CREATE INDEX idx_wir_transactions_type ON market_wir_transactions(transaction_type);
-      `);
+const { error: createError } = await supabaseAdmin.rpc('execute_sql', {
+  sql: `
+    BEGIN;
+    CREATE TABLE market_wir_transactions (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      amount INTEGER NOT NULL,
+      transaction_type TEXT NOT NULL,
+      reference_id UUID,
+      notes TEXT,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+
+      -- Add constraints
+      CONSTRAINT valid_transaction_type CHECK (
+        transaction_type IN (
+          'purchase',
+          'sale',
+          'transfer',
+          'reward',
+          'listing_fee',
+          'featured_fee',
+          'loot_to_wir_conversion',
+          'wir_to_loot_conversion'
+        )
+      )
+    );
+
+    -- Create indexes
+    CREATE INDEX idx_wir_transactions_user_id ON market_wir_transactions(user_id);
+    CREATE INDEX idx_wir_transactions_reference_id ON market_wir_transactions(reference_id);
+    CREATE INDEX idx_wir_transactions_created_at ON market_wir_transactions(created_at);
+    CREATE INDEX idx_wir_transactions_type ON market_wir_transactions(transaction_type);
+    COMMIT;
+  `
+});
+
+if (createError) {
+  throw new Error(`market_wir_transactions migration failed: ${createError.message}`);
+}
+
       
       console.log('market_wir_transactions table created successfully!');
     } else {
       console.log('market_wir_transactions table already exists.');
     }
     
-    return { success: true, message: 'WIR transactions table migration completed' };
+    return { error: null };
   } catch (error) {
     console.error('Error creating market_wir_transactions table:', error);
-    return { success: false, error: error.message };
+    return { error: error.message };
   }
 }
 
@@ -67,7 +76,7 @@ if (require.main === module) {
   createWIRTransactionsTable()
     .then(result => {
       console.log(result);
-      process.exit(result.success ? 0 : 1);
+      process.exit(result.error ? 1 : 0);
     })
     .catch(error => {
       console.error('Migration failed:', error);
