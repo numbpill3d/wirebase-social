@@ -36,7 +36,7 @@ const memoryMonitor = {
     }
 
     monitorTimer = setInterval(() => {
-      memoryMonitor.logMemoryUsage();
+      this.logMemoryUsage();
     }, interval);
 
     return monitorTimer;
