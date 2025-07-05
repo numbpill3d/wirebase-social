@@ -11,6 +11,19 @@
     <link rel="stylesheet" href="../css/optimizations.css">
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <script src="../js/laincore-loader.js"></script>
+    <style>
+        .cyber-window-controls {
+            display: flex;
+        }
+        .cyber-window-control {
+            margin-left: 8px;
+            color: var(--accent-color);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font: inherit;
+        }
+    </style>
 </head>
 <body>
     <header class="main-header">
@@ -39,9 +52,9 @@
             <div class="cyber-window-header">
                 <span class="cyber-window-title">system.stream</span>
                 <div class="cyber-window-controls">
-                    <span class="cyber-window-control">_</span>
-                    <span class="cyber-window-control">□</span>
-                    <span class="cyber-window-control">×</span>
+                    <button type="button" class="cyber-window-control" aria-label="minimize">_</button>
+                    <button type="button" class="cyber-window-control" aria-label="maximize">□</button>
+                    <button type="button" class="cyber-window-control" aria-label="close">×</button>
                 </div>
             </div>
             <div class="cyber-window-content">
@@ -50,10 +63,10 @@
 
                 <div class="feed-options">
                     <div class="cyber-tabs">
-                        <button class="cyber-tab active" type="button">All Activity</button>
-                        <button class="cyber-tab" type="button">Nullspace Updates</button>
-                        <button class="cyber-tab" type="button">Shell Changes</button>
-                        <button class="cyber-tab" type="button">System Alerts</button>
+                        <button class="cyber-tab active" type="button" data-filter="all">All Activity</button>
+                        <button class="cyber-tab" type="button" data-filter="nullspace">Nullspace Updates</button>
+                        <button class="cyber-tab" type="button" data-filter="shell">Shell Changes</button>
+                        <button class="cyber-tab" type="button" data-filter="system">System Alerts</button>
                     </div>
 
                     <div class="feed-format">
@@ -65,42 +78,42 @@
                 </div>
 
                 <div class="stream-feed">
-                    <div class="feed-item">
+                    <div class="feed-item" data-category="nullspace">
                         <div class="feed-timestamp">2025-05-14 14:32:18</div>
                         <div class="feed-content">
                             <span class="feed-user">SystemAdmin</span> uploaded a new artifact to the Nullspace: <a href="#">Corrupted Memory Block</a>
                         </div>
                     </div>
 
-                    <div class="feed-item">
+                    <div class="feed-item" data-category="shell">
                         <div class="feed-timestamp">2025-05-14 13:45:01</div>
                         <div class="feed-content">
                             <span class="feed-user">Node_4231</span> updated their digital shell with new HTML/CSS
                         </div>
                     </div>
 
-                    <div class="feed-item">
+                    <div class="feed-item" data-category="general">
                         <div class="feed-timestamp">2025-05-14 12:17:33</div>
                         <div class="feed-content">
                             <span class="feed-user">DataNode</span> established connection with <span class="feed-user">CyberEntity</span>
                         </div>
                     </div>
 
-                    <div class="feed-item">
+                    <div class="feed-item" data-category="system">
                         <div class="feed-timestamp">2025-05-14 11:05:22</div>
                         <div class="feed-content">
                             <span class="feed-system">SYSTEM</span>: Network maintenance scheduled for 2025-05-15
                         </div>
                     </div>
 
-                    <div class="feed-item">
+                    <div class="feed-item" data-category="nullspace">
                         <div class="feed-timestamp">2025-05-14 10:42:15</div>
                         <div class="feed-content">
                             <span class="feed-user">PixelArtist</span> uploaded a new artifact to the Nullspace: <a href="#">Pixel Symbols Pack</a>
                         </div>
                     </div>
 
-                    <div class="feed-item">
+                    <div class="feed-item" data-category="shell">
                         <div class="feed-timestamp">2025-05-14 09:30:07</div>
                         <div class="feed-content">
                             <span class="feed-user">GlitchHunter</span> updated their digital shell with new HTML/CSS
@@ -147,6 +160,7 @@
     </footer>
 
     <script src="../js/main.js"></script>
+    <script src="../js/feed.js"></script>
     <script src="../js/laincore.js"></script>
 </body>
 </html>

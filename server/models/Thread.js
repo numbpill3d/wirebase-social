@@ -340,6 +340,33 @@ class Thread {
   }
 
   /**
+   * Count threads that match a query
+   * @param {Object} query - Query filters
+   * @returns {Promise<number>} - Count of matching threads
+   */
+  static async countDocuments(query = {}) {
+    try {
+      let supabaseQuery = supabase
+        .from('forum_threads')
+        .select('id', { count: 'exact' });
+
+      Object.entries(query).forEach(([key, value]) => {
+        const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+        supabaseQuery = supabaseQuery.eq(snakeKey, value);
+      });
+
+      const { count, error } = await supabaseQuery;
+
+      if (error) throw error;
+
+      return count || 0;
+    } catch (error) {
+      console.error('Error counting threads:', error);
+      return 0;
+    }
+  }
+
+  /**
    * Increment view count for a thread
    * @param {string} id - Thread ID
    * @returns {Promise<boolean>} Success status

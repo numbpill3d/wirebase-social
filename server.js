@@ -1,12 +1,27 @@
 // Main server file for Wirebase
+let dotenvWarned = false;
 try {
   // Try to load dotenv if available
   const dotenv = require('dotenv');
   dotenv.config();
   console.log('Environment variables loaded from .env file');
 } catch (err) {
-  console.warn('dotenv module not found, using existing environment variables');
+  if (!dotenvWarned) {
+    console.warn('dotenv module not found, using existing environment variables');
+    dotenvWarned = true;
+  }
 }
+
+const { validateEnv } = require('./server/utils/env-check');
+if (!validateEnv()) {
+  console.error('Environment validation failed. Starting minimal server instead.');
+  require('./minimal-server');
+  return;
+}
+
+// Verify required environment variables
+const { checkRequiredEnv } = require('./server/utils/env-check');
+checkRequiredEnv();
 
 // Import performance optimization utilities
 const {
@@ -29,14 +44,18 @@ const KnexSessionStore = require('connect-session-knex')(session);
 const passport = require('passport');
 const path = require('path');
 const multer = require('multer');
+const csurf = require('csurf');
 const fs = require('fs');
 const { supabase, supabaseAdmin } = require('./server/utils/database');
 
 // Configure Knex with optimized connection pooling and better error handling
 // Make knex instance globally available for utilities
+// Prefer the full database connection string if provided (e.g. from Render)
+// to avoid constructing credentials manually from Supabase values. This helps
+// prevent connection failures during deployment.
 global.knex = require('knex')({
   client: 'pg',
-  connection: {
+  connection: process.env.DATABASE_URL || {
     host: new URL(process.env.SUPABASE_URL).hostname,
     port: 5432,
     user: 'postgres',
@@ -117,8 +136,37 @@ const verifyDatabaseConnection = async (retries = 5, delay = 5000) => {
   }
 };
 
-// Start the verification process
-verifyDatabaseConnection();
+// Helper function to start the server after verifying DB connection
+let server; // will hold HTTP server instance for graceful shutdown
+
+const startServer = async () => {
+  try {
+    const verified = await verifyDatabaseConnection();
+    if (!verified) {
+      console.error('Database connection could not be verified. Exiting...');
+      process.exit(1);
+    }
+
+    server = app.listen(PORT, () => {
+      console.log(`Wirebase server running in ${NODE_ENV} mode on port ${PORT}`);
+
+      // Start database monitoring after server starts
+      console.log('Starting database monitoring...');
+
+      // Start health checks (every 60 seconds)
+      healthCheckTimer = dbHealth.startPeriodicHealthChecks(60000);
+
+      // Start leak detection (check every 30 seconds, fix every 5 minutes)
+      leakDetectionTimers = dbLeakDetector.startLeakDetection(null, 30000, 300000);
+    });
+
+    // Add server timeout to prevent hanging connections
+    server.timeout = 120000; // 2 minutes
+  } catch (err) {
+    console.error('Failed to initialize and start server:', err);
+    process.exit(1);
+  }
+};
 
 // Initialize app
 const app = express();
@@ -140,11 +188,6 @@ app.use(resourceHints); // Add resource hints
 app.use(xssMiddleware); // Prevent XSS attacks
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public'), {
-  maxAge: '7d', // Cache static assets for 7 days
-  etag: true,
-  lastModified: true
-}));
 app.use(cacheControl); // Add cache control headers
 
 // Apply rate limiting to API routes
@@ -216,7 +259,6 @@ app.use(session({
   rolling: false, // Disable rolling to reduce database writes
   name: 'wirebase.sid', // Custom cookie name for better security
   cookie: {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     httpOnly: true, // Prevent client-side JS from accessing cookie
@@ -229,6 +271,15 @@ app.use(session({
 // Initialize passport for authentication
 app.use(passport.initialize());
 app.use(passport.session());
+
+// CSRF protection (disabled during tests)
+if (NODE_ENV !== 'test') {
+  app.use(csurf());
+  app.use((req, res, next) => {
+    res.locals.csrfToken = req.csrfToken();
+    next();
+  });
+}
 
 // Setup file storage for user uploads
 const storage = multer.diskStorage({
@@ -286,6 +337,7 @@ require('./server/utils/passport-config')(passport);
 app.use((req, res, next) => {
   res.locals.user = req.user || null;
   res.locals.isAuthenticated = req.isAuthenticated();
+  res.locals.isProduction = process.env.NODE_ENV === 'production';
   next();
 });
 
@@ -305,6 +357,9 @@ const dbMonitor = require('./server/utils/db-monitor');
 const dbHealth = require('./server/utils/db-health');
 const dbErrorHandler = require('./server/utils/db-error-handler');
 const dbLeakDetector = require('./server/utils/db-leak-detector');
+const memoryMonitor = require('./server/utils/memory-monitor');
+const errorHandler = require('./server/middleware/error-handler');
+
 const { queryTimeoutMiddleware, transactionTimeoutMiddleware } = require('./server/middleware/query-timeout');
 
 // Initialize database utilities with knex instance
@@ -336,11 +391,20 @@ app.use('/market', require('./server/routes/market'));
 app.use('/market/user', require('./server/routes/user-market'));
 app.use('/api/market', require('./server/routes/market-api'));
 
+// Serve static assets after routes so dynamic pages take precedence
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: '7d', // Cache static assets for 7 days
+  etag: true,
+  lastModified: true
+}));
+
 // 404 handler
 app.use((req, res) => {
-  console.log('404 Not Found:', req.method, req.url);
-  console.log('Referrer:', req.get('Referrer') || 'None');
-  console.log('User Agent:', req.get('User-Agent'));
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('404 Not Found:', req.method, req.url);
+    console.log('Referrer:', req.get('Referrer') || 'None');
+    console.log('User Agent:', req.get('User-Agent'));
+  }
 
   res.status(404).render('error', {
     title: '404 - Page Not Found',
@@ -350,25 +414,21 @@ app.use((req, res) => {
   });
 });
 
-// Error handler
+// CSRF error handler
 app.use((err, req, res, next) => {
-  console.error('Server Error:', err.name, err.message);
-  console.error('Error Stack:', err.stack);
-  console.error('Request URL:', req.method, req.url);
-  console.error('Request Headers:', JSON.stringify(req.headers, null, 2));
-
-  // Check if headers have already been sent
-  if (res.headersSent) {
-    return next(err);
+  if (err.code === 'EBADCSRFTOKEN') {
+    return res.status(403).render('error', {
+      title: 'Invalid CSRF Token',
+      errorCode: 403,
+      message: 'Form tampered with or session expired.',
+      theme: 'locked-dungeon'
+    });
   }
-
-  res.status(500).render('error', {
-    title: '500 - Server Error',
-    errorCode: 500,
-    message: 'Something went wrong on our end.',
-    theme: 'broken-window'
-  });
+  next(err);
 });
+
+// Error handler
+app.use(errorHandler);
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (reason, promise) => {
@@ -394,9 +454,12 @@ const gracefulShutdown = async () => {
   try {
     // Stop health checks and leak detection
     console.log('Stopping database monitoring...');
-    clearInterval(healthCheckTimer);
+    if (healthCheckTimer && typeof healthCheckTimer.stop === 'function') {
+      healthCheckTimer.stop();
+    }
     clearInterval(leakDetectionTimers.checkTimer);
     clearInterval(leakDetectionTimers.fixTimer);
+    memoryMonitor.stop();
 
     // Fix any connection leaks before shutdown
     console.log('Checking for connection leaks before shutdown...');
@@ -430,22 +493,10 @@ process.on('SIGINT', gracefulShutdown);
 let healthCheckTimer;
 let leakDetectionTimers;
 
-// Start server
-const server = app.listen(PORT, () => {
-  console.log(`Wirebase server running in ${NODE_ENV} mode on port ${PORT}`);
 
-  // Start database monitoring after server starts
-  console.log('Starting database monitoring...');
+// Start server after verifying database connection
+startServer();
 
-  // Start health checks (every 60 seconds)
-  healthCheckTimer = dbHealth.startPeriodicHealthChecks(60000);
-
-  // Start leak detection (check every 30 seconds, fix every 5 minutes)
-  leakDetectionTimers = dbLeakDetector.startLeakDetection(null, 30000, 300000);
-});
-
-// Add server timeout to prevent hanging connections
-server.timeout = 120000; // 2 minutes
 
 // Export knex instance and monitoring utilities for use in other modules
 module.exports = {
