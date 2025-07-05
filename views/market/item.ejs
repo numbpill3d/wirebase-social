@@ -93,6 +93,14 @@
             </span>
           <% } %>
         </div>
+        <div style="text-align: right; margin-top: 10px;">
+          <button class="view-html-button action-button"
+                  data-item-id="<%= item.id %>"
+                  data-modal-target="item-html-modal">
+            <i class="button-icon fa fa-code"></i>
+            <span class="button-text">View HTML</span>
+          </button>
+        </div>
       </div>
       
       <% if (item.collection) { %>
@@ -151,6 +159,16 @@
       <div class="modal-actions">
         <button class="cancel-button close-modal">Cancel</button>
         <button class="submit-button confirm-purchase-button">Confirm Purchase</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="item-html-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>Item HTML Preview</h2>
+      <div class="item-html-container">
+        Loading...
       </div>
     </div>
   </div>

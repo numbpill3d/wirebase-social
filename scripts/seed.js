@@ -541,36 +541,52 @@ async function seedDatabase() {
     }
     
     console.log('Database cleared');
-    
+
     // Add users
     const createdUsers = {};
-    
+
     for (const userData of users) {
-      console.log(`Creating user: ${userData.username}...`);
-      
-      // Create user with the User model (which handles password hashing)
-      const user = await User.create({
-        ...userData
-      });
-      
+      // Check if the user already exists
+      let user = await User.findOne({ username: userData.username });
+
+      if (user) {
+        console.log(`User ${userData.username} already exists. Skipping creation.`);
+      } else {
+        console.log(`Creating user: ${userData.username}...`);
+
+        // Create user with the User model (which handles password hashing)
+        user = await User.create({
+          ...userData
+        });
+
+        console.log(`Created user: ${userData.username} with ID: ${user.id}`);
+      }
+
+      // Store the user (existing or newly created)
       createdUsers[userData.username] = user;
-      console.log(`Created user: ${userData.username} with ID: ${user.id}`);
     }
     
     // Add scrapyard items
     for (const itemData of scrapyardItems) {
+      // Check if the item already exists
+      const existingItem = await ScrapyardItem.findOne({ title: itemData.title });
+      if (existingItem) {
+        console.log(`Scrapyard item ${itemData.title} already exists. Skipping creation.`);
+        continue;
+      }
+
       // Assign random creator
       const creatorUsername = users[Math.floor(Math.random() * users.length)].username;
       const creatorId = createdUsers[creatorUsername].id;
-      
+
       console.log(`Creating scrapyard item: ${itemData.title}...`);
-      
+
       // Create item with ScrapyardItem model
       const item = await ScrapyardItem.create({
         ...itemData,
         creator: creatorId
       });
-      
+
       console.log(`Created scrapyard item: ${itemData.title} with ID: ${item.id}`);
     }
     

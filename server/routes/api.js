@@ -5,6 +5,7 @@ const ScrapyardItem = require('../models/ScrapyardItem');
 const MarketItem = require('../models/MarketItem');
 const Streetpass = require('../models/Streetpass');
 
+
 // Middleware to ensure user is authenticated
 const ensureAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) {
@@ -16,22 +17,22 @@ const ensureAuthenticated = (req, res, next) => {
 // GET all users (public API)
 router.get('/users', async (req, res) => {
   try {
-    const users = await User.find()
-      .select('username displayName avatar customGlyph statusMessage')
-      .sort({ createdAt: -1 });
+    const users = await User.find({}, { sort: { createdAt: -1 } })
+      .select('username displayName avatar customGlyph statusMessage');
 
     res.json(users);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({
+      error: process.env.NODE_ENV !== 'production' ? err.message : 'Server error'
+    });
   }
 });
 
 // GET user by username
 router.get('/users/:username', async (req, res) => {
   try {
-    const user = await User.findOne({ username: req.params.username })
-      .select('username displayName avatar customGlyph statusMessage createdAt');
+    const user = await User.findOne({ username: req.params.username });
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -40,7 +41,9 @@ router.get('/users/:username', async (req, res) => {
     res.json(user);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({
+      error: process.env.NODE_ENV !== 'production' ? err.message : 'Server error'
+    });
   }
 });
 
@@ -56,7 +59,9 @@ router.get('/me', ensureAuthenticated, async (req, res) => {
     res.json(user);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({
+      error: process.env.NODE_ENV !== 'production' ? err.message : 'Server error'
+    });
   }
 });
 
@@ -66,23 +71,26 @@ router.get('/scrapyard', async (req, res) => {
     const category = req.query.category;
     const query = category ? { category } : {};
 
+
     const items = await ScrapyardItem.find(query)
       .sort({ createdAt: -1 })
       .limit(20)
       .populate('creator', 'username displayName avatar customGlyph');
 
+
     res.json(items);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({
+      error: process.env.NODE_ENV !== 'production' ? err.message : 'Server error'
+    });
   }
 });
 
 // GET scrapyard item by ID
 router.get('/scrapyard/:id', async (req, res) => {
   try {
-    const item = await ScrapyardItem.findById(req.params.id)
-      .populate('creator', 'username displayName avatar customGlyph');
+    const item = await ScrapyardItem.findById(req.params.id);
 
     if (!item) {
       return res.status(404).json({ error: 'Item not found' });
@@ -91,7 +99,9 @@ router.get('/scrapyard/:id', async (req, res) => {
     res.json(item);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({
+      error: process.env.NODE_ENV !== 'production' ? err.message : 'Server error'
+    });
   }
 });
 
@@ -135,7 +145,12 @@ router.get('/market/items', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching market items:', error);
-    res.status(500).json({ error: 'An error occurred while fetching marketplace items' });
+    res.status(500).json({
+      error:
+        process.env.NODE_ENV !== 'production'
+          ? error.message
+          : 'An error occurred while fetching marketplace items'
+    });
   }
 });
 
@@ -151,7 +166,12 @@ router.get('/market/items/:id', async (req, res) => {
     res.json(item);
   } catch (error) {
     console.error('Error fetching market item:', error);
-    res.status(500).json({ error: 'An error occurred while fetching the marketplace item' });
+    res.status(500).json({
+      error:
+        process.env.NODE_ENV !== 'production'
+          ? error.message
+          : 'An error occurred while fetching the marketplace item'
+    });
   }
 });
 
@@ -182,7 +202,7 @@ router.post('/streetpass/visit', ensureAuthenticated, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to record visit',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Server error'
+      error: process.env.NODE_ENV !== 'production' ? error.message : 'Server error'
     });
   }
 });
@@ -208,7 +228,7 @@ router.get('/streetpass/visitors/:profileId', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to get visitors',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Server error'
+      error: process.env.NODE_ENV !== 'production' ? error.message : 'Server error'
     });
   }
 });
@@ -237,9 +257,49 @@ router.put('/streetpass/emote', ensureAuthenticated, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to update emote',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Server error'
+      error: process.env.NODE_ENV !== 'production' ? error.message : 'Server error'
     });
   }
+});
+
+/**
+ * POST /api/user/avatar
+ * Upload a new avatar for the authenticated user
+ */
+router.post('/user/avatar', ensureAuthenticated, (req, res) => {
+  const {upload} = req.app.locals;
+  upload.single('avatar')(req, res, async err => {
+    if (err) {
+      console.error('Avatar upload error:', err);
+      return res.status(400).json({ success: false, error: err.message });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'No file uploaded' });
+    }
+
+    try {
+      const relativePath = `/uploads/${req.user.id}/${req.file.filename}`;
+      const updatedUser = await User.findByIdAndUpdate(
+        req.user.id,
+        { avatar: relativePath },
+        { new: true }
+      );
+
+      if (!updatedUser) {
+        return res.status(404).json({ success: false, error: 'User not found' });
+      }
+
+      res.json({ success: true, avatarUrl: relativePath });
+    } catch (error) {
+      console.error('Error updating avatar:', error);
+      res.status(500).json({
+        success: false,
+        error:
+          process.env.NODE_ENV !== 'production' ? error.message : 'Server error'
+      });
+    }
+  });
 });
 
 // Health check endpoint

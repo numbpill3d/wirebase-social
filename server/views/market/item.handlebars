@@ -169,6 +169,15 @@
   </div>
 </div>
 
+<!-- Source code modal -->
+<div id="source-code-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Source Code</h2>
+    <pre><code>{{htmlEscape item.content}}</code></pre>
+  </div>
+</div>
+
 <!-- Purchase confirmation modal -->
 <div id="purchase-modal" class="modal">
   <div class="modal-content">
@@ -182,6 +191,31 @@
       <button id="confirm-purchase" class="action-button purchase-button">Confirm Purchase</button>
       <button class="action-button cancel-button close-modal">Cancel</button>
     </div>
+  </div>
+</div>
+
+<!-- New Collection Modal -->
+<div id="new-collection-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2>Create New Collection</h2>
+    <form id="create-collection-form">
+      <div class="form-group">
+        <label for="collection-name">Collection Name <span class="required">*</span></label>
+        <input type="text" id="collection-name" name="name" required>
+      </div>
+      <div class="form-group">
+        <label for="collection-description">Description</label>
+        <textarea id="collection-description" name="description"></textarea>
+      </div>
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="collection-public" name="isPublic" checked>
+          <label for="collection-public">Make collection public</label>
+        </div>
+      </div>
+      <button type="submit" class="action-button">Create Collection</button>
+    </form>
   </div>
 </div>
 
@@ -788,6 +822,58 @@
         });
       });
     });
+
+    // New collection modal handling
+    const createCollectionTrigger = document.getElementById('create-collection-trigger');
+    const newCollectionModal = document.getElementById('new-collection-modal');
+    const createCollectionForm = document.getElementById('create-collection-form');
+
+    if (createCollectionTrigger) {
+      createCollectionTrigger.addEventListener('click', function(e) {
+        e.preventDefault();
+        newCollectionModal.style.display = 'block';
+      });
+    }
+
+    window.addEventListener('click', function(event) {
+      if (event.target === newCollectionModal) {
+        newCollectionModal.style.display = 'none';
+      }
+    });
+
+    if (createCollectionForm) {
+      createCollectionForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = {
+          name: document.getElementById('collection-name').value,
+          description: document.getElementById('collection-description').value,
+          isPublic: document.getElementById('collection-public').checked
+        };
+
+        fetch('/market/user/collections/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showNotification('Collection created', 'success');
+            newCollectionModal.style.display = 'none';
+            setTimeout(() => window.location.reload(), 1000);
+          } else {
+            showNotification(data.message || 'Failed to create collection', 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showNotification('An error occurred', 'error');
+        });
+      });
+    }
     
     // Wishlist functionality
     const wishlistButton = document.getElementById('wishlist-button');
@@ -828,7 +914,18 @@
         });
       });
     }
-    
+
+    // View source button
+    const viewSourceButton = document.getElementById('view-source-button');
+    const sourceCodeModal = document.getElementById('source-code-modal');
+
+    if (viewSourceButton && sourceCodeModal) {
+      viewSourceButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        sourceCodeModal.style.display = 'block';
+      });
+    }
+
     // Purchase functionality
     const purchaseButton = document.getElementById('purchase-button');
     const purchaseModal = document.getElementById('purchase-modal');

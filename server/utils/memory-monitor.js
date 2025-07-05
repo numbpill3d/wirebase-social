@@ -2,6 +2,7 @@ const v8 = require('v8');
 
 let monitorTimer = null;
 
+
 const memoryMonitor = {
   getMemoryUsage() {
     const heapStats = v8.getHeapStatistics();
@@ -52,4 +53,28 @@ const memoryMonitor = {
   }
 };
 
-module.exports = memoryMonitor;
+let monitorTimer = null;
+
+const start = (interval = 300000, threshold = 80) => {
+  if (monitorTimer) {
+    console.warn('Memory monitor is already running');
+    return false;
+  }
+  monitorTimer = setInterval(() => {
+    memoryMonitor.logMemoryUsage(threshold);
+  }, interval);
+  return true;
+};
+
+const stop = () => {
+  if (monitorTimer) {
+    clearInterval(monitorTimer);
+    monitorTimer = null;
+  }
+};
+
+module.exports = {
+  ...memoryMonitor,
+  start,
+  stop
+};

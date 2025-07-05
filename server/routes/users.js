@@ -3,24 +3,21 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const passport = require('passport');
 const User = require('../models/User');
+const { ensureAuthenticated } = require('../utils/auth-helpers');
+const emailRegex = /^[^\s@]+@([^\s@.]+\.)+[^\s@.]{2,}$/;
 
-// Middleware to ensure user is authenticated
-const ensureAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  req.flash('error_msg', 'Please log in to view this resource');
-  res.redirect('/users/login');
-};
 
 // Login page
 router.get('/login', (req, res) => {
   if (req.isAuthenticated()) {
     return res.redirect('/profile');
   }
+  const errorMsg = req.flash('error')[0] || req.flash('error_msg')[0];
   res.render('users/login', {
     title: 'Login - Wirebase',
-    pageTheme: 'dark-dungeon'
+    pageTheme: 'dark-dungeon',
+    error_msg: errorMsg,
+    email: req.flash('email')[0]
   });
 });
 
@@ -36,8 +33,16 @@ router.get('/register', (req, res) => {
 });
 
 // Handle user registration
-router.post('/register', async (req, res) => {
-  const { username, email, password, password2, displayName, customGlyph, statusMessage } = req.body;
+router.post('/register', async (req, res, next) => {
+  const {
+    username,
+    email,
+    password,
+    password2,
+    displayName,
+    customGlyph,
+    statusMessage
+  } = req.body;
   const errors = [];
 
   // Check required fields
@@ -55,12 +60,16 @@ router.post('/register', async (req, res) => {
     errors.push({ msg: 'Password should be at least 6 characters' });
   }
 
-  // Check username format and length
+  // Validate email format
+  if (email && !emailRegex.test(email)) {
+    errors.push({ msg: 'Please enter a valid email address' });
+  }
+
   if (username && (username.length < 3 || username.length > 20)) {
     errors.push({ msg: 'Username must be between 3 and 20 characters' });
   }
 
-  if (username && !/^[a-zA-Z0-9_-]+$/.test(username)) {
+  if (username && !/^[a-zA-Z0-9_-]+$/u.test(username)) {
     errors.push({ msg: 'Username can only contain letters, numbers, underscores, and hyphens' });
   }
 
@@ -124,21 +133,35 @@ router.post('/register', async (req, res) => {
     res.redirect('/users/login');
   } catch (err) {
     console.error(err);
-    res.status(500).render('error', {
-      title: 'Server Error',
-      errorCode: 500,
-      message: 'Registration error occurred',
-      theme: 'broken-window'
-    });
+    next(err);
   }
 });
 
 // Handle login process
 router.post('/login', (req, res, next) => {
-  passport.authenticate('local', {
-    successRedirect: '/profile',
-    failureRedirect: '/users/login',
-    failureFlash: true
+  passport.authenticate('local', (err, user, info) => {
+    if (err) { return next(err); }
+    if (!user) {
+      req.flash('error_msg', info?.message || 'Invalid credentials');
+      req.flash('email', req.body.email);
+      return res.redirect('/users/login');
+    }
+
+    req.logIn(user, (err) => {
+      if (err) return next(err);
+
+      const rememberMe = req.body.remember === 'on' || req.body.remember === true;
+
+      if (rememberMe) {
+        // Persist session for 30 days
+        req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
+      } else {
+        // Session expires on browser close
+        req.session.cookie.expires = false;
+      }
+
+      return res.redirect('/dashboard');
+    });
   })(req, res, next);
 });
 
@@ -160,24 +183,26 @@ router.get('/forgot-password', (req, res) => {
 });
 
 // Handle password reset request
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', async (req, res, next) => {
   const { email } = req.body;
-  
+
   try {
-    const user = await User.findOne({ email });
-    
-    // Don't reveal if user exists or not for security
-    req.flash('success_msg', 'If an account with that email exists, a password reset link has been sent');
-    res.redirect('/users/login');
+    const { supabaseAdmin } = require('../utils/database');
+    // Request Supabase to send a password recovery email
+    await supabaseAdmin.auth.resetPasswordForEmail(email, {
+      redirectTo: `${req.protocol}://${req.get('host')}/users/reset-password`
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).render('error', {
-      title: 'Server Error',
-      errorCode: 500,
-      message: 'Error processing password reset',
-      theme: 'broken-window'
-    });
+    // Ignore errors to avoid revealing whether the email exists
   }
+
+  // Always show the same message for security
+  req.flash(
+    'success_msg',
+    'If an account with that email exists, a password reset link has been sent'
+  );
+  res.redirect('/users/login');
 });
 
 // Account settings page
@@ -185,57 +210,94 @@ router.get('/settings', ensureAuthenticated, (req, res) => {
   res.render('users/settings', {
     title: 'Account Settings - Wirebase',
     user: req.user,
+    displayName: req.user.displayName,
+    email: req.user.email,
+    customGlyph: req.user.customGlyph,
+    statusMessage: req.user.statusMessage,
     pageTheme: 'dark-dungeon'
   });
 });
 
 // Update account settings
-router.post('/settings', ensureAuthenticated, async (req, res) => {
+router.post('/settings', ensureAuthenticated, async (req, res, next) => {
   const { displayName, email, statusMessage, customGlyph } = req.body;
-  
+  const errors = [];
+
+  // Validate inputs
+
+
+  if (displayName && displayName.length < 3) {
+    errors.push({ msg: 'Display name must be at least 3 characters' });
+  }
+
+  if (email && !emailRegex.test(email)) {
+    errors.push({ msg: 'Please enter a valid email address' });
+  }
+
+  if (customGlyph && customGlyph.length > 2) {
+    errors.push({ msg: 'Custom glyph must be at most 2 characters' });
+  }
+
+  // Check if new email already exists
+  if (email && email !== req.user.email) {
+    const existing = await User.findOne({ email });
+    if (existing) {
+      errors.push({ msg: 'Email is already registered' });
+    }
+  }
+
+  if (errors.length > 0) {
+    return res.render('users/settings', {
+      title: 'Account Settings - Wirebase',
+      user: req.user,
+      errors,
+      pageTheme: 'dark-dungeon',
+      form: {
+        displayName,
+        email,
+        statusMessage,
+        customGlyph
+      }
+
+    });
+  }
+
   try {
-    // Prepare update data
     const updateData = {
       displayName: displayName || req.user.displayName,
       email: email || req.user.email,
       statusMessage: statusMessage || req.user.statusMessage
     };
-    
-    if (customGlyph && customGlyph.length <= 2) {
+
+    if (customGlyph) {
       updateData.customGlyph = customGlyph;
     }
-    
-    // Use Supabase method to update
+
     await User.findByIdAndUpdate(req.user.id, updateData);
-    
+
     req.flash('success_msg', 'Account settings updated');
     res.redirect('/users/settings');
   } catch (err) {
     console.error(err);
-    res.status(500).render('error', {
-      title: 'Server Error',
-      errorCode: 500,
-      message: 'Error updating account settings',
-      theme: 'broken-window'
-    });
+    next(err);
   }
 });
 
 // Change password
-router.post('/change-password', ensureAuthenticated, async (req, res) => {
+router.post('/change-password', ensureAuthenticated, async (req, res, next) => {
   const { currentPassword, newPassword, confirmPassword } = req.body;
   const errors = [];
-  
+
   // Check password match
   if (newPassword !== confirmPassword) {
     errors.push({ msg: 'New passwords do not match' });
   }
-  
+
   // Check password length
   if (newPassword.length < 6) {
     errors.push({ msg: 'Password should be at least 6 characters' });
   }
-  
+
   if (errors.length > 0) {
     return res.render('users/settings', {
       title: 'Account Settings - Wirebase',
@@ -244,14 +306,14 @@ router.post('/change-password', ensureAuthenticated, async (req, res) => {
       pageTheme: 'dark-dungeon'
     });
   }
-  
+
   try {
     // Get user with password for verification
     const user = await User.findByIdWithPassword(req.user.id);
-    
+
     // Check current password
     const isMatch = await bcrypt.compare(currentPassword, user.password);
-    
+
     if (!isMatch) {
       errors.push({ msg: 'Current password is incorrect' });
       return res.render('users/settings', {
@@ -261,20 +323,15 @@ router.post('/change-password', ensureAuthenticated, async (req, res) => {
         pageTheme: 'dark-dungeon'
       });
     }
-    
+
     // Update with new password - hashing will be handled by the User model
     await User.findByIdAndUpdate(req.user.id, { password: newPassword });
-    
+
     req.flash('success_msg', 'Password updated successfully');
     res.redirect('/users/settings');
   } catch (err) {
     console.error(err);
-    res.status(500).render('error', {
-      title: 'Server Error',
-      errorCode: 500,
-      message: 'Error updating password',
-      theme: 'broken-window'
-    });
+    next(err);
   }
 });
 

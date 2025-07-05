@@ -29,6 +29,10 @@ console.log = jest.fn();
 const memoryMonitor = require('../../../server/utils/memory-monitor');
 
 describe('Memory Monitor', () => {
+  beforeAll(() => {
+    memoryMonitor.start(1000); // use shorter interval for tests
+  });
+
   beforeEach(() => {
     // Clear all mocks before each test
     jest.clearAllMocks();
@@ -40,6 +44,7 @@ describe('Memory Monitor', () => {
     process.memoryUsage = originalMemoryUsage;
     console.warn = originalConsoleWarn;
     console.log = originalConsoleLog;
+    memoryMonitor.stop();
   });
 
   describe('getMemoryUsage', () => {
