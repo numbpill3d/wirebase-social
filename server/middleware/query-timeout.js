@@ -27,23 +27,28 @@ const queryTimeoutMiddleware = (knexInstance, timeout = 30000) => {
 
   return (req, res, next) => {
     if (!knexInstance || typeof knexInstance.raw !== 'function') {
-      console.error('ERROR: knex.raw is undefined in query timeout middleware execution');
+console.error('ERROR: Invalid knex instance or knex.raw is undefined in query timeout middleware execution');
+
       return next();
     }
 
     // Store original raw method
     const originalRaw = knexInstance.raw.bind(knexInstance);
 
-    // Override raw to add timeout race
-    knexInstance.raw = (...args) => {
-      const queryBuilder = originalRaw(...args);
+// Override raw method with timeout wrapper
+knexInstance.raw = (...args) => {
+  const queryBuilder = originalRaw(...args);
 
-      // Apply knex level timeout when available for maximum compatibility
-      if (typeof queryBuilder.timeout === 'function') {
-        queryBuilder.timeout(timeout, { cancel: true });
-      }
+  // Apply timeout only if supported
+  if (typeof queryBuilder.timeout === 'function') {
+    queryBuilder.timeout(timeout, { cancel: true });
+  }
 
-      const queryPromise = Promise.resolve(queryBuilder);
+  const queryPromise = Promise.resolve(queryBuilder);
+
+  // Optionally add custom timeout logic here, e.g., a race with a manual timeout
+  return queryPromise;
+};
 
       const timeoutPromise = new Promise((_, reject) => {
         const id = setTimeout(() => {
@@ -61,10 +66,10 @@ const queryTimeoutMiddleware = (knexInstance, timeout = 30000) => {
           reject(new Error(`Query timeout after ${timeout}ms`));
         }, timeout);
 
-        queryPromise.finally(() => clearTimeout(id));
-      });
+queryPromise.finally(() => clearTimeout(id));
 
-      return Promise.race([queryPromise, timeoutPromise]);
+return Promise.race([queryPromise, timeoutPromise]);
+
     };
 
     next();
