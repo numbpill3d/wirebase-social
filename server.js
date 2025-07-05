@@ -494,8 +494,18 @@ let healthCheckTimer;
 let leakDetectionTimers;
 
 
+// Start health checks (every 60 seconds)
+healthCheckTimer = dbHealth.startPeriodicHealthChecks(60000);
+
+// Start leak detection (check every 30 seconds, fix every 5 minutes)
+leakDetectionTimers = dbLeakDetector.startLeakDetection(null, 30000, 300000);
+
+// Start memory monitoring
+memoryMonitor.start();
+
 // Start server after verifying database connection
 startServer();
+
 
 
 // Export knex instance and monitoring utilities for use in other modules

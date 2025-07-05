@@ -1,6 +1,7 @@
 const v8 = require('v8');
 
-let timer = null;
+let monitorTimer = null;
+
 
 const memoryMonitor = {
   getMemoryUsage() {
@@ -28,26 +29,47 @@ const memoryMonitor = {
         console.log('Forced garbage collection');
       }
     }
+  },
+
+  start(interval = 300000) {
+    if (monitorTimer) {
+      return monitorTimer;
+    }
+
+    monitorTimer = setInterval(() => {
+      this.logMemoryUsage();
+    }, interval);
+
+    return monitorTimer;
+  },
+
+  stop() {
+    if (monitorTimer) {
+      clearInterval(monitorTimer);
+      monitorTimer = null;
+      return true;
+    }
+    return false;
   }
 };
 
-// Start monitoring memory usage
+let monitorTimer = null;
+
 const start = (interval = 300000, threshold = 80) => {
-  if (timer) {
+  if (monitorTimer) {
     console.warn('Memory monitor is already running');
     return false;
   }
-  timer = setInterval(() => {
+  monitorTimer = setInterval(() => {
     memoryMonitor.logMemoryUsage(threshold);
   }, interval);
   return true;
 };
 
-// Stop monitoring memory usage
 const stop = () => {
-  if (timer) {
-    clearInterval(timer);
-    timer = null;
+  if (monitorTimer) {
+    clearInterval(monitorTimer);
+    monitorTimer = null;
   }
 };
 
