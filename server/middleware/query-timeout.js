@@ -18,7 +18,6 @@ console.log('Query timeout middleware loaded');
 const queryTimeoutMiddleware = (knexInstance, timeout = 30000) => {
   if (!knexInstance) {
     console.error('ERROR: knexInstance not provided to queryTimeoutMiddleware');
-    // Return a dummy middleware that just calls next()
     return (req, res, next) => next();
   }
 
@@ -27,33 +26,23 @@ const queryTimeoutMiddleware = (knexInstance, timeout = 30000) => {
 
   return (req, res, next) => {
     if (!knexInstance || typeof knexInstance.raw !== 'function') {
-console.error('ERROR: Invalid knex instance or knex.raw is undefined in query timeout middleware execution');
-
+      console.error('ERROR: Invalid knex instance or knex.raw is undefined in query timeout middleware execution');
       return next();
     }
 
-    // Store original raw method
     const originalRaw = knexInstance.raw.bind(knexInstance);
 
-// Override raw method with timeout wrapper
-knexInstance.raw = (...args) => {
-  const queryBuilder = originalRaw(...args);
+    knexInstance.raw = (...args) => {
+      const queryBuilder = originalRaw(...args);
 
-  // Apply timeout only if supported
-  if (typeof queryBuilder.timeout === 'function') {
-    queryBuilder.timeout(timeout, { cancel: true });
-  }
+      if (typeof queryBuilder.timeout === 'function') {
+        queryBuilder.timeout(timeout, { cancel: true });
+      }
 
-  const queryPromise = Promise.resolve(queryBuilder);
-
-  // Optionally add custom timeout logic here, e.g., a race with a manual timeout
-  return queryPromise;
-};
+      const queryPromise = Promise.resolve(queryBuilder);
 
       const timeoutPromise = new Promise((_, reject) => {
         const id = setTimeout(() => {
-          clearTimeout(id);
-
           const poolStatus = dbMonitor.getPoolStatus(knexInstance);
           console.error('Query timeout detected', {
             query: args[0],
@@ -62,14 +51,13 @@ knexInstance.raw = (...args) => {
           });
 
           dbHealth.checkHealth(knexInstance).catch(console.error);
-
           reject(new Error(`Query timeout after ${timeout}ms`));
         }, timeout);
 
-queryPromise.finally(() => clearTimeout(id));
+        queryPromise.finally(() => clearTimeout(id));
+      });
 
-return Promise.race([queryPromise, timeoutPromise]);
-
+      return Promise.race([queryPromise, timeoutPromise]);
     };
 
     next();
@@ -89,33 +77,24 @@ return Promise.race([queryPromise, timeoutPromise]);
 const transactionTimeoutMiddleware = (knexInstance, timeout = 60000) => {
   if (!knexInstance) {
     console.error('ERROR: knexInstance not provided to transactionTimeoutMiddleware');
-    // Return a dummy middleware that just calls next()
     return (req, res, next) => next();
   }
 
   return (req, res, next) => {
-    // Store original transaction method
     const originalTransaction = knexInstance.transaction;
 
-    // Override transaction method with timeout
     knexInstance.transaction = (...args) => {
-      // Get transaction options
       const options = args[0] || {};
-
-      // Add timeout to options
       const newOptions = {
         ...options,
         timeout
       };
 
-      // Call original transaction method with new options
       return originalTransaction.call(knexInstance, newOptions);
     };
 
-    // Continue to next middleware
     next();
 
-    // Restore original transaction method after request is complete
     res.on('finish', () => {
       knexInstance.transaction = originalTransaction;
     });
