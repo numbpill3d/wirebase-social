@@ -2,7 +2,6 @@ const v8 = require('v8');
 
 let monitorTimer = null;
 
-
 const memoryMonitor = {
   getMemoryUsage() {
     const heapStats = v8.getHeapStatistics();
@@ -21,60 +20,44 @@ const memoryMonitor = {
     const usagePercent = (stats.heapUsed / stats.heapSizeLimit) * 100;
 
     if (usagePercent > threshold) {
-      console.warn(`High memory usage: ${usagePercent.toFixed(2)}%`);
-      console.warn('Memory stats:', stats);
+      console.warn(`⚠️ High memory usage: ${usagePercent.toFixed(2)}%`);
+      console.warn('📊 Memory stats:', stats);
 
       if (usagePercent > 90) {
-        global.gc && global.gc();
-        console.log('Forced garbage collection');
+        if (global.gc) {
+          global.gc();
+          console.log('🧹 Forced garbage collection triggered');
+        } else {
+          console.warn('🚫 Garbage collection unavailable — run with --expose-gc');
+        }
       }
     }
   },
 
-  start(interval = 300000) {
+  start(interval = 300000, threshold = 80) {
     if (monitorTimer) {
-      return monitorTimer;
+      console.warn('🔁 Memory monitor is already running');
+      return false;
     }
 
     monitorTimer = setInterval(() => {
-      this.logMemoryUsage();
+      this.logMemoryUsage(threshold);
     }, interval);
 
-    return monitorTimer;
+    console.log(`🟢 Memory monitor started (every ${interval / 1000}s)`);
+    return true;
   },
 
   stop() {
     if (monitorTimer) {
       clearInterval(monitorTimer);
       monitorTimer = null;
+      console.log('🛑 Memory monitor stopped');
       return true;
     }
+    console.warn('⛔ Memory monitor is not running');
     return false;
   }
 };
 
-let monitorTimer = null;
-
-const start = (interval = 300000, threshold = 80) => {
-  if (monitorTimer) {
-    console.warn('Memory monitor is already running');
-    return false;
-  }
-  monitorTimer = setInterval(() => {
-    memoryMonitor.logMemoryUsage(threshold);
-  }, interval);
-  return true;
-};
-
-const stop = () => {
-  if (monitorTimer) {
-    clearInterval(monitorTimer);
-    monitorTimer = null;
-  }
-};
-
-module.exports = {
-  ...memoryMonitor,
-  start,
-  stop
-};
+module.exports = memoryMonitor;
