@@ -1,7 +1,10 @@
 /**
  * Database health check utility
- * Provides functions to check database connection health and perform maintenance
+ * Prov
+des functions to check database connection health and perform maintenance
  */
+let knexConfig = null;
+
 
 // Remove direct import of knex to break circular dependency
 const dbMonitor = require('./db-monitor');
@@ -134,7 +137,11 @@ const performMaintenance = async (knex = null) => {
       await kInstance.destroy();
 
       // Recreate knex instance using original configuration
-      const newKnex = require('knex')(kInstance.client.config);
+      if (!knexConfig) {
+  throw new Error('Knex config not available for rebuilding the pool');
+}
+const newKnex = require('knex')(knexConfig);
+
       knexInstance = newKnex;
       global.knex = newKnex;
 
@@ -212,9 +219,11 @@ const startPeriodicHealthChecks = (knex = null, interval = 60000) => {
 const initialize = (knex) => {
   if (knex) {
     knexInstance = knex;
+    knexConfig = knex.client.config; // 🔥 Capture it now
     console.log('Database health check utility initialized with knex instance');
   }
 };
+
 
 // Export functions
 module.exports = {
