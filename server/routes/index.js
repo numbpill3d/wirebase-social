@@ -146,7 +146,8 @@ router.get('/discover', async (req, res) => {
 ScrapyardItem.find({})
   .sort({ createdAt: -1 })
   .skip(skip)
-  .limit(limit);
+  .limit(limit)  // ← no semicolon here
+
 
 
     ]);
