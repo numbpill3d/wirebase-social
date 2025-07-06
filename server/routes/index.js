@@ -143,14 +143,11 @@ router.get('/discover', async (req, res) => {
         .select('username displayName avatar customGlyph statusMessage lastActive'),
 
       // Recent Scrapyard submissions
-ScrapyardItem.find(
-  {},
-  {
-    sort: { createdAt: -1 },
-    skip,
-    limit
-  }
-);
+ScrapyardItem.find({})
+  .sort({ createdAt: -1 })
+  .skip(skip)
+  .limit(limit);
+
 
     ]);
 
