@@ -213,7 +213,7 @@ class StreetpassWidget extends HTMLElement {
     const emoteButtons = this.shadowRoot.querySelectorAll('.emote-option');
     emoteButtons.forEach(button => {
       button.addEventListener('click', () => {
-        const emote = button.dataset.emote;
+        const {emote} = button.dataset;
         this.leaveEmote(emote);
       });
     });
