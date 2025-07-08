@@ -345,7 +345,7 @@ class WIRTransaction {
       id: transaction.sender.id,
       username: transaction.sender.username,
       displayName: transaction.sender.display_name,
-      avatar: transaction.sender.avatar || '/images/default-avatar.png'
+      avatar: transaction.sender.avatar || '/images/laincore/default-avatar.png'
     } : null;
 
     // Format the receiver
@@ -353,7 +353,7 @@ class WIRTransaction {
       id: transaction.receiver.id,
       username: transaction.receiver.username,
       displayName: transaction.receiver.display_name,
-      avatar: transaction.receiver.avatar || '/images/default-avatar.png'
+      avatar: transaction.receiver.avatar || '/images/laincore/default-avatar.png'
     } : null;
 
     // Format the item
