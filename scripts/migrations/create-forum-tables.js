@@ -124,7 +124,7 @@ const { error: catCreateError } = await supabaseAdmin.rpc('execute_sql', {
 });
 
 if (catCreateError) {
-  throw new Error(\`Category table migration failed: \${catCreateError.message}\`);
+  throw new Error(`Category table migration failed: ${catCreateError.message}`);
 }
 
       

@@ -37,6 +37,9 @@ public/uploads/
 .DS_Store
 Thumbs.db
 
+# Development history
+.history/
+
 # MongoDB local data
 data/db/
 
