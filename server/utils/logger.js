@@ -9,7 +9,7 @@ if (process.env.LOGFLARE_API_KEY && process.env.LOGFLARE_SOURCE_TOKEN) {
     sourceToken: process.env.LOGFLARE_SOURCE_TOKEN,
   });
 
-  const stream = logflare.stream;
+  const {stream} = logflare;
   logger = pino({ level: process.env.LOG_LEVEL || 'info' }, stream);
 
   console.log('Using Pino with Logflare for logging');
