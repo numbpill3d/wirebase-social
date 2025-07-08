@@ -8,6 +8,11 @@ jest.mock('../../../server/models/User', () => ({
   findRecent: jest.fn().mockResolvedValue([
     { username: 'user1', displayName: 'User 1' },
     { username: 'user2', displayName: 'User 2' }
+  ]),
+  countDocuments: jest.fn().mockResolvedValue(2),
+  find: jest.fn().mockResolvedValue([
+    { username: 'active1', lastActive: new Date() },
+    { username: 'active2', lastActive: new Date() }
   ])
 }));
 
