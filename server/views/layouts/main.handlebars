@@ -188,6 +188,11 @@
     <!-- Load critical scripts first -->
     <script src="/js/main.js" defer></script>
 
+    <!-- Plausible Analytics -->
+    {{#if plausibleDomain}}
+        <script defer data-domain="{{plausibleDomain}}" src="https://plausible.io/js/plausible.js"></script>
+    {{/if}}
+
     <!-- Load non-critical scripts with defer to improve page load performance -->
     <script src="/js/laincore-loader.js" defer></script>
     <script src="/js/loading-states.js" defer></script>

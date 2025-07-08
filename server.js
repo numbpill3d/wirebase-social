@@ -12,6 +12,13 @@ try {
   }
 }
 
+// Setup logger and pipe console output to it
+const logger = require('./server/utils/logger');
+console.log = logger.info.bind(logger);
+console.info = logger.info.bind(logger);
+console.warn = logger.warn.bind(logger);
+console.error = logger.error.bind(logger);
+
 const { validateEnv } = require('./server/utils/env-check');
 if (!validateEnv()) {
   console.error('Environment validation failed. Starting minimal server instead.');
@@ -341,6 +348,12 @@ app.use((req, res, next) => {
   next();
 });
 
+// Provide Plausible analytics domain to templates
+app.use((req, res, next) => {
+  res.locals.plausibleDomain = process.env.PLAUSIBLE_DOMAIN || null;
+  next();
+});
+
 // Set default theme
 app.use((req, res, next) => {
   // Check user preference first, then session, then default
@@ -514,5 +527,6 @@ module.exports = {
   dbMonitor,
   dbHealth,
   dbErrorHandler,
-  dbLeakDetector
+  dbLeakDetector,
+  logger
 };

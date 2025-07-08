@@ -40,6 +40,8 @@
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
     "pg": "^8.11.3",
+    "pino": "^9.7.0",
+    "pino-logflare": "^0.5.2",
     "sharp": "^0.34.2",
     "three": "^0.152.2",
     "uuid": "^9.0.1",
