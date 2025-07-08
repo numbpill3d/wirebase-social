@@ -83,7 +83,9 @@ const forumThreads = [
     id: '1',
     title: 'Welcome to the Wirebase Assembly',
     category: 'general',
-    content: 'Welcome to the forum! Share your ideas and connect with other digital underground dwellers.',
+    content:
+      'Welcome to the forum! Share your ideas and connect with other digital ' +
+      'underground dwellers.',
     creator: { username: 'admin', displayName: 'Admin', customGlyph: '👁️' },
     createdAt: new Date('2025-05-01'),
     replies: [
@@ -184,7 +186,7 @@ const server = http.createServer((req, res) => {
     const filePath = path.join(__dirname, 'public', pathname);
     console.log('Attempting to serve static file:', filePath);
     const extname = path.extname(filePath);
-    
+
     const contentTypeMap = {
       '.html': 'text/html',
       '.css': 'text/css',
@@ -197,9 +199,9 @@ const server = http.createServer((req, res) => {
       '.svg': 'image/svg+xml',
       '.ico': 'image/x-icon'
     };
-    
+
     const contentType = contentTypeMap[extname] || 'text/plain';
-    
+
     fs.readFile(filePath, (err, content) => {
       if (err) {
         console.error('Error reading static file:', err.message);
@@ -208,13 +210,13 @@ const server = http.createServer((req, res) => {
         return;
       }
       console.log('Successfully served static file:', pathname);
-      
+
       res.writeHead(200, { 'Content-Type': contentType });
       res.end(content);
     });
     return;
   }
-  
+
   // Handle routes
   if (req.method === 'GET') {
     // Home route
@@ -243,7 +245,7 @@ const server = http.createServer((req, res) => {
       `;
       sendHTML(res, content, 'Wirebase - Digital Underground');
     }
-    
+
     // Scrapyard routes
     else if (pathname === '/scrapyard') {
       const content = `
@@ -278,7 +280,7 @@ const server = http.createServer((req, res) => {
       `;
       sendHTML(res, content, 'The Scrapyard - Wirebase');
     }
-    
+
     // Forum routes
     else if (pathname === '/forum') {
       const content = `
@@ -311,7 +313,7 @@ const server = http.createServer((req, res) => {
       `;
       sendHTML(res, content, 'Assembly - Wirebase');
     }
-    
+
     // Feed route
     else if (pathname === '/feed') {
       const content = `
@@ -320,10 +322,17 @@ const server = http.createServer((req, res) => {
           <p>Latest updates from the Wirebase community</p>
         </div>
         <div class="feed-items">
-          ${[...scrapyardItems, ...forumThreads].sort((a, b) => b.createdAt - a.createdAt).map(item => {
-            if (item.category && ['widget', 'template', 'icon', 'banner', 'gif'].includes(item.category)) {
-              // Scrapyard item
-              return `
+          ${[...scrapyardItems, ...forumThreads]
+    .sort((a, b) => b.createdAt - a.createdAt)
+    .map(item => {
+      if (
+        item.category &&
+          ['widget', 'template', 'icon', 'banner', 'gif'].includes(
+            item.category
+          )
+      ) {
+      // Scrapyard item
+        return `
                 <div class="feed-item">
                   <div class="feed-item-header">
                     <span class="feed-item-type">New Scrapyard Item</span>
@@ -342,9 +351,9 @@ const server = http.createServer((req, res) => {
                   </div>
                 </div>
               `;
-            } else {
-              // Forum thread
-              return `
+      } else {
+      // Forum thread
+        return `
                 <div class="feed-item">
                   <div class="feed-item-header">
                     <span class="feed-item-type">New Forum Thread</span>
@@ -353,7 +362,10 @@ const server = http.createServer((req, res) => {
                   <div class="feed-item-content">
                     <div class="feed-item-details">
                       <h3><a href="/forum/thread/${item.id}">${item.title}</a></h3>
-                      <p>${item.content.substring(0, 100)}${item.content.length > 100 ? '...' : ''}</p>
+                      <p>
+                        ${item.content.substring(0, 100)}
+                        ${item.content.length > 100 ? '...' : ''}
+                      </p>
                       <div class="feed-item-meta">
                         <span>By: ${item.creator.displayName}</span>
                         <span>Category: ${item.category}</span>
@@ -363,13 +375,13 @@ const server = http.createServer((req, res) => {
                   </div>
                 </div>
               `;
-            }
-          }).join('')}
+      }
+    }).join('')}
         </div>
       `;
       sendHTML(res, content, 'Feed - Wirebase');
     }
-    
+
     // Profile route
     else if (pathname === '/profile') {
       const content = `
@@ -379,7 +391,11 @@ const server = http.createServer((req, res) => {
         </div>
         <div class="profile-view">
           <div class="profile-header">
-            <img src="/images/laincore/default-avatar.svg" alt="Profile Avatar" class="profile-avatar">
+            <img
+              src="/images/laincore/default-avatar.svg"
+              alt="Profile Avatar"
+              class="profile-avatar"
+            >
             <div class="profile-info">
               <h2>Demo User <span class="custom-glyph">👁️</span></h2>
               <p class="status-message">Exploring the digital underground</p>
@@ -418,7 +434,7 @@ const server = http.createServer((req, res) => {
       `;
       sendHTML(res, content, 'Profile - Wirebase');
     }
-    
+
     // 404 for all other routes
     else {
       const content = `
@@ -428,7 +444,7 @@ const server = http.createServer((req, res) => {
           <a href="/" class="button">Return Home</a>
         </div>
       `;
-      
+
       res.writeHead(404, { 'Content-Type': 'text/html' });
       sendHTML(res, content, '404 - Wirebase');
     }

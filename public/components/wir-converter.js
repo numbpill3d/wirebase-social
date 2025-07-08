@@ -226,11 +226,11 @@ class WIRConverter extends HTMLElement {
   updateBalances() {
     const wirBalanceElement = this.shadowRoot.getElementById('wir-balance');
     const lootBalanceElement = this.shadowRoot.getElementById('loot-balance');
-    
+
     if (wirBalanceElement) {
       wirBalanceElement.textContent = this.wirBalance;
     }
-    
+
     if (lootBalanceElement) {
       lootBalanceElement.textContent = this.lootBalance;
     }
@@ -241,38 +241,38 @@ class WIRConverter extends HTMLElement {
     const amount = parseInt(amountInput.value);
     const directionInput = this.shadowRoot.querySelector('input[name="direction"]:checked');
     const direction = directionInput.value;
-    
+
     const errorMessage = this.shadowRoot.getElementById('error-message');
     const successMessage = this.shadowRoot.getElementById('success-message');
     const loading = this.shadowRoot.getElementById('loading');
-    
+
     // Reset messages
     errorMessage.style.display = 'none';
     successMessage.style.display = 'none';
-    
+
     // Validate input
     if (!amount || isNaN(amount) || amount < 1) {
       errorMessage.textContent = 'Please enter a valid amount (minimum 1)';
       errorMessage.style.display = 'block';
       return;
     }
-    
+
     // Check balances
     if (direction === 'lootToWir' && amount > this.lootBalance) {
       errorMessage.textContent = 'Insufficient Loot tokens';
       errorMessage.style.display = 'block';
       return;
     }
-    
+
     if (direction === 'wirToLoot' && amount > this.wirBalance) {
       errorMessage.textContent = 'Insufficient WIR balance';
       errorMessage.style.display = 'block';
       return;
     }
-    
+
     // Show loading
     loading.style.display = 'flex';
-    
+
     try {
       // Call the API to convert currency
       const response = await fetch('/api/market/wir/convert', {
@@ -285,22 +285,25 @@ class WIRConverter extends HTMLElement {
           amount
         })
       });
-      
+
       const result = await response.json();
-      
+
       // Hide loading
       loading.style.display = 'none';
-      
+
       if (result.success) {
         // Update balances
         this.wirBalance = result.newWirBalance;
         this.lootBalance = result.newLootBalance;
         this.updateBalances();
-        
+
         // Show success message
-        successMessage.textContent = `Successfully converted ${amount} ${direction === 'lootToWir' ? 'Loot to WIR' : 'WIR to Loot'}`;
+        successMessage.textContent =
+          `Successfully converted ${amount} ${
+            direction === 'lootToWir' ? 'Loot to WIR' : 'WIR to Loot'
+          }`;
         successMessage.style.display = 'block';
-        
+
         // Dispatch event
         this.dispatchEvent(new CustomEvent('conversion-complete', {
           detail: {
@@ -317,10 +320,10 @@ class WIRConverter extends HTMLElement {
       }
     } catch (error) {
       console.error('Error converting currency:', error);
-      
+
       // Hide loading
       loading.style.display = 'none';
-      
+
       // Show error message
       errorMessage.textContent = 'An error occurred during conversion';
       errorMessage.style.display = 'block';

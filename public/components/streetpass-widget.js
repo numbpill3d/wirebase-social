@@ -4,72 +4,74 @@
  */
 
 class StreetpassWidget extends HTMLElement {
-    constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.visitors = [];
+    this.username = this.getAttribute('username') || 'unknown';
+    this.profileId = this.getAttribute('profile-id') || '';
+    this.maxVisitors = parseInt(this.getAttribute('max-visitors') || '5');
+    this.theme = this.getAttribute('theme') || 'cyber';
+  }
+
+  connectedCallback() {
+    this.loadVisitors()
+      .then(() => {
+        this.render();
+        this.attachEventListeners();
+      })
+      .catch(error => {
+        console.error('Error loading streetpass data:', error);
         this.visitors = [];
-        this.username = this.getAttribute('username') || 'unknown';
-        this.profileId = this.getAttribute('profile-id') || '';
-        this.maxVisitors = parseInt(this.getAttribute('max-visitors') || '5');
-        this.theme = this.getAttribute('theme') || 'cyber';
+        this.renderError();
+      });
+  }
+
+  async loadVisitors() {
+    if (!this.profileId) {
+      console.error('No profile ID provided to Streetpass widget');
+      this.visitors = [];
+      return;
+    }
+    // Fetch visitors from API
+    const url = `/api/streetpass/visitors/${this.profileId}?limit=${this.maxVisitors}`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`Failed to load visitors: ${response.status} ${response.statusText}`);
     }
 
-    connectedCallback() {
-        this.loadVisitors()
-            .then(() => {
-                this.render();
-                this.attachEventListeners();
-            })
-            .catch(error => {
-                console.error('Error loading streetpass data:', error);
-                this.visitors = [];
-                this.renderError();
-            });
+    const data = await response.json();
+
+    if (data.success && Array.isArray(data.visitors)) {
+      // Transform API data to widget format
+      this.visitors = data.visitors.map(visitor => {
+        if (!visitor.visitor) {
+          throw new Error('Invalid visitor data structure');
+        }
+        return {
+          timestamp: visitor.visitedAt
+            ? new Date(visitor.visitedAt).getTime()
+            : Date.now(),
+          username: visitor.visitor.username,
+          displayName: visitor.visitor.displayName,
+          glyph: visitor.visitor.customGlyph,
+          emote: visitor.emote || '👋',
+          visitId: visitor.id
+        };
+      });
+    } else {
+      // Invalid data format
+      throw new Error('API returned invalid data format');
     }
+  }
 
-    async loadVisitors() {
-        if (!this.profileId) {
-            console.error('No profile ID provided to Streetpass widget');
-            this.visitors = [];
-            return;
-        }
-        // Fetch visitors from API
-        const response = await fetch(`/api/streetpass/visitors/${this.profileId}?limit=${this.maxVisitors}`);
+  render() {
+    const styles = this.getStyles();
+    const visitorsList = this.renderVisitorsList();
+    const emoteSelector = this.renderEmoteSelector();
 
-        if (!response.ok) {
-            throw new Error(`Failed to load visitors: ${response.status} ${response.statusText}`);
-        }
-
-        const data = await response.json();
-
-        if (data.success && Array.isArray(data.visitors)) {
-            // Transform API data to widget format
-            this.visitors = data.visitors.map(visitor => {
-                if (!visitor.visitor) {
-                    throw new Error('Invalid visitor data structure');
-                }
-                return {
-                    timestamp: visitor.visitedAt ? new Date(visitor.visitedAt).getTime() : Date.now(),
-                    username: visitor.visitor.username,
-                    displayName: visitor.visitor.displayName,
-                    glyph: visitor.visitor.customGlyph,
-                    timestamp: new Date(visitor.visitedAt).getTime(),
-                    emote: visitor.emote || '👋',
-                    visitId: visitor.id
-                };
-            });
-        } else {
-            // Invalid data format
-            throw new Error('API returned invalid data format');
-        }
-    }
-
-    render() {
-        const styles = this.getStyles();
-        const visitorsList = this.renderVisitorsList();
-        const emoteSelector = this.renderEmoteSelector();
-
-        this.shadowRoot.innerHTML = `
+    this.shadowRoot.innerHTML = `
             <style>${styles}</style>
             <div class="streetpass-widget theme-${this.theme}">
                 <div class="cyber-window">
@@ -83,7 +85,11 @@ class StreetpassWidget extends HTMLElement {
                     <div class="cyber-window-content">
                         <div class="widget-header">
                             <div class="title-container">
-                                <img src="/images/streetpass-icon.svg" alt="Connection Log" class="widget-icon">
+                                <img
+                                  src="/images/streetpass-icon.svg"
+                                  alt="Connection Log"
+                                  class="widget-icon"
+                                >
                                 <h3>Network Connections</h3>
                             </div>
                             <div class="visitor-count">
@@ -100,14 +106,14 @@ class StreetpassWidget extends HTMLElement {
                 </div>
             </div>
         `;
+  }
+
+  renderVisitorsList() {
+    if (this.visitors.length === 0) {
+      return '<div class="no-visitors">No connections detected.</div>';
     }
 
-    renderVisitorsList() {
-        if (this.visitors.length === 0) {
-            return '<div class="no-visitors">No connections detected.</div>';
-        }
-
-        return `
+    return `
             <ul class="visitors-list">
                 ${this.visitors.map(visitor => `
                     <li class="visitor-item">
@@ -116,21 +122,24 @@ class StreetpassWidget extends HTMLElement {
                             <span class="visitor-name">${visitor.username}</span>
                             <span class="visitor-time">${this.formatTime(visitor.timestamp)}</span>
                         </div>
-                        <div class="visitor-emote" title="${visitor.username} left ${visitor.emote}">
+                            <div
+                              class="visitor-emote"
+                              title="${visitor.username} left ${visitor.emote}"
+                            >
                             ${visitor.emote}
                         </div>
                     </li>
                 `).join('')}
             </ul>
         `;
-    }
+  }
 
-    renderEmoteSelector() {
-        // Only show emote selector if this is not the user's own profile
-        const currentUser = localStorage.getItem('wirebase_username');
+  renderEmoteSelector() {
+    // Only show emote selector if this is not the user's own profile
+    const currentUser = localStorage.getItem('wirebase_username');
 
-        if (currentUser && currentUser !== this.username) {
-            return `
+    if (currentUser && currentUser !== this.username) {
+      return `
                 <div class="emote-section">
                     <h4>Transmit signal:</h4>
                     <div class="emote-selector">
@@ -145,13 +154,13 @@ class StreetpassWidget extends HTMLElement {
                     </div>
                 </div>
             `;
-        }
-
-        return '';
     }
 
-    renderError() {
-        this.shadowRoot.innerHTML = `
+    return '';
+  }
+
+  renderError() {
+    this.shadowRoot.innerHTML = `
             <div class="streetpass-widget error">
                 <div class="cyber-window">
                     <div class="cyber-window-header">
@@ -168,157 +177,157 @@ class StreetpassWidget extends HTMLElement {
             </div>
         `;
 
-        this.shadowRoot.querySelector('.retry-button').addEventListener('click', () => {
-            this.loadVisitors()
-                .then(() => {
-                    this.render();
-                    this.attachEventListeners();
-                })
-                .catch(err => {
-                    console.error('Error loading streetpass data:', err);
-                    this.visitors = [];
-                    this.renderError();
-                });
+    this.shadowRoot.querySelector('.retry-button').addEventListener('click', () => {
+      this.loadVisitors()
+        .then(() => {
+          this.render();
+          this.attachEventListeners();
+        })
+        .catch(err => {
+          console.error('Error loading streetpass data:', err);
+          this.visitors = [];
+          this.renderError();
         });
+    });
+  }
+
+  attachEventListeners() {
+    // Window controls
+    const minimizeBtn = this.shadowRoot.querySelector('.minimize');
+    const closeBtn = this.shadowRoot.querySelector('.close');
+
+    if (minimizeBtn) {
+      minimizeBtn.addEventListener('click', () => {
+        const content = this.shadowRoot.querySelector('.cyber-window-content');
+        content.style.display = content.style.display === 'none' ? 'block' : 'none';
+      });
     }
 
-    attachEventListeners() {
-        // Window controls
-        const minimizeBtn = this.shadowRoot.querySelector('.minimize');
-        const closeBtn = this.shadowRoot.querySelector('.close');
-
-        if (minimizeBtn) {
-            minimizeBtn.addEventListener('click', () => {
-                const content = this.shadowRoot.querySelector('.cyber-window-content');
-                content.style.display = content.style.display === 'none' ? 'block' : 'none';
-            });
-        }
-
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
-                this.style.display = 'none';
-            });
-        }
-
-        // Emote buttons
-        const emoteButtons = this.shadowRoot.querySelectorAll('.emote-option');
-        emoteButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const emote = button.dataset.emote;
-                this.leaveEmote(emote);
-            });
-        });
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        this.style.display = 'none';
+      });
     }
 
-    async leaveEmote(emote) {
-        try {
-            if (!this.profileId) {
-                this.showErrorNotification('Cannot leave emote: No profile ID provided');
-                return;
-            }
+    // Emote buttons
+    const emoteButtons = this.shadowRoot.querySelectorAll('.emote-option');
+    emoteButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const emote = button.dataset.emote;
+        this.leaveEmote(emote);
+      });
+    });
+  }
 
-            // Show loading state
-            this.showEmoteConfirmation('⏳');
+  async leaveEmote(emote) {
+    try {
+      if (!this.profileId) {
+        this.showErrorNotification('Cannot leave emote: No profile ID provided');
+        return;
+      }
 
-            // Send to server
-            const response = await fetch('/api/streetpass/visit', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    profileId: this.profileId,
-                    emote: emote
-                })
-            });
+      // Show loading state
+      this.showEmoteConfirmation('⏳');
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to record visit');
-            }
+      // Send to server
+      const response = await fetch('/api/streetpass/visit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          profileId: this.profileId,
+          emote: emote
+        })
+      });
 
-            const result = await response.json();
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to record visit');
+      }
 
-            if (result.success) {
-                // Reload visitors to get updated list
-                await this.loadVisitors();
+      const result = await response.json();
 
-                // Re-render
-                this.render();
-                this.attachEventListeners();
+      if (result.success) {
+        // Reload visitors to get updated list
+        await this.loadVisitors();
 
-                // Show confirmation
-                this.showEmoteConfirmation(emote);
-            } else {
-                throw new Error(result.message || 'Failed to record visit');
-            }
-        } catch (error) {
-            console.error('Error saving streetpass data:', error);
-            this.showErrorNotification('Failed to save your emote. Please try again.');
-        }
+        // Re-render
+        this.render();
+        this.attachEventListeners();
+
+        // Show confirmation
+        this.showEmoteConfirmation(emote);
+      } else {
+        throw new Error(result.message || 'Failed to record visit');
+      }
+    } catch (error) {
+      console.error('Error saving streetpass data:', error);
+      this.showErrorNotification('Failed to save your emote. Please try again.');
+    }
+  }
+
+  showErrorNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'error-notification';
+    notification.textContent = message;
+
+    this.shadowRoot.querySelector('.streetpass-widget').appendChild(notification);
+
+    setTimeout(() => {
+      notification.classList.add('fade-out');
+      setTimeout(() => notification.remove(), 500);
+    }, 3000);
+  }
+
+  showEmoteConfirmation(emote) {
+    const confirmation = document.createElement('div');
+    confirmation.className = 'emote-confirmation';
+    confirmation.textContent = emote;
+
+    this.shadowRoot.querySelector('.streetpass-widget').appendChild(confirmation);
+
+    // Animate and remove
+    setTimeout(() => {
+      confirmation.classList.add('fade-out');
+      setTimeout(() => confirmation.remove(), 500);
+    }, 1000);
+  }
+
+  formatTime(timestamp) {
+    const now = Date.now();
+    const diff = now - timestamp;
+
+    // Less than a minute
+    if (diff < 60000) {
+      return 'just now';
     }
 
-    showErrorNotification(message) {
-        const notification = document.createElement('div');
-        notification.className = 'error-notification';
-        notification.textContent = message;
-
-        this.shadowRoot.querySelector('.streetpass-widget').appendChild(notification);
-
-        setTimeout(() => {
-            notification.classList.add('fade-out');
-            setTimeout(() => notification.remove(), 500);
-        }, 3000);
+    // Less than an hour
+    if (diff < 3600000) {
+      const minutes = Math.floor(diff / 60000);
+      return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
     }
 
-    showEmoteConfirmation(emote) {
-        const confirmation = document.createElement('div');
-        confirmation.className = 'emote-confirmation';
-        confirmation.textContent = emote;
-
-        this.shadowRoot.querySelector('.streetpass-widget').appendChild(confirmation);
-
-        // Animate and remove
-        setTimeout(() => {
-            confirmation.classList.add('fade-out');
-            setTimeout(() => confirmation.remove(), 500);
-        }, 1000);
+    // Less than a day
+    if (diff < 86400000) {
+      const hours = Math.floor(diff / 3600000);
+      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
     }
 
-    formatTime(timestamp) {
-        const now = Date.now();
-        const diff = now - timestamp;
-
-        // Less than a minute
-        if (diff < 60000) {
-            return 'just now';
-        }
-
-        // Less than an hour
-        if (diff < 3600000) {
-            const minutes = Math.floor(diff / 60000);
-            return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-        }
-
-        // Less than a day
-        if (diff < 86400000) {
-            const hours = Math.floor(diff / 3600000);
-            return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-        }
-
-        // Less than a week
-        if (diff < 604800000) {
-            const days = Math.floor(diff / 86400000);
-            return `${days} day${days > 1 ? 's' : ''} ago`;
-        }
-
-        // Format as date
-        const date = new Date(timestamp);
-        return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+    // Less than a week
+    if (diff < 604800000) {
+      const days = Math.floor(diff / 86400000);
+      return `${days} day${days > 1 ? 's' : ''} ago`;
     }
 
-    getStyles() {
-        return `
+    // Format as date
+    const date = new Date(timestamp);
+    return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+  }
+
+  getStyles() {
+    return `
             :host {
                 display: block;
                 font-family: 'PixelOperator', 'VT323', 'Courier New', monospace;
@@ -618,7 +627,7 @@ class StreetpassWidget extends HTMLElement {
                 100% { transform: translateY(20px); }
             }
         `;
-    }
+  }
 }
 
 // Register the custom element
