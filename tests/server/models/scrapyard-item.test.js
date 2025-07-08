@@ -40,6 +40,3 @@ describe('ScrapyardItem.find', () => {
     expect(ids).toEqual(['1', '2', '3']); // +3, 0, -1
   });
 });
-
-  });
-});

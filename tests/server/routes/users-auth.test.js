@@ -85,7 +85,7 @@ describe('User registration and login', () => {
       .send({ email: 'test@example.com', password: 'secret' });
 
     expect(res.status).toBe(302);
-    expect(res.headers.location).toBe('/profile');
+    expect(res.headers.location).toBe('/dashboard');
     // session cookie should be set
     expect(res.headers['set-cookie']).toEqual(expect.arrayContaining([expect.stringContaining('wirebase.sid')]));
 

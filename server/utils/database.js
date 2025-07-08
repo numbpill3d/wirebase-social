@@ -89,7 +89,7 @@ async function initializeDatabase() {
           display_name TEXT,
           profile_html TEXT,
           profile_css TEXT,
-          avatar TEXT DEFAULT '/images/default-avatar.png',
+          avatar TEXT DEFAULT '/images/laincore/default-avatar.png',
           custom_glyph TEXT DEFAULT '⚔️',
           status_message TEXT DEFAULT 'Just joined Wirebase',
           status_icon TEXT DEFAULT 'online',
