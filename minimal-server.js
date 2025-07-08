@@ -1,4 +1,5 @@
 // Enhanced minimal server with support for scrapyard and forum
+const logger = require("./server/utils/logger");
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
@@ -161,14 +162,14 @@ const server = http.createServer((req, res) => {
   const pathname = parsedUrl.pathname;
 
   // Log all requests
-  console.log(`Request: ${req.method} ${pathname}`);
+  if (process.env.DEBUG) logger.debug(`Request: ${req.method} ${pathname}`);
 
   // Special case for favicon
   if (req.method === 'GET' && pathname === '/favicon.ico') {
     const filePath = path.join(__dirname, 'public', 'favicon.ico');
     fs.readFile(filePath, (err, content) => {
       if (err) {
-        console.error('Favicon not found:', err.message);
+        logger.error('Favicon not found:', err.message);
         res.writeHead(404);
         res.end();
         return;
@@ -184,7 +185,7 @@ const server = http.createServer((req, res) => {
       pathname.startsWith('/js/') ||
       pathname.startsWith('/images/'))) {
     const filePath = path.join(__dirname, 'public', pathname);
-    console.log('Attempting to serve static file:', filePath);
+    logger.debug('Attempting to serve static file:', filePath);
     const extname = path.extname(filePath);
 
     const contentTypeMap = {
@@ -204,12 +205,12 @@ const server = http.createServer((req, res) => {
 
     fs.readFile(filePath, (err, content) => {
       if (err) {
-        console.error('Error reading static file:', err.message);
+        logger.error('Error reading static file:', err.message);
         res.writeHead(404);
         res.end('File not found');
         return;
       }
-      console.log('Successfully served static file:', pathname);
+logger.debug('Successfully served static file:', pathname);
 
       res.writeHead(200, { 'Content-Type': contentType });
       res.end(content);
@@ -453,6 +454,6 @@ const server = http.createServer((req, res) => {
 
 // Start the server
 server.listen(PORT, () => {
-  console.log(`Enhanced minimal server running on port ${PORT}`);
-  console.log(`Visit http://localhost:${PORT} to view the site`);
+  logger.info(`Enhanced minimal server running on port ${PORT}`);
+  logger.info(`Visit http://localhost:${PORT} to view the site`);
 });

@@ -74,7 +74,7 @@ You can use these accounts to explore the platform:
    npm install
    ```
 
-3. Create a `.env` file in the root directory with the following variables:
+3. Copy `.env.example` to `.env` and update the variables:
    ```
    PORT=3000
    SUPABASE_URL=your-supabase-url
@@ -159,7 +159,7 @@ Create a `.env` file by copying the provided example:
 cp .env.example .env
 ```
 
-Then update the values inside `.env`:
+Then update the values inside `.env` (this file is ignored by Git):
 
 ```bash
 # Required environment variables
