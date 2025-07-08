@@ -38,23 +38,6 @@ Visit the live demo at: [https://wirebase.city](https://wirebase.city)
   <img src="docs/screenshots/profile.png" alt="Profile Page" width="45%">
 </div>
 
-## Demo Accounts
-
-You can use these accounts to explore the platform:
-
-- **Username**: DungeonMaster
-  - **Email**: master@wirebase.com
-  - **Password**: password123
-  - **Role**: Admin
-
-- **Username**: PixelKnight
-  - **Email**: knight@wirebase.com
-  - **Password**: password123
-
-- **Username**: RetroQueen
-  - **Email**: queen@wirebase.com
-  - **Password**: password123
-
 ## Local Development
 
 ### Prerequisites
@@ -82,12 +65,29 @@ You can use these accounts to explore the platform:
    SUPABASE_SERVICE_KEY=your-service-role-key
    SESSION_SECRET=your-session-secret
    NODE_ENV=development
+   # Optional seed credentials
+   SEED_ADMIN_USERNAME=admin
+   SEED_ADMIN_EMAIL=admin@example.com
+   SEED_ADMIN_PASSWORD=changeMe
+   SEED_USER_USERNAME=user
+   SEED_USER_EMAIL=user@example.com
+   SEED_USER_PASSWORD=changeMe
+   SEED_USER1_USERNAME=dungeonmaster
+   SEED_USER1_EMAIL=master@example.com
+   SEED_USER1_PASSWORD=
+   SEED_USER2_USERNAME=pixelknight
+   SEED_USER2_EMAIL=knight@example.com
+   SEED_USER2_PASSWORD=
+   SEED_USER3_USERNAME=retroqueen
+   SEED_USER3_EMAIL=queen@example.com
+   SEED_USER3_PASSWORD=
    ```
 
-4. Seed the database with initial data
+4. Seed the database with initial data (optional)
    ```
    node scripts/seed-defaults.js
    ```
+   See [docs/SEEDING.md](docs/SEEDING.md) for guidance on generating secure seed data.
 
 5. Start the development server
    ```
