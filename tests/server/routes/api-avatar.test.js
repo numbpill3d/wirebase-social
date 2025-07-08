@@ -60,7 +60,11 @@ test('uploads avatar and updates user', async () => {
 
   expect(res.status).toBe(200);
   expect(res.body.success).toBe(true);
-  expect(User.findByIdAndUpdate).toHaveBeenCalledWith('user1', expect.objectContaining({ avatar: expect.stringContaining('/uploads/user1/') }));
+  expect(User.findByIdAndUpdate).toHaveBeenCalledWith(
+    'user1',
+    expect.objectContaining({ avatar: expect.stringContaining('/uploads/user1/') }),
+    expect.objectContaining({ new: true })
+  );
 
   fs.unlinkSync(filePath);
 });

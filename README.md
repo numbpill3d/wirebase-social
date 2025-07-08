@@ -57,7 +57,7 @@ Visit the live demo at: [https://wirebase.city](https://wirebase.city)
    npm install
    ```
 
-3. Create a `.env` file in the root directory with the following variables:
+3. Copy `.env.example` to `.env` and update the variables:
    ```
    PORT=3000
    SUPABASE_URL=your-supabase-url
@@ -65,22 +65,53 @@ Visit the live demo at: [https://wirebase.city](https://wirebase.city)
    SUPABASE_SERVICE_KEY=your-service-role-key
    SESSION_SECRET=your-session-secret
    NODE_ENV=development
-   # Optional seed credentials
-   SEED_ADMIN_USERNAME=admin
-   SEED_ADMIN_EMAIL=admin@example.com
-   SEED_ADMIN_PASSWORD=changeMe
-   SEED_USER_USERNAME=user
-   SEED_USER_EMAIL=user@example.com
-   SEED_USER_PASSWORD=changeMe
-   SEED_USER1_USERNAME=dungeonmaster
-   SEED_USER1_EMAIL=master@example.com
-   SEED_USER1_PASSWORD=
-   SEED_USER2_USERNAME=pixelknight
-   SEED_USER2_EMAIL=knight@example.com
-   SEED_USER2_PASSWORD=
-   SEED_USER3_USERNAME=retroqueen
-   SEED_USER3_EMAIL=queen@example.com
-   SEED_USER3_PASSWORD=
+# Optional: full Postgres connection string
+DATABASE_URL=postgres://user:password@localhost:5432/database
+
+# URL where your site will be hosted
+SITE_URL=http://localhost:3000
+
+# File upload limit (bytes)
+MAX_UPLOAD_SIZE=5242880
+
+# Image size limits for marketplace previews
+MARKET_PREVIEW_MAX_WIDTH=1000
+MARKET_PREVIEW_MAX_HEIGHT=1000
+
+# Default theme slug
+DEFAULT_THEME=dark-dungeon
+
+# Rate limiting controls
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+
+# Comma separated list of trusted IPs
+TRUSTED_IPS=
+
+# Enable additional logging
+DEBUG=false
+
+# Optional seed credentials (development only)
+SEED_ADMIN_USERNAME=admin
+SEED_ADMIN_EMAIL=admin@example.com
+SEED_ADMIN_PASSWORD=changeMe
+
+SEED_USER_USERNAME=user
+SEED_USER_EMAIL=user@example.com
+SEED_USER_PASSWORD=changeMe
+
+SEED_USER1_USERNAME=dungeonmaster
+SEED_USER1_EMAIL=master@example.com
+SEED_USER1_PASSWORD=
+
+SEED_USER2_USERNAME=pixelknight
+SEED_USER2_EMAIL=knight@example.com
+SEED_USER2_PASSWORD=
+
+SEED_USER3_USERNAME=retroqueen
+SEED_USER3_EMAIL=queen@example.com
+SEED_USER3_PASSWORD=
+
    ```
 
 4. Seed the database with initial data (optional)
@@ -109,6 +140,8 @@ Visit the live demo at: [https://wirebase.city](https://wirebase.city)
 
 3. Configure environment variables in Render dashboard if needed
    - Include `TRUSTED_IPS` if you want certain IPs to bypass rate limiting. The server will check `x-forwarded-for` when behind a proxy.
+   - Set `PLAUSIBLE_DOMAIN` for analytics tracking.
+   - Optionally configure `LOGFLARE_API_KEY` and `LOGFLARE_SOURCE_TOKEN` to forward logs.
 
 ### Manual Deployment
 
@@ -121,9 +154,12 @@ Visit the live demo at: [https://wirebase.city](https://wirebase.city)
    - `NODE_ENV`: `production`
    - `SESSION_SECRET`: (generate a random string)
    - `PORT`: `10000` (or use Render assigned port)
- `SUPABASE_URL`: your Supabase project URL  
-- `SUPABASE_KEY`: your Supabase anon key  
-- `SUPABASE_SERVICE_KEY`: your service role key 
+   `SUPABASE_URL`: your Supabase project URL
+   - `SUPABASE_KEY`: your Supabase anon key
+   - `SUPABASE_SERVICE_KEY`: your service role key
+   - `PLAUSIBLE_DOMAIN`: your analytics domain
+   - `LOGFLARE_API_KEY`: API key for Logflare (optional)
+   - `LOGFLARE_SOURCE_TOKEN`: source token for Logflare (optional)
 
 ## Customization
 
@@ -159,7 +195,7 @@ Create a `.env` file by copying the provided example:
 cp .env.example .env
 ```
 
-Then update the values inside `.env`:
+Then update the values inside `.env` (this file is ignored by Git):
 
 ```bash
 # Required environment variables
@@ -169,6 +205,25 @@ SUPABASE_SERVICE_KEY=your-service-role-key
 SESSION_SECRET=your-secret
 PORT=3000
 NODE_ENV=development
+
+# Optional connection string for PostgreSQL
+DATABASE_URL=postgres://user:password@localhost:5432/database
+# URL of your site
+SITE_URL=http://localhost:3000
+# File upload limit (bytes)
+MAX_UPLOAD_SIZE=5242880
+# Marketplace preview dimensions
+MARKET_PREVIEW_MAX_WIDTH=1000
+MARKET_PREVIEW_MAX_HEIGHT=1000
+# Default theme
+DEFAULT_THEME=dark-dungeon
+# Rate limiting settings
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+# Whitelisted IPs for rate limiting
+TRUSTED_IPS=
+# Enable debug logging
+DEBUG=false
 ```
 
 ## Continuous Integration

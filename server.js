@@ -1,20 +1,29 @@
 // Main server file for Wirebase
+const logger = require("./server/utils/logger");
+
 let dotenvWarned = false;
 try {
   // Try to load dotenv if available
   const dotenv = require('dotenv');
   dotenv.config();
-  console.log('Environment variables loaded from .env file');
+  logger.info('Environment variables loaded from .env file');
 } catch (err) {
   if (!dotenvWarned) {
-    console.warn('dotenv module not found, using existing environment variables');
+    logger.warn('dotenv module not found, using existing environment variables');
     dotenvWarned = true;
   }
 }
 
+// Setup logger and pipe console output to it
+const logger = require('./server/utils/logger');
+console.log = logger.info.bind(logger);
+console.info = logger.info.bind(logger);
+console.warn = logger.warn.bind(logger);
+console.error = logger.error.bind(logger);
+
 const { validateEnv } = require('./server/utils/env-check');
 if (!validateEnv()) {
-  console.error('Environment validation failed. Starting minimal server instead.');
+  logger.error('Environment validation failed. Starting minimal server instead.');
   require('./minimal-server');
   return;
 }
@@ -74,10 +83,10 @@ global.knex = require('knex')({
     afterCreate: (conn, done) => {
       conn.query('SELECT 1', err => {
         if (err) {
-          console.error('Error in database connection afterCreate:', err);
+          logger.error('Error in database connection afterCreate:', err);
           done(err, conn);
         } else {
-          console.log('Database connection established in afterCreate');
+          logger.debug('Database connection established in afterCreate');
           done(null, conn);
         }
       });
@@ -91,8 +100,8 @@ global.knex = require('knex')({
 
 // Add better error handling with detailed logging
 global.knex.on('error', (err) => {
-  console.error('Unexpected database error:', err);
-  console.error('Error details:', {
+  logger.error('Unexpected database error:', err);
+  logger.error('Error details:', {
     code: err.code,
     message: err.message,
     stack: err.stack,
@@ -115,19 +124,19 @@ const verifyDatabaseConnection = async (retries = 5, delay = 5000) => {
         // If Supabase fails, try Knex as fallback
         await global.knex.raw('SELECT 1');
       }
-      console.log('Database connection established successfully');
+      logger.info('Database connection established successfully');
       return true;
     } catch (err) {
-      console.error(`Database connection attempt ${attempt}/${retries} failed:`, err.message);
+      logger.error(`Database connection attempt ${attempt}/${retries} failed:`, err.message);
 
       if (attempt < retries) {
-        console.log(`Retrying in ${delay/1000} seconds...`);
+        logger.debug(`Retrying in ${delay/1000} seconds...`);
         await new Promise(resolve => setTimeout(resolve, delay));
       } else {
-        console.error('All database connection attempts failed');
+        logger.error('All database connection attempts failed');
         // Don't exit in production to maintain service availability
         if (process.env.NODE_ENV !== 'production') {
-          console.warn('Database connection failed in development mode. Check your database configuration.');
+          logger.warn('Database connection failed in development mode. Check your database configuration.');
           // Don't exit to allow for mock data or fallback mechanisms
         }
         return false;
@@ -143,15 +152,15 @@ const startServer = async () => {
   try {
     const verified = await verifyDatabaseConnection();
     if (!verified) {
-      console.error('Database connection could not be verified. Exiting...');
+      logger.error('Database connection could not be verified. Exiting...');
       process.exit(1);
     }
 
     server = app.listen(PORT, () => {
-      console.log(`Wirebase server running in ${NODE_ENV} mode on port ${PORT}`);
+      logger.info(`Wirebase server running in ${NODE_ENV} mode on port ${PORT}`);
 
       // Start database monitoring after server starts
-      console.log('Starting database monitoring...');
+      logger.debug('Starting database monitoring...');
 
       // Start health checks (every 60 seconds)
       healthCheckTimer = dbHealth.startPeriodicHealthChecks(60000);
@@ -163,7 +172,7 @@ const startServer = async () => {
     // Add server timeout to prevent hanging connections
     server.timeout = 120000; // 2 minutes
   } catch (err) {
-    console.error('Failed to initialize and start server:', err);
+    logger.error('Failed to initialize and start server:', err);
     process.exit(1);
   }
 };
@@ -209,11 +218,11 @@ app.use((req, res, next) => {
 // Clean up any unfinished uploads on timeout
 app.use((err, req, res, next) => {
   if (err && req.timedout && req.file && req.file.path) {
-    console.log('Request timed out, cleaning up uploaded file:', req.file.path);
+    logger.debug('Request timed out, cleaning up uploaded file:', req.file.path);
     try {
       fs.unlinkSync(req.file.path);
     } catch (unlinkError) {
-      console.error('Failed to cleanup timed out upload:', unlinkError);
+      logger.error('Failed to cleanup timed out upload:', unlinkError);
     }
   }
   next(err);
@@ -296,7 +305,7 @@ const storage = multer.diskStorage({
       }
       cb(null, dir);
     } catch (err) {
-      console.error('Error creating upload directory:', err);
+      logger.error('Error creating upload directory:', err);
       // Fallback to system temp directory if creation fails
       const fallbackDir = path.join(require('os').tmpdir(), 'wirebase-uploads');
       try {
@@ -305,7 +314,7 @@ const storage = multer.diskStorage({
         }
         cb(null, fallbackDir);
       } catch (fallbackErr) {
-        console.error('Error creating fallback upload directory:', fallbackErr);
+        logger.error('Error creating fallback upload directory:', fallbackErr);
         cb(new Error('Failed to create upload directory'));
       }
     }
@@ -338,6 +347,12 @@ app.use((req, res, next) => {
   res.locals.user = req.user || null;
   res.locals.isAuthenticated = req.isAuthenticated();
   res.locals.isProduction = process.env.NODE_ENV === 'production';
+  next();
+});
+
+// Provide Plausible analytics domain to templates
+app.use((req, res, next) => {
+  res.locals.plausibleDomain = process.env.PLAUSIBLE_DOMAIN || null;
   next();
 });
 
@@ -401,9 +416,9 @@ app.use(express.static(path.join(__dirname, 'public'), {
 // 404 handler
 app.use((req, res) => {
   if (process.env.NODE_ENV !== 'production') {
-    console.log('404 Not Found:', req.method, req.url);
-    console.log('Referrer:', req.get('Referrer') || 'None');
-    console.log('User Agent:', req.get('User-Agent'));
+    logger.debug('404 Not Found:', req.method, req.url);
+    logger.debug('Referrer:', req.get('Referrer') || 'None');
+    logger.debug('User Agent:', req.get('User-Agent'));
   }
 
   res.status(404).render('error', {
@@ -432,28 +447,28 @@ app.use(errorHandler);
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
   // Application specific logging, sending alerts, etc.
 });
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
+  logger.error('Uncaught Exception:', error);
   // Graceful shutdown or recovery logic
   if (process.env.NODE_ENV === 'production') {
     // In production, gracefully shut down to prevent undefined state
-    console.error('Shutting down due to uncaught exception');
+    logger.error('Shutting down due to uncaught exception');
     gracefulShutdown();
   }
 });
 
 // Graceful shutdown function to properly close database connections
 const gracefulShutdown = async () => {
-  console.log('Shutting down gracefully...');
+  logger.info('Shutting down gracefully...');
 
   try {
     // Stop health checks and leak detection
-    console.log('Stopping database monitoring...');
+    logger.debug('Stopping database monitoring...');
     if (healthCheckTimer && typeof healthCheckTimer.stop === 'function') {
       healthCheckTimer.stop();
     }
@@ -462,25 +477,25 @@ const gracefulShutdown = async () => {
     memoryMonitor.stop();
 
     // Fix any connection leaks before shutdown
-    console.log('Checking for connection leaks before shutdown...');
+    logger.debug('Checking for connection leaks before shutdown...');
     await dbLeakDetector.fixLeaks(true);
 
     // Close server to stop accepting new connections
-    console.log('Closing HTTP server...');
+    logger.info('Closing HTTP server...');
     await new Promise((resolve) => {
       server.close(resolve);
     });
 
     // Close database connections
-    console.log('Closing database connections...');
+    logger.info('Closing database connections...');
     await global.knex.destroy();
-    console.log('Database connections closed successfully');
+    logger.info('Database connections closed successfully');
 
     // Exit process
-    console.log('Shutdown complete');
+    logger.info('Shutdown complete');
     process.exit(0);
   } catch (err) {
-    console.error('Error during graceful shutdown:', err);
+    logger.error('Error during graceful shutdown:', err);
     process.exit(1);
   }
 };
@@ -514,5 +529,6 @@ module.exports = {
   dbMonitor,
   dbHealth,
   dbErrorHandler,
-  dbLeakDetector
+  dbLeakDetector,
+  logger
 };

@@ -42,7 +42,9 @@ const { error: createError } = await supabaseAdmin.rpc('execute_sql', {
 });
 
 if (createError) {
-  throw new Error(\`Streetpass visits table migration failed: \${createError.message}\`);
+  throw new Error(
+    `Streetpass visits table migration failed: ${createError.message}`
+  );
 }
 
       

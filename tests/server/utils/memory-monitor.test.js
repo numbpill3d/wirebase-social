@@ -29,9 +29,6 @@ console.log = jest.fn();
 const memoryMonitor = require('../../../server/utils/memory-monitor');
 
 describe('Memory Monitor', () => {
-  beforeAll(() => {
-    memoryMonitor.start(1000); // use shorter interval for tests
-  });
 
   beforeEach(() => {
     // Clear all mocks before each test
@@ -44,7 +41,6 @@ describe('Memory Monitor', () => {
     process.memoryUsage = originalMemoryUsage;
     console.warn = originalConsoleWarn;
     console.log = originalConsoleLog;
-    memoryMonitor.stop();
   });
 
   describe('getMemoryUsage', () => {
@@ -75,7 +71,7 @@ describe('Memory Monitor', () => {
       memoryMonitor.logMemoryUsage(50); // Threshold of 50%
       
       expect(console.warn).toHaveBeenCalledTimes(2);
-      expect(console.warn).toHaveBeenCalledWith('High memory usage: 60.00%');
+      expect(console.warn).toHaveBeenCalledWith('⚠️ High memory usage: 60.00%');
     });
     
     it('should not log a warning when memory usage is below threshold', () => {
@@ -106,7 +102,9 @@ describe('Memory Monitor', () => {
       
       expect(console.warn).toHaveBeenCalledTimes(2);
       expect(global.gc).toHaveBeenCalledTimes(1);
-      expect(console.log).toHaveBeenCalledWith('Forced garbage collection');
+      expect(console.log).toHaveBeenCalledWith(
+        '🧹 Forced garbage collection triggered'
+      );
       
       // Clean up
       delete global.gc;
