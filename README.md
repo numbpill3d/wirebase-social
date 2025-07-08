@@ -82,6 +82,24 @@ You can use these accounts to explore the platform:
    SUPABASE_SERVICE_KEY=your-service-role-key
    SESSION_SECRET=your-session-secret
    NODE_ENV=development
+   # Optional: full Postgres connection string
+   DATABASE_URL=postgres://user:password@localhost:5432/database
+   # URL where your site will be hosted
+   SITE_URL=http://localhost:3000
+   # File upload limit (bytes)
+   MAX_UPLOAD_SIZE=5242880
+   # Image size limits for marketplace previews
+   MARKET_PREVIEW_MAX_WIDTH=1000
+   MARKET_PREVIEW_MAX_HEIGHT=1000
+   # Default theme slug
+   DEFAULT_THEME=dark-dungeon
+   # Rate limiting controls
+   RATE_LIMIT_WINDOW_MS=900000
+   RATE_LIMIT_MAX_REQUESTS=100
+   # Comma separated list of trusted IPs
+   TRUSTED_IPS=
+   # Enable additional logging
+   DEBUG=false
    ```
 
 4. Seed the database with initial data
@@ -169,6 +187,25 @@ SUPABASE_SERVICE_KEY=your-service-role-key
 SESSION_SECRET=your-secret
 PORT=3000
 NODE_ENV=development
+
+# Optional connection string for PostgreSQL
+DATABASE_URL=postgres://user:password@localhost:5432/database
+# URL of your site
+SITE_URL=http://localhost:3000
+# File upload limit (bytes)
+MAX_UPLOAD_SIZE=5242880
+# Marketplace preview dimensions
+MARKET_PREVIEW_MAX_WIDTH=1000
+MARKET_PREVIEW_MAX_HEIGHT=1000
+# Default theme
+DEFAULT_THEME=dark-dungeon
+# Rate limiting settings
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+# Whitelisted IPs for rate limiting
+TRUSTED_IPS=
+# Enable debug logging
+DEBUG=false
 ```
 
 ## Continuous Integration
