@@ -1,5 +1,6 @@
 const { supabase, supabaseAdmin } = require('../utils/database');
 const bcrypt = require('bcrypt');
+const { clearCache } = require('../utils/performance');
 
 /**
  * User model for Supabase
@@ -223,7 +224,9 @@ class User {
         throw error;
       }
 
-      return User.formatUser(data);
+      const formatted = User.formatUser(data);
+      clearCache(/^feed:/);
+      return formatted;
     } catch (error) {
       console.error('Error updating user:', error);
       throw error;
@@ -278,7 +281,7 @@ class User {
 
       // Update this instance with the returned data
       Object.assign(this, User.formatUser(data));
-
+      clearCache(/^feed:/);
       return this;
     } catch (error) {
       console.error('Error saving user:', error);
@@ -440,6 +443,40 @@ class User {
    */
   static getProfileUrl(username) {
     return `/profile/${username}`;
+  }
+
+  /**
+   * Find multiple users by their IDs
+   * @param {Array<string>} ids - Array of user IDs
+   * @returns {Promise<Array>} - Array of user objects
+   */
+  static async findByIds(ids = []) {
+    try {
+      if (!ids.length) {
+        return [];
+      }
+
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, username, display_name, avatar, custom_glyph')
+        .in('id', ids);
+
+      if (error) {
+        console.error('Supabase query error:', error);
+        return [];
+      }
+
+      return data.map(row => ({
+        id: row.id,
+        username: row.username,
+        displayName: row.display_name,
+        avatar: row.avatar,
+        customGlyph: row.custom_glyph
+      }));
+    } catch (error) {
+      console.error('Error finding users by IDs:', error);
+      return [];
+    }
   }
 
   /**

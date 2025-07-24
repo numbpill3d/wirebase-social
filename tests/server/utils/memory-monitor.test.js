@@ -29,13 +29,15 @@ console.log = jest.fn();
 const memoryMonitor = require('../../../server/utils/memory-monitor');
 
 describe('Memory Monitor', () => {
+
   beforeEach(() => {
     // Clear all mocks before each test
     jest.clearAllMocks();
   });
 
   afterAll(() => {
-    // Restore original functions
+    // Stop any running monitor and restore original functions
+    memoryMonitor.stop();
     process.memoryUsage = originalMemoryUsage;
     console.warn = originalConsoleWarn;
     console.log = originalConsoleLog;
@@ -69,7 +71,7 @@ describe('Memory Monitor', () => {
       memoryMonitor.logMemoryUsage(50); // Threshold of 50%
       
       expect(console.warn).toHaveBeenCalledTimes(2);
-      expect(console.warn).toHaveBeenCalledWith('High memory usage: 60.00%');
+      expect(console.warn).toHaveBeenCalledWith('⚠️ High memory usage: 60.00%');
     });
     
     it('should not log a warning when memory usage is below threshold', () => {
@@ -100,10 +102,32 @@ describe('Memory Monitor', () => {
       
       expect(console.warn).toHaveBeenCalledTimes(2);
       expect(global.gc).toHaveBeenCalledTimes(1);
-      expect(console.log).toHaveBeenCalledWith('Forced garbage collection');
+      expect(console.log).toHaveBeenCalledWith(
+        '🧹 Forced garbage collection triggered'
+      );
       
       // Clean up
       delete global.gc;
+    });
+  });
+
+  describe('start and stop', () => {
+    it('should start and stop the monitoring interval', () => {
+      jest.useFakeTimers();
+      const setSpy = jest.spyOn(global, 'setInterval');
+      const clearSpy = jest.spyOn(global, 'clearInterval');
+
+      memoryMonitor.start(1000);
+
+      expect(setSpy).toHaveBeenCalledWith(expect.any(Function), 1000);
+
+      memoryMonitor.stop();
+
+      expect(clearSpy).toHaveBeenCalled();
+
+      setSpy.mockRestore();
+      clearSpy.mockRestore();
+      jest.useRealTimers();
     });
   });
 });

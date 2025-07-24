@@ -13,6 +13,36 @@ const { apiCache } = require('../utils/performance');
 const MarketItem = require('../models/MarketItem');
 const Collection = require('../models/Collection');
 const WIRTransaction = require('../models/WIRTransaction');
+const User = require('../models/User');
+
+const multer = require('multer');
+const sharp = require('sharp');
+const path = require('path');
+const fs = require('fs');
+
+// Setup storage for preview image uploads
+const previewStorage = multer.diskStorage({
+  destination: function (_req, _file, cb) {
+    const dir = path.join(__dirname, '../../public/uploads/market');
+    fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename: function (_req, file, cb) {
+    const allowed = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!allowed.includes(file.mimetype)) {
+      return cb(new Error('Invalid file type'));
+    }
+    cb(null, Date.now() + '-' + file.originalname.replace(/[^a-zA-Z0-9.]/g, '_'));
+  }
+});
+
+const uploadPreview = multer({
+  storage: previewStorage,
+  limits: {
+    fileSize: process.env.MAX_UPLOAD_SIZE || 5242880,
+    files: 1
+  }
+});
 
 /**
  * GET /api/market/items
@@ -285,6 +315,43 @@ router.get('/stats', apiCache(300), async (req, res) => {
   }
 });
 
+/**
+ * POST /api/market/upload/preview
+ * Upload a preview image and validate its dimensions
+ */
+router.post('/upload/preview', ensureApiAuth, uploadPreview.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No file uploaded'
+      });
+    }
+
+    const metadata = await sharp(req.file.path).metadata();
+    const maxWidth = parseInt(process.env.MARKET_PREVIEW_MAX_WIDTH) || 1000;
+    const maxHeight = parseInt(process.env.MARKET_PREVIEW_MAX_HEIGHT) || 1000;
+
+    if (metadata.width > maxWidth || metadata.height > maxHeight) {
+      fs.unlink(req.file.path, () => {});
+      return res.status(400).json({
+        success: false,
+        message: `Image exceeds maximum dimensions of ${maxWidth}x${maxHeight}`
+      });
+    }
+
+    const relativePath = `/uploads/market/${path.basename(req.file.path)}`;
+    res.json({ success: true, path: relativePath });
+  } catch (error) {
+    console.error('API Error - Upload preview image:', error);
+    if (req.file) fs.unlink(req.file.path, () => {});
+    res.status(500).json({
+      success: false,
+      message: 'Failed to upload image'
+    });
+  }
+});
+
 // === Authenticated API Routes ===
 
 /**
@@ -502,6 +569,16 @@ router.post('/items/:id/purchase', ensureApiAuth, async (req, res) => {
     const itemId = req.params.id;
     const userId = req.user.id;
 
+    // Refresh user's balance from the database
+    const freshUser = await User.findById(userId);
+    if (!freshUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    req.user.wirBalance = freshUser.wirBalance;
+
     // Get the item details
     const item = await MarketItem.getById(itemId);
 
@@ -533,6 +610,22 @@ router.post('/items/:id/purchase', ensureApiAuth, async (req, res) => {
     const result = await MarketItem.purchase(itemId, userId);
 
     if (result.success) {
+      // Update user's WIR balance in session
+      req.user.wirBalance = result.newBalance;
+
+      // Refresh session data
+      const updatedUser = await User.findById(userId);
+      if (updatedUser) {
+        await new Promise(resolve => {
+          req.login(updatedUser, err => {
+            if (err) {
+              console.error('Error updating session after purchase:', err);
+            }
+            resolve();
+          });
+        });
+      }
+
       return res.json({
         success: true,
         message: 'Purchase successful',

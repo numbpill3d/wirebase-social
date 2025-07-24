@@ -38,34 +38,17 @@ Visit the live demo at: [https://wirebase.city](https://wirebase.city)
   <img src="docs/screenshots/profile.png" alt="Profile Page" width="45%">
 </div>
 
-## Demo Accounts
-
-You can use these accounts to explore the platform:
-
-- **Username**: DungeonMaster
-  - **Email**: master@wirebase.com
-  - **Password**: password123
-  - **Role**: Admin
-
-- **Username**: PixelKnight
-  - **Email**: knight@wirebase.com
-  - **Password**: password123
-
-- **Username**: RetroQueen
-  - **Email**: queen@wirebase.com
-  - **Password**: password123
-
 ## Local Development
 
 ### Prerequisites
 - Node.js (v16 or higher)
-- MongoDB (local or remote)
+- Supabase project credentials
 
 ### Installation
 
 1. Clone the repository
    ```
-   git clone https://github.com/yourusername/wirebase.git
+   git clone https://github.com/yourusername/wirebase-social.git
    cd wirebase
    ```
 
@@ -74,18 +57,68 @@ You can use these accounts to explore the platform:
    npm install
    ```
 
-3. Create a `.env` file in the root directory with the following variables:
+3. Copy `.env.example` to `.env` and update the variables:
    ```
    PORT=3000
-   MONGODB_URI=mongodb://localhost:27017/wirebase
+   SUPABASE_URL=your-supabase-url
+   SUPABASE_KEY=your-anon-key
+   SUPABASE_SERVICE_KEY=your-service-role-key
    SESSION_SECRET=your-session-secret
    NODE_ENV=development
+# Optional: full Postgres connection string
+DATABASE_URL=postgres://user:password@localhost:5432/database
+
+# URL where your site will be hosted
+SITE_URL=http://localhost:3000
+
+# File upload limit (bytes)
+MAX_UPLOAD_SIZE=5242880
+
+# Image size limits for marketplace previews
+MARKET_PREVIEW_MAX_WIDTH=1000
+MARKET_PREVIEW_MAX_HEIGHT=1000
+
+# Default theme slug
+DEFAULT_THEME=dark-dungeon
+
+# Rate limiting controls
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+
+# Comma separated list of trusted IPs
+TRUSTED_IPS=
+
+# Enable additional logging
+DEBUG=false
+
+# Optional seed credentials (development only)
+SEED_ADMIN_USERNAME=admin
+SEED_ADMIN_EMAIL=admin@example.com
+SEED_ADMIN_PASSWORD=changeMe
+
+SEED_USER_USERNAME=user
+SEED_USER_EMAIL=user@example.com
+SEED_USER_PASSWORD=changeMe
+
+SEED_USER1_USERNAME=dungeonmaster
+SEED_USER1_EMAIL=master@example.com
+SEED_USER1_PASSWORD=
+
+SEED_USER2_USERNAME=pixelknight
+SEED_USER2_EMAIL=knight@example.com
+SEED_USER2_PASSWORD=
+
+SEED_USER3_USERNAME=retroqueen
+SEED_USER3_EMAIL=queen@example.com
+SEED_USER3_PASSWORD=
+
    ```
 
-4. Seed the database with initial data
+4. Seed the database with initial data (optional)
    ```
-   node scripts/seed.js
+   node scripts/seed-defaults.js
    ```
+   See [docs/SEEDING.md](docs/SEEDING.md) for guidance on generating secure seed data.
 
 5. Start the development server
    ```
@@ -106,6 +139,9 @@ You can use these accounts to explore the platform:
    - Render will automatically set up the web service and database
 
 3. Configure environment variables in Render dashboard if needed
+   - Include `TRUSTED_IPS` if you want certain IPs to bypass rate limiting. The server will check `x-forwarded-for` when behind a proxy.
+   - Set `PLAUSIBLE_DOMAIN` for analytics tracking.
+   - Optionally configure `LOGFLARE_API_KEY` and `LOGFLARE_SOURCE_TOKEN` to forward logs.
 
 ### Manual Deployment
 
@@ -118,9 +154,12 @@ You can use these accounts to explore the platform:
    - `NODE_ENV`: `production`
    - `SESSION_SECRET`: (generate a random string)
    - `PORT`: `10000` (or use Render assigned port)
-   - `MONGODB_URI`: (your MongoDB connection string)
-
-3. Create a MongoDB database and connect it to your service
+   `SUPABASE_URL`: your Supabase project URL
+   - `SUPABASE_KEY`: your Supabase anon key
+   - `SUPABASE_SERVICE_KEY`: your service role key
+   - `PLAUSIBLE_DOMAIN`: your analytics domain
+   - `LOGFLARE_API_KEY`: API key for Logflare (optional)
+   - `LOGFLARE_SOURCE_TOKEN`: source token for Logflare (optional)
 
 ## Customization
 
@@ -145,7 +184,19 @@ Users can create their profiles with raw HTML/CSS, either through:
 - **Authentication**: Passport.js with Supabase Auth
 - **Templates**: Handlebars
 
+## API Documentation
+
+See [docs/API.md](docs/API.md) for a summary of available `/api` routes.
+
 ## Environment Setup
+Create a `.env` file by copying the provided example:
+
+```bash
+cp .env.example .env
+```
+
+Then update the values inside `.env` (this file is ignored by Git):
+
 ```bash
 # Required environment variables
 SUPABASE_URL=your-supabase-url
@@ -154,6 +205,35 @@ SUPABASE_SERVICE_KEY=your-service-role-key
 SESSION_SECRET=your-secret
 PORT=3000
 NODE_ENV=development
+
+# Optional connection string for PostgreSQL
+DATABASE_URL=postgres://user:password@localhost:5432/database
+# URL of your site
+SITE_URL=http://localhost:3000
+# File upload limit (bytes)
+MAX_UPLOAD_SIZE=5242880
+# Marketplace preview dimensions
+MARKET_PREVIEW_MAX_WIDTH=1000
+MARKET_PREVIEW_MAX_HEIGHT=1000
+# Default theme
+DEFAULT_THEME=dark-dungeon
+# Rate limiting settings
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+# Whitelisted IPs for rate limiting
+TRUSTED_IPS=
+# Enable debug logging
+DEBUG=false
+```
+
+## Continuous Integration
+
+Run the following commands in your CI pipeline:
+
+```bash
+npm ci
+npm run lint
+npm test
 ```
 
 ## License
@@ -163,4 +243,4 @@ This project is available under the MIT License. See the [LICENSE](LICENSE) file
 ## Acknowledgements
 
 - Design inspired by Windows 98 UI and medieval fantasy aesthetics, as well as by the Ethos and Feeling of the Wired, from Serial Experiments Lain. Temple OS also.
-- Built with Express.js, MongoDB, and Handlebars
+- Built with Express.js, Supabase, and Handlebars

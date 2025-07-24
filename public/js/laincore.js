@@ -138,6 +138,9 @@ function createGlitchEffect() {
     "Close your eyes. Count to ten. You are now in the wired."
   ];
 
-  console.log("%c" + lainQuotes[Math.floor(Math.random() * lainQuotes.length)],
-    "color: #00ff00; background: #0f0f0f; padding: 10px; font-family: monospace; font-size: 14px;");
+  // Display a random quote in the developer console when debugging
+  if (window.debugMode) {
+    console.log("%c" + lainQuotes[Math.floor(Math.random() * lainQuotes.length)],
+      "color: #00ff00; background: #0f0f0f; padding: 10px; font-family: monospace; font-size: 14px;");
+  }
 })();

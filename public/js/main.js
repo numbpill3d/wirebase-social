@@ -3,6 +3,10 @@
  * Enhances the Serial Experiments Lain / cyberschizo experience with interactive elements
  */
 
+// Terminal edit state
+let terminalEditMode = null;
+let terminalEditBuffer = '';
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize Cyber UI elements
     setupCyberElements();
@@ -44,6 +48,13 @@ document.addEventListener('DOMContentLoaded', function() {
 function setupCyberElements() {
     // Setup window controls
     const windowControls = document.querySelectorAll('.cyber-window-control');
+
+    windowControls.forEach(control => {
+        if (control.tagName !== 'BUTTON') {
+            control.setAttribute('role', 'button');
+            control.setAttribute('tabindex', '0');
+        }
+    });
 
     windowControls.forEach(control => {
         control.addEventListener('mousedown', function() {
@@ -287,10 +298,8 @@ function setupCyberEffects() {
     // Temporarily disable custom page transitions to fix navigation issues
     document.querySelectorAll('a:not([data-no-transition])').forEach(link => {
         if (link.href && link.href.indexOf(window.location.hostname) !== -1) {
-            console.log('Adding standard navigation to link:', link.href);
             link.addEventListener('click', function() {
                 // Don't prevent default - let the browser handle navigation normally
-                console.log('Navigation link clicked, using default browser navigation:', this.href);
                 try {
                     playSound('click');
                 } catch (soundErr) {
@@ -480,6 +489,48 @@ function processTerminalCommand(command, terminal) {
     // Add command to output history
     addTerminalOutput(`<span class="terminal-prompt">[node_4231@wirebase]&gt; </span>${command}`);
 
+    // If currently editing, accumulate or save
+    if (terminalEditMode) {
+        if (command === ':wq' || command === ':save') {
+            addTerminalOutput(`Saving ${terminalEditMode.toUpperCase()} changes...`);
+            const MAX_RETRIES = 2;
+            let attempt = 0;
+
+            function trySaveProfile() {
+                saveProfile(terminalEditMode, terminalEditBuffer)
+                    .then(() => addTerminalOutput('Changes saved successfully!'))
+                    .catch((error) => {
+                        attempt++;
+                        if (error && error.message && error.message.includes('Network')) {
+                            if (attempt <= MAX_RETRIES) {
+                                addTerminalOutput(`Network error while saving. Retrying (${attempt}/${MAX_RETRIES})...`);
+                                setTimeout(trySaveProfile, 1000 * attempt); // Exponential backoff
+                            } else {
+                                addTerminalOutput('Failed to save changes after multiple attempts due to network issues.');
+                            }
+                        } else if (error && error.message) {
+                            addTerminalOutput(`Error saving changes: ${error.message}`);
+                        } else {
+                            addTerminalOutput('An unknown error occurred while saving changes.');
+                        }
+                    });
+            }
+
+            trySaveProfile();
+            terminal.dataset.editMode = '';
+            terminalEditMode = null;
+            terminalEditBuffer = '';
+        } else if (command === ':q!' || command === ':cancel') {
+            addTerminalOutput(`Exited ${terminalEditMode.toUpperCase()} edit mode without saving.`);
+            terminal.dataset.editMode = '';
+            terminalEditMode = null;
+            terminalEditBuffer = '';
+        } else {
+            terminalEditBuffer += command + '\n';
+        }
+        return;
+    }
+
     // Process commands
     if (command === 'help') {
         addTerminalOutput('Available commands:');
@@ -498,8 +549,18 @@ function processTerminalCommand(command, terminal) {
             addTerminalOutput(`Editing ${type.toUpperCase()}. Type your code, then :wq to save.`);
             addTerminalOutput(`--- ${type.toUpperCase()} EDIT MODE ---`);
 
-            // In a real app, this would activate edit mode
             terminal.dataset.editMode = type;
+            terminalEditMode = type;
+            terminalEditBuffer = '';
+            // Attempt to fetch existing content
+            fetch(`/profile/edit/${type}`, { headers: { 'Accept': 'application/json' } })
+                .then(res => res.json().catch(() => null))
+                .then(data => {
+                    if (data && (data.profileHtml || data.profileCss)) {
+                        terminalEditBuffer = data.profileHtml || data.profileCss;
+                    }
+                })
+                .catch(() => {});
         } else {
             addTerminalOutput(`Unknown file type. Use 'edit html' or 'edit css'.`);
         }
@@ -516,14 +577,7 @@ function processTerminalCommand(command, terminal) {
             window.location.href = '/profile';
         }, 1000);
     } else if (command === ':wq' || command === ':save') {
-        const editMode = terminal.dataset.editMode;
-        if (editMode) {
-            addTerminalOutput(`Saving ${editMode.toUpperCase()} changes...`);
-            addTerminalOutput('Changes saved successfully!');
-            terminal.dataset.editMode = '';
-        } else {
-            addTerminalOutput('Not in edit mode. Use "edit html" or "edit css" first.');
-        }
+        addTerminalOutput('Not in edit mode. Use "edit html" or "edit css" first.');
     } else {
         addTerminalOutput(`Command not recognized: ${command}`);
         addTerminalOutput('Type "help" for available commands.');
@@ -548,6 +602,19 @@ function addTerminalOutput(text) {
 
     // Scroll to bottom
     terminal.scrollTop = terminal.scrollHeight;
+}
+
+function saveProfile(type, content) {
+    return fetch(`/profile/edit/${type}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            [`profile${type.charAt(0).toUpperCase() + type.slice(1)}`]: content
+        })
+    });
 }
 
 /**
@@ -625,7 +692,12 @@ function showConnectionNotification() {
     emoteButtons.forEach(button => {
         button.addEventListener('click', () => {
             const emote = button.textContent;
-            recordEmote(emote);
+            if (window.currentVisitId) {
+                recordEmote(emote, window.currentVisitId);
+            } else {
+                console.warn('No visit ID available for emote recording');
+                showErrorToast('Unable to record emote - no active visit');
+            }
             playSound('click');
             fadeOutElement(notification, () => notification.remove());
 
@@ -645,25 +717,36 @@ function showConnectionNotification() {
 /**
  * Record an emote for the Streetpass system
  */
-function recordEmote(emote) {
-    // In a real app, this would send the data to the server
-    console.log(`Recorded emote: ${emote}`);
-
-    // Show notification that emote was recorded
-    const toast = document.createElement('div');
-    toast.className = 'emote-toast';
-    toast.innerHTML = `
-        <div class="emote-icon">${emote}</div>
-        <div class="emote-message">Signal transmitted!</div>
-    `;
-
-    document.body.appendChild(toast);
-
-    // Remove after 3 seconds
-    setTimeout(() => {
-        toast.classList.add('fade-out');
-        setTimeout(() => toast.remove(), 500);
-    }, 3000);
+function recordEmote(emote, visitId) {
+    fetch('/api/streetpass/emote', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ emote, visitId })
+    })
+        .then(async response => {
+            const data = await response.json().catch(() => ({}));
+            if (response.ok && data.success) {
+                const toast = document.createElement('div');
+                toast.className = 'emote-toast';
+                toast.innerHTML = `
+                    <div class="emote-icon">${emote}</div>
+                    <div class="emote-message">Signal transmitted!</div>
+                `;
+                document.body.appendChild(toast);
+                setTimeout(() => {
+                    toast.classList.add('fade-out');
+                    setTimeout(() => toast.remove(), 500);
+                }, 3000);
+            } else {
+                throw new Error(data.message || 'Failed to record emote');
+            }
+        })
+        .catch(error => {
+            console.error('Error recording emote:', error);
+            showErrorToast(error.message || 'Failed to record emote');
+        });
 }
 
 /**
@@ -953,12 +1036,10 @@ function setupCustomCursors() {
  * Play a sound effect
  */
 function playSound(sound) {
-    console.log('playSound called with:', sound);
 
     // Check if sound is enabled in settings
     const soundEnabled = localStorage.getItem('soundEffects') !== 'disabled';
     if (!soundEnabled) {
-        console.log('Sound effects are disabled in settings, returning early');
         return;
     }
 
@@ -972,14 +1053,11 @@ function playSound(sound) {
 
     // Play the sound if it exists
     if (sounds[sound]) {
-        console.log('Sound exists in library, creating Audio object for:', sounds[sound]);
         try {
             const audio = new Audio(sounds[sound]);
             audio.volume = 0.5; // 50% volume
-            console.log('Audio object created, attempting to play...');
 
             audio.play().catch(e => {
-                console.log('Sound playback prevented:', e);
                 // Don't show errors for autoplay restrictions - these are expected
                 if (!e.message.includes('user didn\'t interact')) {
                     console.error('Showing error toast for sound issue:', e.message);

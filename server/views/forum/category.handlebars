@@ -1,3 +1,5 @@
+{{!< layouts/main}}
+
 <div class="forum-container">
   <!-- Sidebar Navigation -->
   <div class="forum-sidebar">
@@ -76,108 +78,45 @@
     </div>
     <div class="cyber-window-content">
       <div class="thread-list">
-        <!-- In a real app, this would be populated with actual threads -->
-        {{#if (eq category "general")}}
-          <div class="thread-item pinned">
-            <div class="pin-indicator" title="Pinned Thread">📌</div>
-            <div class="thread-title">
-              <a href="/forum/thread/1">Welcome to the Wirebase Assembly</a>
+        {{#if threads.length}}
+          {{#each threads}}
+            <div class="thread-item {{#if isPinned}}pinned{{/if}}">
+              {{#if isPinned}}
+                <div class="pin-indicator" title="Pinned Thread">📌</div>
+              {{/if}}
+              <div class="thread-title">
+                <a href="/forum/thread/{{id}}">{{title}}</a>
+              </div>
+              <div class="thread-meta">
+                <span class="thread-author">{{creator.username}}</span>
+                <span class="thread-date">{{formatDate createdAt 'relative'}}</span>
+                <span class="thread-replies">{{replyCount}} {{#if (eq replyCount 1)}}reply{{else}}replies{{/if}}</span>
+              </div>
+              {{#if tags.length}}
+                <div class="thread-tags">
+                  {{#each tags}}
+                    <span class="thread-tag">{{this}}</span>
+                  {{/each}}
+                </div>
+              {{/if}}
             </div>
-            <div class="thread-meta">
-              <span class="thread-author">system_admin</span>
-              <span class="thread-date">2 days ago</span>
-              <span class="thread-replies">5 replies</span>
-            </div>
+          {{/each}}
+        {{else}}
+          <div class="no-threads">
+            <p>No threads found. Be the first to create a thread!</p>
           </div>
         {{/if}}
-
-        {{#if (eq category "tech")}}
-          <div class="thread-item pinned">
-            <div class="pin-indicator" title="Pinned Thread">📌</div>
-            <div class="thread-title">
-              <a href="/forum/thread/2">Technical FAQ and Resources</a>
-            </div>
-            <div class="thread-meta">
-              <span class="thread-author">tech_support</span>
-              <span class="thread-date">1 day ago</span>
-              <span class="thread-replies">3 replies</span>
-            </div>
-          </div>
-        {{/if}}
-
-        {{#if (eq category "creative")}}
-          <div class="thread-item">
-            <div class="thread-title">
-              <a href="/forum/thread/3">Share Your Wirebase Profile Designs</a>
-            </div>
-            <div class="thread-meta">
-              <span class="thread-author">design_guru</span>
-              <span class="thread-date">12 hours ago</span>
-              <span class="thread-replies">7 replies</span>
-            </div>
-          </div>
-        {{/if}}
-
-        {{#if (eq category "meta")}}
-          <div class="thread-item">
-            <div class="thread-title">
-              <a href="/forum/thread/4">Feature Request: Enhanced Terminal Mode</a>
-            </div>
-            <div class="thread-meta">
-              <span class="thread-author">power_user</span>
-              <span class="thread-date">5 hours ago</span>
-              <span class="thread-replies">2 replies</span>
-            </div>
-          </div>
-        {{/if}}
-
-        <!-- Add some placeholder threads for all categories -->
-        <div class="thread-item">
-          <div class="thread-title">
-            <a href="/forum/thread/5">Example Thread in {{category}}</a>
-          </div>
-          <div class="thread-meta">
-            <span class="thread-author">user123</span>
-            <span class="thread-date">3 hours ago</span>
-            <span class="thread-replies">0 replies</span>
-          </div>
-        </div>
-
-        <div class="thread-item">
-          <div class="thread-title">
-            <a href="/forum/thread/6">Another Example Thread in {{category}}</a>
-          </div>
-          <div class="thread-meta">
-            <span class="thread-author">wirebase_fan</span>
-            <span class="thread-date">1 hour ago</span>
-            <span class="thread-replies">1 reply</span>
-          </div>
-        </div>
-
-        <!-- Generate more example threads for pagination demo -->
-        {{#each (range 7 15)}}
-          <div class="thread-item">
-            <div class="thread-title">
-              <a href="/forum/thread/{{this}}">Thread #{{this}} in {{../category}}</a>
-            </div>
-            <div class="thread-meta">
-              <span class="thread-author">user{{this}}</span>
-              <span class="thread-date">{{subtract this 6}} hours ago</span>
-              <span class="thread-replies">{{subtract this 7}} replies</span>
-            </div>
-          </div>
-        {{/each}}
       </div>
 
       <!-- Pagination -->
       <div class="pagination">
-        <a href="?page=1" class="cyber-button pagination-button {{#if (eq currentPage 1)}}disabled{{/if}}">First</a>
-        <a href="?page={{subtract currentPage 1}}" class="cyber-button pagination-button {{#if (eq currentPage 1)}}disabled{{/if}}">Previous</a>
+        <a href="?page=1" class="cyber-button pagination-button {{#unless pagination.hasPrev}}disabled{{/unless}}">First</a>
+        <a href="?page={{pagination.prevPage}}" class="cyber-button pagination-button {{#unless pagination.hasPrev}}disabled{{/unless}}">Previous</a>
 
-        <div class="pagination-info">Page {{currentPage}} of {{totalPages}}</div>
+        <div class="pagination-info">Page {{pagination.currentPage}} of {{pagination.totalPages}}</div>
 
-        <a href="?page={{add currentPage 1}}" class="cyber-button pagination-button {{#if (eq currentPage totalPages)}}disabled{{/if}}">Next</a>
-        <a href="?page={{totalPages}}" class="cyber-button pagination-button {{#if (eq currentPage totalPages)}}disabled{{/if}}">Last</a>
+        <a href="?page={{pagination.nextPage}}" class="cyber-button pagination-button {{#unless pagination.hasNext}}disabled{{/unless}}">Next</a>
+        <a href="?page={{pagination.totalPages}}" class="cyber-button pagination-button {{#unless pagination.hasNext}}disabled{{/unless}}">Last</a>
       </div>
     </div>
   </div>
@@ -253,35 +192,5 @@
       });
     }
 
-    // Pagination functionality
-    const paginationButtons = document.querySelectorAll('.pagination-button');
-
-    paginationButtons.forEach(button => {
-      if (!button.classList.contains('disabled')) {
-        button.addEventListener('click', function(e) {
-          // In a real app, this would navigate to the page
-          // For demo purposes, we'll just show an alert
-          const href = this.getAttribute('href');
-          const page = href.split('=')[1];
-
-          alert(`Navigating to page ${page}`);
-
-          // Prevent default to avoid actual navigation in demo
-          e.preventDefault();
-        });
-      }
-    });
-
-    // Set default values for pagination demo
-    const paginationInfo = document.querySelector('.pagination-info');
-    if (paginationInfo) {
-      // Set current page to 1 and total pages to 5 for demo
-      paginationInfo.textContent = paginationInfo.textContent.replace('{{currentPage}}', '1').replace('{{totalPages}}', '5');
-    }
   });
 </script>
-
-<!-- Link to the new forum CSS file -->
-<link rel="stylesheet" href="/css/forum.css">
-<!-- Font Awesome for icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">

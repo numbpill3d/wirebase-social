@@ -219,7 +219,7 @@ class WIRTransfer extends HTMLElement {
 
   updateBalance() {
     const wirBalanceElement = this.shadowRoot.getElementById('wir-balance');
-    
+
     if (wirBalanceElement) {
       wirBalanceElement.textContent = this.wirBalance;
     }
@@ -229,43 +229,43 @@ class WIRTransfer extends HTMLElement {
     const receiverInput = this.shadowRoot.getElementById('receiver');
     const amountInput = this.shadowRoot.getElementById('amount');
     const notesInput = this.shadowRoot.getElementById('notes');
-    
+
     const receiverUsername = receiverInput.value.trim();
     const amount = parseInt(amountInput.value);
     const notes = notesInput.value.trim();
-    
+
     const errorMessage = this.shadowRoot.getElementById('error-message');
     const successMessage = this.shadowRoot.getElementById('success-message');
     const loading = this.shadowRoot.getElementById('loading');
     const transferButton = this.shadowRoot.getElementById('transfer-button');
-    
+
     // Reset messages
     errorMessage.style.display = 'none';
     successMessage.style.display = 'none';
-    
+
     // Validate input
     if (!receiverUsername) {
       errorMessage.textContent = 'Please enter a recipient username';
       errorMessage.style.display = 'block';
       return;
     }
-    
+
     if (!amount || isNaN(amount) || amount < 1) {
       errorMessage.textContent = 'Please enter a valid amount (minimum 1)';
       errorMessage.style.display = 'block';
       return;
     }
-    
+
     if (amount > this.wirBalance) {
       errorMessage.textContent = 'Insufficient WIR balance';
       errorMessage.style.display = 'block';
       return;
     }
-    
+
     // Show loading and disable button
     loading.style.display = 'flex';
     transferButton.disabled = true;
-    
+
     try {
       // Call the API to transfer WIR
       const response = await fetch('/api/market/wir/transfer', {
@@ -279,27 +279,29 @@ class WIRTransfer extends HTMLElement {
           notes
         })
       });
-      
+
       const result = await response.json();
-      
+
       // Hide loading
       loading.style.display = 'none';
       transferButton.disabled = false;
-      
+
       if (result.success) {
         // Update balance
         this.wirBalance = result.newBalance;
         this.updateBalance();
-        
+
         // Show success message
-        successMessage.textContent = result.message || `Successfully transferred ${amount} WIR to ${receiverUsername}`;
+        successMessage.textContent =
+          result.message ||
+          `Successfully transferred ${amount} WIR to ${receiverUsername}`;
         successMessage.style.display = 'block';
-        
+
         // Clear form
         receiverInput.value = '';
         amountInput.value = '10';
         notesInput.value = '';
-        
+
         // Dispatch event
         this.dispatchEvent(new CustomEvent('transfer-complete', {
           detail: {
@@ -315,11 +317,11 @@ class WIRTransfer extends HTMLElement {
       }
     } catch (error) {
       console.error('Error transferring WIR:', error);
-      
+
       // Hide loading
       loading.style.display = 'none';
       transferButton.disabled = false;
-      
+
       // Show error message
       errorMessage.textContent = 'An error occurred during transfer';
       errorMessage.style.display = 'block';
