@@ -124,10 +124,10 @@ class Thread {
    * @param {number} offset - Number of threads to skip
    * @returns {Promise<Object>} Object with threads array and total count
    */
-  static async getByCategory(category, limit = 20, offset = 0) {
+  static async getByCategory(category, limit = 20, offset = 0, sort = 'newest') {
     try {
       // Check cache first
-      const cacheKey = `threads:category:${category}:${limit}:${offset}`;
+      const cacheKey = `threads:category:${category}:${limit}:${offset}:${sort}`;
       const cachedThreads = cache.get(cacheKey);
 
       if (cachedThreads) {
@@ -150,10 +150,10 @@ class Thread {
         `, { count: 'exact' })
         .eq('category', category)
         .order('is_pinned', { ascending: false })
-        .order('created_at', { ascending: false })
         .range(offset, offset + limit - 1);
 
       if (error) throw error;
+
 
       // Format the threads data
       const formattedThreads = threads.map(thread => ({
@@ -161,8 +161,28 @@ class Thread {
         replyCount: thread.replies ? thread.replies.length : 0
       }));
 
+      // Sort threads based on requested sort option
+      const pinned = formattedThreads.filter(t => t.isPinned);
+      let regular = formattedThreads.filter(t => !t.isPinned);
+
+      switch (sort) {
+        case 'oldest':
+          regular.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+          break;
+        case 'replies':
+          regular.sort((a, b) => b.replyCount - a.replyCount);
+          break;
+        case 'activity':
+          regular.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+          break;
+        default:
+          regular.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      }
+
+      const sortedThreads = [...pinned, ...regular];
+
       const result = {
-        threads: formattedThreads,
+        threads: sortedThreads,
         total: count || 0
       };
 
@@ -325,8 +345,12 @@ class Thread {
    */
   static clearCategoryCache(category) {
     // Clear all possible cache entries for this category
+    const sorts = ['newest', 'oldest', 'replies', 'activity'];
     for (let i = 0; i <= 100; i += 20) {
       cache.del(`threads:category:${category}:20:${i}`);
+      sorts.forEach(sort => {
+        cache.del(`threads:category:${category}:20:${i}:${sort}`);
+      });
     }
   }
 

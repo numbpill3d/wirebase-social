@@ -67,119 +67,59 @@
     <div class="cyber-window-header">
       <span class="cyber-window-title">Threads</span>
       <div class="thread-sort-controls">
-        <label for="thread-sort">Sort by:</label>
-        <select id="thread-sort" class="cyber-select">
-          <option value="newest">Newest</option>
-          <option value="oldest">Oldest</option>
-          <option value="replies">Most Replies</option>
-          <option value="activity">Recent Activity</option>
-        </select>
+        <form id="sort-form" method="get">
+          <input type="hidden" name="page" value="{{pagination.currentPage}}">
+          <label for="thread-sort">Sort by:</label>
+          <select id="thread-sort" name="sort" class="cyber-select">
+            <option value="newest" {{#if (eq sort 'newest')}}selected{{/if}}>Newest</option>
+            <option value="oldest" {{#if (eq sort 'oldest')}}selected{{/if}}>Oldest</option>
+            <option value="replies" {{#if (eq sort 'replies')}}selected{{/if}}>Most Replies</option>
+            <option value="activity" {{#if (eq sort 'activity')}}selected{{/if}}>Recent Activity</option>
+          </select>
+        </form>
       </div>
     </div>
     <div class="cyber-window-content">
       <div class="thread-list">
-        <!-- In a real app, this would be populated with actual threads -->
-        {{#if (eq category "general")}}
-          <div class="thread-item pinned">
-            <div class="pin-indicator" title="Pinned Thread">📌</div>
-            <div class="thread-title">
-              <a href="/forum/thread/1">Welcome to the Wirebase Assembly</a>
+        {{#if threads.length}}
+          {{#each threads}}
+            <div class="thread-item {{#if isPinned}}pinned{{/if}}">
+              {{#if isPinned}}
+                <div class="pin-indicator" title="Pinned Thread">📌</div>
+              {{/if}}
+              <div class="thread-title">
+                <a href="/forum/thread/{{id}}">{{title}}</a>
+              </div>
+              <div class="thread-meta">
+                <span class="thread-author">{{creator.username}}</span>
+                <span class="thread-date">{{formatDate createdAt 'relative'}}</span>
+                <span class="thread-replies">{{replyCount}} {{#if (eq replyCount 1)}}reply{{else}}replies{{/if}}</span>
+              </div>
+              {{#if tags.length}}
+                <div class="thread-tags">
+                  {{#each tags}}
+                    <span class="thread-tag">{{this}}</span>
+                  {{/each}}
+                </div>
+              {{/if}}
             </div>
-            <div class="thread-meta">
-              <span class="thread-author">system_admin</span>
-              <span class="thread-date">2 days ago</span>
-              <span class="thread-replies">5 replies</span>
-            </div>
+          {{/each}}
+        {{else}}
+          <div class="no-threads">
+            <p>No threads found. Be the first to create a thread!</p>
           </div>
         {{/if}}
-
-        {{#if (eq category "tech")}}
-          <div class="thread-item pinned">
-            <div class="pin-indicator" title="Pinned Thread">📌</div>
-            <div class="thread-title">
-              <a href="/forum/thread/2">Technical FAQ and Resources</a>
-            </div>
-            <div class="thread-meta">
-              <span class="thread-author">tech_support</span>
-              <span class="thread-date">1 day ago</span>
-              <span class="thread-replies">3 replies</span>
-            </div>
-          </div>
-        {{/if}}
-
-        {{#if (eq category "creative")}}
-          <div class="thread-item">
-            <div class="thread-title">
-              <a href="/forum/thread/3">Share Your Wirebase Profile Designs</a>
-            </div>
-            <div class="thread-meta">
-              <span class="thread-author">design_guru</span>
-              <span class="thread-date">12 hours ago</span>
-              <span class="thread-replies">7 replies</span>
-            </div>
-          </div>
-        {{/if}}
-
-        {{#if (eq category "meta")}}
-          <div class="thread-item">
-            <div class="thread-title">
-              <a href="/forum/thread/4">Feature Request: Enhanced Terminal Mode</a>
-            </div>
-            <div class="thread-meta">
-              <span class="thread-author">power_user</span>
-              <span class="thread-date">5 hours ago</span>
-              <span class="thread-replies">2 replies</span>
-            </div>
-          </div>
-        {{/if}}
-
-        <!-- Add some placeholder threads for all categories -->
-        <div class="thread-item">
-          <div class="thread-title">
-            <a href="/forum/thread/5">Example Thread in {{category}}</a>
-          </div>
-          <div class="thread-meta">
-            <span class="thread-author">user123</span>
-            <span class="thread-date">3 hours ago</span>
-            <span class="thread-replies">0 replies</span>
-          </div>
-        </div>
-
-        <div class="thread-item">
-          <div class="thread-title">
-            <a href="/forum/thread/6">Another Example Thread in {{category}}</a>
-          </div>
-          <div class="thread-meta">
-            <span class="thread-author">wirebase_fan</span>
-            <span class="thread-date">1 hour ago</span>
-            <span class="thread-replies">1 reply</span>
-          </div>
-        </div>
-
-        <!-- Generate more example threads for pagination demo -->
-        {{#each (range 7 15)}}
-          <div class="thread-item">
-            <div class="thread-title">
-              <a href="/forum/thread/{{this}}">Thread #{{this}} in {{../category}}</a>
-            </div>
-            <div class="thread-meta">
-              <span class="thread-author">user{{this}}</span>
-              <span class="thread-date">{{subtract this 6}} hours ago</span>
-              <span class="thread-replies">{{subtract this 7}} replies</span>
-            </div>
-          </div>
-        {{/each}}
       </div>
 
       <!-- Pagination -->
       <div class="pagination">
-        <a href="?page=1" class="cyber-button pagination-button {{#if (eq currentPage 1)}}disabled{{/if}}">First</a>
-        <a href="?page={{subtract currentPage 1}}" class="cyber-button pagination-button {{#if (eq currentPage 1)}}disabled{{/if}}">Previous</a>
+        <a href="?page=1&sort={{sort}}" class="cyber-button pagination-button {{#if (eq pagination.currentPage 1)}}disabled{{/if}}">First</a>
+        <a href="?page={{subtract pagination.currentPage 1}}&sort={{sort}}" class="cyber-button pagination-button {{#if (eq pagination.currentPage 1)}}disabled{{/if}}">Previous</a>
 
-        <div class="pagination-info">Page {{currentPage}} of {{totalPages}}</div>
+        <div class="pagination-info">Page {{pagination.currentPage}} of {{pagination.totalPages}}</div>
 
-        <a href="?page={{add currentPage 1}}" class="cyber-button pagination-button {{#if (eq currentPage totalPages)}}disabled{{/if}}">Next</a>
-        <a href="?page={{totalPages}}" class="cyber-button pagination-button {{#if (eq currentPage totalPages)}}disabled{{/if}}">Last</a>
+        <a href="?page={{add pagination.currentPage 1}}&sort={{sort}}" class="cyber-button pagination-button {{#if (eq pagination.currentPage pagination.totalPages)}}disabled{{/if}}">Next</a>
+        <a href="?page={{pagination.totalPages}}&sort={{sort}}" class="cyber-button pagination-button {{#if (eq pagination.currentPage pagination.totalPages)}}disabled{{/if}}">Last</a>
       </div>
     </div>
   </div>
@@ -194,91 +134,12 @@
       header.setAttribute('data-text', text);
     });
 
-    // Thread sorting functionality
+    // Submit sort form when option changes
     const threadSortSelect = document.getElementById('thread-sort');
-    const threadList = document.querySelector('.thread-list');
-    const threadItems = Array.from(document.querySelectorAll('.thread-item'));
-
-    if (threadSortSelect && threadList) {
+    if (threadSortSelect) {
       threadSortSelect.addEventListener('change', function() {
-        const sortBy = this.value;
-
-        // Clone the thread items for sorting
-        const sortedItems = [...threadItems];
-
-        // Sort the items based on the selected option
-        switch(sortBy) {
-          case 'newest':
-            sortedItems.sort((a, b) => {
-              const dateA = a.querySelector('.thread-date').textContent;
-              const dateB = b.querySelector('.thread-date').textContent;
-              // Simple comparison for demo purposes
-              // In a real app, you'd parse actual dates
-              return dateA.localeCompare(dateB);
-            });
-            break;
-
-          case 'oldest':
-            sortedItems.sort((a, b) => {
-              const dateA = a.querySelector('.thread-date').textContent;
-              const dateB = b.querySelector('.thread-date').textContent;
-              return dateB.localeCompare(dateA);
-            });
-            break;
-
-          case 'replies':
-            sortedItems.sort((a, b) => {
-              const repliesA = parseInt(a.querySelector('.thread-replies').textContent);
-              const repliesB = parseInt(b.querySelector('.thread-replies').textContent);
-              return repliesB - repliesA; // Most replies first
-            });
-            break;
-
-          case 'activity':
-            // For demo purposes, we'll just use a random sort
-            sortedItems.sort(() => Math.random() - 0.5);
-            break;
-        }
-
-        // Move pinned threads to the top regardless of sort
-        const pinnedItems = sortedItems.filter(item => item.classList.contains('pinned'));
-        const regularItems = sortedItems.filter(item => !item.classList.contains('pinned'));
-        const finalSortedItems = [...pinnedItems, ...regularItems];
-
-        // Clear the thread list
-        threadList.innerHTML = '';
-
-        // Append the sorted items
-        finalSortedItems.forEach(item => {
-          threadList.appendChild(item);
-        });
+        document.getElementById('sort-form').submit();
       });
-    }
-
-    // Pagination functionality
-    const paginationButtons = document.querySelectorAll('.pagination-button');
-
-    paginationButtons.forEach(button => {
-      if (!button.classList.contains('disabled')) {
-        button.addEventListener('click', function(e) {
-          // In a real app, this would navigate to the page
-          // For demo purposes, we'll just show an alert
-          const href = this.getAttribute('href');
-          const page = href.split('=')[1];
-
-          alert(`Navigating to page ${page}`);
-
-          // Prevent default to avoid actual navigation in demo
-          e.preventDefault();
-        });
-      }
-    });
-
-    // Set default values for pagination demo
-    const paginationInfo = document.querySelector('.pagination-info');
-    if (paginationInfo) {
-      // Set current page to 1 and total pages to 5 for demo
-      paginationInfo.textContent = paginationInfo.textContent.replace('{{currentPage}}', '1').replace('{{totalPages}}', '5');
     }
   });
 </script>
