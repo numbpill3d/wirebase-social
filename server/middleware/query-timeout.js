@@ -6,8 +6,9 @@
 // Break circular dependency by removing direct import
 const dbMonitor = require('../utils/db-monitor');
 const dbHealth = require('../utils/db-health');
+const logger = require('../utils/logger');
 
-console.log('Query timeout middleware loaded');
+logger.info('Query timeout middleware loaded');
 
 /**
  * Create a middleware that adds query timeout handling
@@ -17,16 +18,16 @@ console.log('Query timeout middleware loaded');
  */
 const queryTimeoutMiddleware = (knexInstance, timeout = 30000) => {
   if (!knexInstance) {
-    console.error('ERROR: knexInstance not provided to queryTimeoutMiddleware');
+    logger.error('ERROR: knexInstance not provided to queryTimeoutMiddleware');
     return (req, res, next) => next();
   }
 
-  console.log('Creating query timeout middleware with knex:', knexInstance ? 'defined' : 'undefined');
-  console.log('knex.client:', knexInstance?.client ? 'defined' : 'undefined');
+  logger.debug('Creating query timeout middleware with knex:', knexInstance ? 'defined' : 'undefined');
+  logger.debug('knex.client:', knexInstance?.client ? 'defined' : 'undefined');
 
   return (req, res, next) => {
     if (!knexInstance || typeof knexInstance.raw !== 'function') {
-      console.error('ERROR: Invalid knex instance or knex.raw is undefined in query timeout middleware execution');
+      logger.error('ERROR: Invalid knex instance or knex.raw is undefined in query timeout middleware execution');
       return next();
     }
 
@@ -44,13 +45,13 @@ const queryTimeoutMiddleware = (knexInstance, timeout = 30000) => {
       const timeoutPromise = new Promise((_, reject) => {
         const id = setTimeout(() => {
           const poolStatus = dbMonitor.getPoolStatus(knexInstance);
-          console.error('Query timeout detected', {
+          logger.error('Query timeout detected', {
             query: args[0],
             timeout,
             poolStatus
           });
 
-          dbHealth.checkHealth(knexInstance).catch(console.error);
+          dbHealth.checkHealth(knexInstance).catch((err) => logger.error(err));
           reject(new Error(`Query timeout after ${timeout}ms`));
         }, timeout);
 
@@ -76,7 +77,7 @@ const queryTimeoutMiddleware = (knexInstance, timeout = 30000) => {
  */
 const transactionTimeoutMiddleware = (knexInstance, timeout = 60000) => {
   if (!knexInstance) {
-    console.error('ERROR: knexInstance not provided to transactionTimeoutMiddleware');
+    logger.error('ERROR: knexInstance not provided to transactionTimeoutMiddleware');
     return (req, res, next) => next();
   }
 

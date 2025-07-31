@@ -15,12 +15,27 @@ dotenv.config();
 const User = require('../server/models/User');
 const ScrapyardItem = require('../server/models/ScrapyardItem');
 
-// Demo users data
-const users = [
-  {
-    username: 'DungeonMaster',
-    email: 'master@wirebase.com',
-    password: 'password123',
+// Load user credentials from environment variables
+const user1Username = process.env.SEED_USER1_USERNAME || 'DungeonMaster';
+const user1Email = process.env.SEED_USER1_EMAIL || 'master@wirebase.com';
+const user1Password = process.env.SEED_USER1_PASSWORD;
+
+const user2Username = process.env.SEED_USER2_USERNAME || 'PixelKnight';
+const user2Email = process.env.SEED_USER2_EMAIL || 'knight@wirebase.com';
+const user2Password = process.env.SEED_USER2_PASSWORD;
+
+const user3Username = process.env.SEED_USER3_USERNAME || 'RetroQueen';
+const user3Email = process.env.SEED_USER3_EMAIL || 'queen@wirebase.com';
+const user3Password = process.env.SEED_USER3_PASSWORD;
+
+// Configurable users data (only seeded when password env vars are present)
+const users = [];
+
+if (user1Username && user1Email && user1Password) {
+  users.push({
+    username: user1Username,
+    email: user1Email,
+    password: user1Password,
     displayName: 'Dungeon Master',
     customGlyph: '🧙',
     statusMessage: 'Keeper of the code realm',
@@ -64,11 +79,14 @@ const users = [
         description: 'Expert coder and HTML wizard'
       }
     ]
-  },
-  {
-    username: 'PixelKnight',
-    email: 'knight@wirebase.com',
-    password: 'password123',
+  });
+}
+
+if (user2Username && user2Email && user2Password) {
+  users.push({
+    username: user2Username,
+    email: user2Email,
+    password: user2Password,
     displayName: 'Pixel Knight',
     customGlyph: '⚔️',
     statusMessage: 'Defender of pixel perfection',
@@ -114,11 +132,14 @@ const users = [
     .shield { background-color: #4b2883; }
     .potion { background-color: #ff7f00; }`,
     lootTokens: 350
-  },
-  {
-    username: 'RetroQueen',
-    email: 'queen@wirebase.com',
-    password: 'password123',
+  });
+}
+
+if (user3Username && user3Email && user3Password) {
+  users.push({
+    username: user3Username,
+    email: user3Email,
+    password: user3Password,
     displayName: 'Retro Queen',
     customGlyph: '👑',
     statusMessage: 'Windows 98 forever!',
@@ -184,8 +205,8 @@ const users = [
       margin-top: 10px;
     }`,
     lootTokens: 280
-  }
-];
+  });
+}
 
 // Sample Scrapyard items
 const scrapyardItems = [

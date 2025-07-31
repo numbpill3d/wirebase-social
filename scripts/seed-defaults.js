@@ -3,23 +3,33 @@
  */
 
 const bcrypt = require('bcrypt');
+const dotenv = require('dotenv');
 const { supabaseAdmin } = require('../server/utils/database');
 
+dotenv.config();
+
+const adminUsername = process.env.SEED_ADMIN_USERNAME;
+const adminEmail = process.env.SEED_ADMIN_EMAIL;
+const adminPassword = process.env.SEED_ADMIN_PASSWORD;
+const userUsername = process.env.SEED_USER_USERNAME;
+const userEmail = process.env.SEED_USER_EMAIL;
+const userPassword = process.env.SEED_USER_PASSWORD;
+
 const users = [
-  {
-    username: 'DemoAdmin',
-    email: 'admin@example.com',
-    password: 'password123',
-    displayName: 'Demo Admin',
+  adminUsername && adminEmail && adminPassword && {
+    username: adminUsername,
+    email: adminEmail,
+    password: adminPassword,
+    displayName: process.env.SEED_ADMIN_DISPLAY_NAME || 'Admin',
     role: 'admin'
   },
-  {
-    username: 'DemoUser',
-    email: 'demo@example.com',
-    password: 'password123',
-    displayName: 'Demo User'
+  userUsername && userEmail && userPassword && {
+    username: userUsername,
+    email: userEmail,
+    password: userPassword,
+    displayName: process.env.SEED_USER_DISPLAY_NAME || 'User'
   }
-];
+].filter(Boolean);
 
 const marketItems = [
   {
@@ -29,7 +39,7 @@ const marketItems = [
     content: '<div class="sample-widget">Sample Widget</div>',
     wirPrice: 5,
     tags: ['sample'],
-    creator: 'DemoAdmin'
+    creator: adminUsername
   },
   {
     title: 'Sample Template',
@@ -38,7 +48,7 @@ const marketItems = [
     content: '<div class="sample-template">Template</div>',
     wirPrice: 0,
     tags: ['template'],
-    creator: 'DemoUser'
+    creator: userUsername
   }
 ];
 
