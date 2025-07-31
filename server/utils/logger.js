@@ -20,7 +20,11 @@ if (process.env.LOGFLARE_API_KEY && process.env.LOGFLARE_SOURCE_TOKEN) {
 
   const transportList = [new transports.Console()];
   if (process.env.LOG_FILE_PATH) {
-    transportList.push(new transports.File({ filename: process.env.LOG_FILE_PATH }));
+    try {
+      transportList.push(new transports.File({ filename: process.env.LOG_FILE_PATH }));
+    } catch (err) {
+      console.error(`Failed to create log file transport: ${err.message}`);
+    }
   }
 
   logger = createLogger({
