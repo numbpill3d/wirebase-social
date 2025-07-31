@@ -67,13 +67,16 @@
     <div class="cyber-window-header">
       <span class="cyber-window-title">Threads</span>
       <div class="thread-sort-controls">
-        <label for="thread-sort">Sort by:</label>
-        <select id="thread-sort" class="cyber-select">
-          <option value="newest">Newest</option>
-          <option value="oldest">Oldest</option>
-          <option value="replies">Most Replies</option>
-          <option value="activity">Recent Activity</option>
-        </select>
+        <form id="sort-form" method="get">
+          <input type="hidden" name="page" value="{{pagination.currentPage}}">
+          <label for="thread-sort">Sort by:</label>
+          <select id="thread-sort" name="sort" class="cyber-select">
+            <option value="newest" {{#if (eq sort 'newest')}}selected{{/if}}>Newest</option>
+            <option value="oldest" {{#if (eq sort 'oldest')}}selected{{/if}}>Oldest</option>
+            <option value="replies" {{#if (eq sort 'replies')}}selected{{/if}}>Most Replies</option>
+            <option value="activity" {{#if (eq sort 'activity')}}selected{{/if}}>Recent Activity</option>
+          </select>
+        </form>
       </div>
     </div>
     <div class="cyber-window-content">
@@ -110,13 +113,14 @@
 
       <!-- Pagination -->
       <div class="pagination">
-        <a href="?page=1" class="cyber-button pagination-button {{#unless pagination.hasPrev}}disabled{{/unless}}">First</a>
-        <a href="?page={{pagination.prevPage}}" class="cyber-button pagination-button {{#unless pagination.hasPrev}}disabled{{/unless}}">Previous</a>
+<a href="?page=1&sort={{sort}}" class="cyber-button pagination-button {{#unless pagination.hasPrev}}disabled{{/unless}}">First</a>
+<a href="?page={{pagination.prevPage}}&sort={{sort}}" class="cyber-button pagination-button {{#unless pagination.hasPrev}}disabled{{/unless}}">Previous</a>
 
-        <div class="pagination-info">Page {{pagination.currentPage}} of {{pagination.totalPages}}</div>
+<div class="pagination-info">Page {{pagination.currentPage}} of {{pagination.totalPages}}</div>
 
-        <a href="?page={{pagination.nextPage}}" class="cyber-button pagination-button {{#unless pagination.hasNext}}disabled{{/unless}}">Next</a>
-        <a href="?page={{pagination.totalPages}}" class="cyber-button pagination-button {{#unless pagination.hasNext}}disabled{{/unless}}">Last</a>
+<a href="?page={{pagination.nextPage}}&sort={{sort}}" class="cyber-button pagination-button {{#unless pagination.hasNext}}disabled{{/unless}}">Next</a>
+<a href="?page={{pagination.totalPages}}&sort={{sort}}" class="cyber-button pagination-button {{#unless pagination.hasNext}}disabled{{/unless}}">Last</a>
+
       </div>
     </div>
   </div>
@@ -131,64 +135,11 @@
       header.setAttribute('data-text', text);
     });
 
-    // Thread sorting functionality
+    // Submit sort form when option changes
     const threadSortSelect = document.getElementById('thread-sort');
-    const threadList = document.querySelector('.thread-list');
-    const threadItems = Array.from(document.querySelectorAll('.thread-item'));
-
-    if (threadSortSelect && threadList) {
+    if (threadSortSelect) {
       threadSortSelect.addEventListener('change', function() {
-        const sortBy = this.value;
-
-        // Clone the thread items for sorting
-        const sortedItems = [...threadItems];
-
-        // Sort the items based on the selected option
-        switch(sortBy) {
-          case 'newest':
-            sortedItems.sort((a, b) => {
-              const dateA = a.querySelector('.thread-date').textContent;
-              const dateB = b.querySelector('.thread-date').textContent;
-              // Simple comparison for demo purposes
-              // In a real app, you'd parse actual dates
-              return dateA.localeCompare(dateB);
-            });
-            break;
-
-          case 'oldest':
-            sortedItems.sort((a, b) => {
-              const dateA = a.querySelector('.thread-date').textContent;
-              const dateB = b.querySelector('.thread-date').textContent;
-              return dateB.localeCompare(dateA);
-            });
-            break;
-
-          case 'replies':
-            sortedItems.sort((a, b) => {
-              const repliesA = parseInt(a.querySelector('.thread-replies').textContent);
-              const repliesB = parseInt(b.querySelector('.thread-replies').textContent);
-              return repliesB - repliesA; // Most replies first
-            });
-            break;
-
-          case 'activity':
-            // For demo purposes, we'll just use a random sort
-            sortedItems.sort(() => Math.random() - 0.5);
-            break;
-        }
-
-        // Move pinned threads to the top regardless of sort
-        const pinnedItems = sortedItems.filter(item => item.classList.contains('pinned'));
-        const regularItems = sortedItems.filter(item => !item.classList.contains('pinned'));
-        const finalSortedItems = [...pinnedItems, ...regularItems];
-
-        // Clear the thread list
-        threadList.innerHTML = '';
-
-        // Append the sorted items
-        finalSortedItems.forEach(item => {
-          threadList.appendChild(item);
-        });
+        document.getElementById('sort-form').submit();
       });
     }
 
