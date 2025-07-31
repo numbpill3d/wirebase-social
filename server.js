@@ -356,6 +356,12 @@ app.use((req, res, next) => {
   next();
 });
 
+// Provide Google Analytics tracking ID to templates
+app.use((req, res, next) => {
+  res.locals.gaTrackingId = process.env.GA_TRACKING_ID || null;
+  next();
+});
+
 // Set default theme
 app.use((req, res, next) => {
   // Check user preference first, then session, then default

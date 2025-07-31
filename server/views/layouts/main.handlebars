@@ -193,6 +193,17 @@
         <script defer data-domain="{{plausibleDomain}}" src="https://plausible.io/js/plausible.js"></script>
     {{/if}}
 
+    <!-- Google Analytics -->
+    {{#if gaTrackingId}}
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{gaTrackingId}}"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '{{gaTrackingId}}');
+        </script>
+    {{/if}}
+
     <!-- Load non-critical scripts with defer to improve page load performance -->
     <script src="/js/laincore-loader.js" defer></script>
     <script src="/js/loading-states.js" defer></script>
