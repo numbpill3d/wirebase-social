@@ -177,7 +177,27 @@ class Thread {
           break;
         default:
           regular.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      }
+replies:forum_replies (id)
+        `, { count: 'exact' })
+        .eq('category', category)
+        .order('is_pinned', { ascending: false })
+        .order(sort === 'oldest' ? 'created_at' : sort === 'replies' ? 'reply_count' : sort === 'activity' ? 'updated_at' : 'created_at', { ascending: sort === 'oldest' })
+        .range(offset, offset + limit - 1);
+
+      if (error) throw error;
+
+      // Format the threads data
+      const formattedThreads = threads.map(thread => ({
+        ...this.formatThread(thread),
+        replyCount: thread.replies ? thread.replies.length : 0
+      }));
+
+      const result = {
+        threads: formattedThreads,
+        total: count || 0
+      };
+
+      // Cache the result
 
       const sortedThreads = [...pinned, ...regular];
 
