@@ -3,54 +3,101 @@ const router = express.Router();
 const { Feed } = require('feed');
 const User = require('../models/User');
 const ScrapyardItem = require('../models/ScrapyardItem');
+const { cache } = require('../utils/performance');
+const { supabase } = require('../utils/database');
+
+// Base URL for generating feed links
+const SITE_URL = process.env.SITE_URL || 'https://wirebase.example.com';
+
+// Helper to get content type from format
+const getContentType = format => {
+  switch (format) {
+    case 'atom':
+      return 'application/atom+xml';
+    case 'json':
+      return 'application/json';
+    default:
+      return 'application/rss+xml';
+  }
+};
+
+const buildFeedOutput = (feed, format) => {
+  if (format === 'atom') return feed.atom1();
+  if (format === 'json') return feed.json1();
+  return feed.rss2();
+};
 
 // Global site feed
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
   try {
+    const format = req.query.format || 'rss';
+    const cacheKey = `feed:global:${format}`;
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      res.set('Content-Type', getContentType(format));
+      res.set('X-Cache', 'HIT');
+      return res.send(cached);
+    }
+
     // Create main site feed
     const feed = new Feed({
       title: 'Wirebase - Medieval Dungeon Fantasy Social Platform',
       description: 'Latest updates from Wirebase users and Scrapyard submissions',
-      id: 'https://wirebase.example.com/',
-      link: 'https://wirebase.example.com/',
+      id: `${SITE_URL}/`,
+      link: `${SITE_URL}/`,
       language: 'en',
-      image: 'https://wirebase.example.com/images/wirebase-logo.svg',
-      favicon: 'https://wirebase.example.com/favicon.ico',
+      image: `${SITE_URL}/images/wirebase-logo.svg`,
+      favicon: `${SITE_URL}/favicon.ico`,
       copyright: `All rights reserved ${new Date().getFullYear()}, Wirebase`,
       updated: new Date(),
       author: {
         name: 'Wirebase',
-        link: 'https://wirebase.example.com/'
+        link: `${SITE_URL}/`
       }
     });
 
     // Get recent updates - both users and items
-    const [recentUsers, recentItems] = await Promise.all([
+    const [recentUsers, itemsRes] = await Promise.all([
       User.find()
         .sort({ lastActive: -1 })
         .limit(20)
         .select('username displayName avatar customGlyph statusMessage lastActive'),
-        
-      ScrapyardItem.find()
-        .sort({ createdAt: -1 })
+      supabase
+        .from('scrapyard_items')
+        .select(`
+          *,
+          creator:creator (
+            id, username, display_name, avatar, custom_glyph
+          )
+        `)
+        .order('created_at', { ascending: false })
         .limit(20)
-        .populate('creator', 'username displayName avatar customGlyph')
-        .select('title category description previewImage createdAt creator')
     ]);
+
+    if (itemsRes.error) {
+        // Log the original error for debugging (optional, ensure logs are secure)
+        console.error('Supabase error in feed:', itemsRes.error);
+
+        // Throw a sanitized error to avoid leaking sensitive details
+        const err = new Error('Failed to fetch recent items.');
+        err.status = 500;
+        throw err;
+    }
+    const recentItems = (itemsRes.data || []).map(item => ScrapyardItem.formatItem(item));
 
     // Add recent user updates to feed
     recentUsers.forEach(user => {
       feed.addItem({
         title: `${user.displayName} updated their profile`,
-        id: `https://wirebase.example.com/profile/${user.username}#${user.lastActive.getTime()}`,
-        link: `https://wirebase.example.com/profile/${user.username}`,
+        id: `${SITE_URL}/profile/${user.username}#${user.lastActive.getTime()}`,
+        link: `${SITE_URL}/profile/${user.username}`,
         description: user.statusMessage || `${user.displayName} made changes to their profile`,
         content: `<p>${user.statusMessage || `${user.displayName} made changes to their profile`}</p>
                  <p>Visit their profile to see the latest updates and use the Streetpass widget to leave an impression.</p>`,
         author: [
           {
             name: user.displayName,
-            link: `https://wirebase.example.com/profile/${user.username}`
+            link: `${SITE_URL}/profile/${user.username}`
           }
         ],
         date: user.lastActive,
@@ -62,16 +109,16 @@ router.get('/', async (req, res) => {
     recentItems.forEach(item => {
       feed.addItem({
         title: `New ${item.category} in the Scrapyard: ${item.title}`,
-        id: `https://wirebase.example.com/scrapyard/item/${item._id}`,
-        link: `https://wirebase.example.com/scrapyard/item/${item._id}`,
+        id: `${SITE_URL}/scrapyard/item/${item._id}`,
+        link: `${SITE_URL}/scrapyard/item/${item._id}`,
         description: item.description,
         content: `<p>${item.description}</p>
-                 <p>Created by <a href="https://wirebase.example.com/profile/${item.creator.username}">${item.creator.displayName}</a>.</p>
-                 <p>Visit the <a href="https://wirebase.example.com/scrapyard/item/${item._id}">Scrapyard</a> to view and use this item.</p>`,
+                 <p>Created by <a href="${SITE_URL}/profile/${item.creator.username}">${item.creator.displayName}</a>.</p>
+                 <p>Visit the <a href="${SITE_URL}/scrapyard/item/${item._id}">Scrapyard</a> to view and use this item.</p>`,
         author: [
           {
             name: item.creator.displayName,
-            link: `https://wirebase.example.com/profile/${item.creator.username}`
+            link: `${SITE_URL}/profile/${item.creator.username}`
           }
         ],
         date: item.createdAt,
@@ -79,29 +126,29 @@ router.get('/', async (req, res) => {
       });
     });
 
-    // Determine format based on query parameter or Accept header
-    const format = req.query.format || 'rss';
-    
-    // Set content type and send feed
-    if (format === 'atom') {
-      res.set('Content-Type', 'application/atom+xml');
-      res.send(feed.atom1());
-    } else if (format === 'json') {
-      res.set('Content-Type', 'application/json');
-      res.send(feed.json1());
-    } else {
-      res.set('Content-Type', 'application/rss+xml');
-      res.send(feed.rss2());
-    }
+    const output = buildFeedOutput(feed, format);
+    cache.set(cacheKey, output, 300);
+    res.set('Content-Type', getContentType(format));
+    res.set('X-Cache', 'MISS');
+    res.send(output);
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error generating feed');
+    next(err);
   }
 });
 
 // User-specific feed
-router.get('/user/:username', async (req, res) => {
+router.get('/user/:username', async (req, res, next) => {
   try {
+    const format = req.query.format || 'rss';
+    const cacheKey = `feed:user:${req.params.username}:${format}`;
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      res.set('Content-Type', getContentType(format));
+      res.set('X-Cache', 'HIT');
+      return res.send(cached);
+    }
+
     // Find user
     const user = await User.findOne({ username: req.params.username });
     
@@ -113,36 +160,37 @@ router.get('/user/:username', async (req, res) => {
     const feed = new Feed({
       title: `${user.displayName}'s Wirebase Profile`,
       description: user.statusMessage || `Updates from ${user.displayName} on Wirebase`,
-      id: `https://wirebase.example.com/profile/${user.username}`,
-      link: `https://wirebase.example.com/profile/${user.username}`,
+      id: `${SITE_URL}/profile/${user.username}`,
+      link: `${SITE_URL}/profile/${user.username}`,
       language: 'en',
       image: user.avatar,
-      favicon: 'https://wirebase.example.com/favicon.ico',
+      favicon: `${SITE_URL}/favicon.ico`,
       copyright: `All rights reserved ${new Date().getFullYear()}, ${user.displayName}`,
       updated: user.lastActive,
       author: {
         name: user.displayName,
-        link: `https://wirebase.example.com/profile/${user.username}`
+        link: `${SITE_URL}/profile/${user.username}`
       }
     });
     
     // Get user's items in the Scrapyard
-    const userItems = await ScrapyardItem.find({ creator: user._id })
-      .sort({ createdAt: -1 })
-      .limit(20);
+    const userItems = await ScrapyardItem.find(
+      { creator: user._id },
+      { sort: { createdAt: -1 }, limit: 20 }
+    );
     
     // Add items to feed
     userItems.forEach(item => {
       feed.addItem({
         title: `New ${item.category} in the Scrapyard: ${item.title}`,
-        id: `https://wirebase.example.com/scrapyard/item/${item._id}`,
-        link: `https://wirebase.example.com/scrapyard/item/${item._id}`,
+        id: `${SITE_URL}/scrapyard/item/${item._id}`,
+        link: `${SITE_URL}/scrapyard/item/${item._id}`,
         description: item.description,
         content: item.description,
         author: [
           {
             name: user.displayName,
-            link: `https://wirebase.example.com/profile/${user.username}`
+            link: `${SITE_URL}/profile/${user.username}`
           }
         ],
         date: item.createdAt,
@@ -150,30 +198,30 @@ router.get('/user/:username', async (req, res) => {
       });
     });
     
-    // Determine format based on query parameter or Accept header
-    const format = req.query.format || 'rss';
-    
-    // Set content type and send feed
-    if (format === 'atom') {
-      res.set('Content-Type', 'application/atom+xml');
-      res.send(feed.atom1());
-    } else if (format === 'json') {
-      res.set('Content-Type', 'application/json');
-      res.send(feed.json1());
-    } else {
-      res.set('Content-Type', 'application/rss+xml');
-      res.send(feed.rss2());
-    }
+    const output = buildFeedOutput(feed, format);
+    cache.set(cacheKey, output, 300);
+    res.set('Content-Type', getContentType(format));
+    res.set('X-Cache', 'MISS');
+    res.send(output);
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error generating feed');
+    next(err);
   }
 });
 
 // Category-specific feed for Scrapyard
-router.get('/scrapyard/:category', async (req, res) => {
+router.get('/scrapyard/:category', async (req, res, next) => {
   try {
+    const format = req.query.format || 'rss';
     const category = req.params.category;
+    const cacheKey = `feed:scrapyard:${category}:${format}`;
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      res.set('Content-Type', getContentType(format));
+      res.set('X-Cache', 'HIT');
+      return res.send(cached);
+    }
+
     const validCategories = ['widget', 'template', 'icon', 'banner', 'gif', 'all'];
     
     if (!validCategories.includes(category)) {
@@ -194,40 +242,51 @@ router.get('/scrapyard/:category', async (req, res) => {
     const feed = new Feed({
       title: `Wirebase Scrapyard - ${categoryTitles[category]}`,
       description: `Latest submissions to the ${categoryTitles[category]} on Wirebase`,
-      id: `https://wirebase.example.com/scrapyard/category/${category}`,
-      link: `https://wirebase.example.com/scrapyard/category/${category}`,
+      id: `${SITE_URL}/scrapyard/category/${category}`,
+      link: `${SITE_URL}/scrapyard/category/${category}`,
       language: 'en',
-      image: 'https://wirebase.example.com/images/wirebase-logo.svg',
-      favicon: 'https://wirebase.example.com/favicon.ico',
+      image: `${SITE_URL}/images/wirebase-logo.svg`,
+      favicon: `${SITE_URL}/favicon.ico`,
       copyright: `All rights reserved ${new Date().getFullYear()}, Wirebase`,
       updated: new Date(),
       author: {
         name: 'Wirebase',
-        link: 'https://wirebase.example.com/'
+        link: `${SITE_URL}/`
       }
     });
     
-    // Query for items
-    const query = category === 'all' ? {} : { category: category };
-    
-    // Get recent items
-    const items = await ScrapyardItem.find(query)
-      .sort({ createdAt: -1 })
-      .limit(30)
-      .populate('creator', 'username displayName');
-    
+    // Build query for items
+    let itemQuery = supabase
+      .from('scrapyard_items')
+      .select(`
+        *,
+        creator:creator (
+          id, username, display_name, avatar, custom_glyph
+        )
+      `)
+      .order('created_at', { ascending: false })
+      .limit(30);
+
+    if (category !== 'all') {
+      itemQuery = itemQuery.eq('category', category);
+    }
+
+    const { data, error } = await itemQuery;
+    if (error) throw error;
+    const items = (data || []).map(item => ScrapyardItem.formatItem(item));
+
     // Add items to feed
     items.forEach(item => {
       feed.addItem({
         title: item.title,
-        id: `https://wirebase.example.com/scrapyard/item/${item._id}`,
-        link: `https://wirebase.example.com/scrapyard/item/${item._id}`,
+        id: `${SITE_URL}/scrapyard/item/${item._id}`,
+        link: `${SITE_URL}/scrapyard/item/${item._id}`,
         description: item.description,
         content: item.description,
         author: [
           {
             name: item.creator.displayName,
-            link: `https://wirebase.example.com/profile/${item.creator.username}`
+            link: `${SITE_URL}/profile/${item.creator.username}`
           }
         ],
         date: item.createdAt,
@@ -235,23 +294,14 @@ router.get('/scrapyard/:category', async (req, res) => {
       });
     });
     
-    // Determine format based on query parameter or Accept header
-    const format = req.query.format || 'rss';
-    
-    // Set content type and send feed
-    if (format === 'atom') {
-      res.set('Content-Type', 'application/atom+xml');
-      res.send(feed.atom1());
-    } else if (format === 'json') {
-      res.set('Content-Type', 'application/json');
-      res.send(feed.json1());
-    } else {
-      res.set('Content-Type', 'application/rss+xml');
-      res.send(feed.rss2());
-    }
+    const output = buildFeedOutput(feed, format);
+    cache.set(cacheKey, output, 300);
+    res.set('Content-Type', getContentType(format));
+    res.set('X-Cache', 'MISS');
+    res.send(output);
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error generating feed');
+    next(err);
   }
 });
 

@@ -4,6 +4,16 @@ const Thread = require('../models/Thread');
 const Reply = require('../models/Reply');
 const { cache } = require('../utils/performance');
 const { supabase } = require('../utils/database');
+const rateLimit = require('express-rate-limit');
+
+// Limit replies to prevent spam - 5 replies per minute per IP
+const replyRateLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute window
+  max: 5,
+  message: {
+    error: 'You are replying too quickly. Please wait before posting again.'
+  }
+});
 
 // Authentication middleware
 const ensureAuthenticated = (req, res, next) => {
@@ -56,6 +66,7 @@ router.get('/category/:category', async (req, res) => {
   try {
     const { category } = req.params;
     const page = parseInt(req.query.page) || 1;
+    const sort = req.query.sort || 'newest';
     const limit = 20;
     const offset = (page - 1) * limit;
 
@@ -75,8 +86,8 @@ router.get('/category/:category', async (req, res) => {
       });
     }
 
-    // Get threads for this category
-    const { threads, total } = await Thread.getByCategory(category, limit, offset);
+    // Get threads for this category with sorting
+    const { threads, total } = await Thread.getByCategory(category, limit, offset, sort);
 
     // Calculate pagination
     const totalPages = Math.ceil(total / limit);
@@ -102,6 +113,7 @@ router.get('/category/:category', async (req, res) => {
       categoryInfo,
       threads,
       pagination,
+      sort,
       pageDescription: `Discussions in the ${category} category`,
       pageTheme: 'dark-dungeon',
       additionalStyles: ['/css/forum.css'],
@@ -278,8 +290,8 @@ router.post('/new', ensureAuthenticated, async (req, res) => {
   }
 });
 
-// Post reply to thread (requires authentication)
-router.post('/thread/:id/reply', ensureAuthenticated, async (req, res) => {
+// Post reply to thread (requires authentication and rate limiting)
+router.post('/thread/:id/reply', ensureAuthenticated, replyRateLimiter, async (req, res) => {
   try {
     const { id } = req.params;
     const { content } = req.body;

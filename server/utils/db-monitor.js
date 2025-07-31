@@ -3,6 +3,7 @@
  * Provides functions to monitor and report on database connection pool status
  */
 
+const logger = require('./logger');
 // Store knex instance to avoid circular dependency
 let knexInstance = null;
 
@@ -66,7 +67,7 @@ const getPoolStatus = (knex = null) => {
       metrics: { ...metrics }
     };
   } catch (error) {
-    console.error('Error getting pool status:', error);
+    logger.error('Error getting pool status:', error);
     return { error: error.message };
   }
 };
@@ -87,14 +88,14 @@ const setupPoolMonitoring = (knex = null) => {
     }
 
     if (!kInstance || !kInstance.client) {
-      console.warn('Knex instance not available or invalid for pool monitoring');
+      logger.warn('Knex instance not available or invalid for pool monitoring');
       return false;
     }
 
     const { client: { pool } } = kInstance;
 
     if (!pool || !pool.on) {
-      console.warn('Pool monitoring not available');
+      logger.warn('Pool monitoring not available');
       return false;
     }
 
@@ -125,10 +126,10 @@ const setupPoolMonitoring = (knex = null) => {
       logPoolWarning();
     });
 
-    console.log('Database connection pool monitoring enabled');
+    logger.info('Database connection pool monitoring enabled');
     return true;
   } catch (error) {
-    console.error('Error setting up pool monitoring:', error);
+    logger.error('Error setting up pool monitoring:', error);
     return false;
   }
 };
@@ -145,7 +146,7 @@ const logPoolWarning = (knex = null) => {
 
   // Log warning if pool utilization is high
   if (status.used / status.max > 0.7) {
-    console.warn('DATABASE POOL WARNING: High connection utilization', {
+    logger.warn('DATABASE POOL WARNING: High connection utilization', {
       used: status.used,
       free: status.free,
       max: status.max,
@@ -181,7 +182,7 @@ const resetMetrics = () => {
 const initialize = (knex) => {
   if (knex) {
     knexInstance = knex;
-    console.log('Database monitor initialized with knex instance');
+    logger.info('Database monitor initialized with knex instance');
   }
 };
 

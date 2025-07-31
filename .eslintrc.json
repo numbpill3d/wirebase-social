@@ -1,0 +1,84 @@
+{
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": ["eslint:recommended"],
+  "parserOptions": {
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "rules": {
+    "indent": ["warn", 2],
+    "quotes": ["warn", "single"],
+    "semi": ["warn", "always"],
+    "no-var": "warn",
+    "prefer-const": "warn",
+    "linebreak-style": ["warn", "unix"],
+    "eol-last": ["warn", "always"],
+    "no-trailing-spaces": "warn",
+    "keyword-spacing": "warn",
+    "space-infix-ops": "warn",
+    "no-inner-declarations": "warn",
+    "max-len": ["warn", { "code": 100 }]
+  },
+  "overrides": [
+    {
+      "files": ["public/js/**/*.js", "public/components/**/*.js"],
+      "env": {
+        "browser": true,
+        "node": false
+      },
+      "globals": {
+        "document": "readonly",
+        "window": "readonly",
+        "localStorage": "readonly",
+        "sessionStorage": "readonly",
+        "HTMLElement": "readonly",
+        "customElements": "readonly",
+        "prompt": "readonly",
+        "Audio": "readonly",
+        "MutationObserver": "readonly",
+        "IntersectionObserver": "readonly",
+        "requestAnimationFrame": "readonly",
+        "requestIdleCallback": "readonly"
+      },
+      "parserOptions": {
+        "ecmaVersion": 12,
+        "sourceType": "module"
+      },
+      "rules": {
+        "no-unused-vars": "warn"
+      }
+    },
+    {
+      "files": ["server/**/*.js", "scripts/**/*.js", "*.js"],
+      "env": {
+        "browser": false,
+        "node": true
+      },
+      "parserOptions": {
+        "ecmaVersion": 12
+      },
+      "rules": {
+        "no-unused-vars": "warn"
+      }
+    },
+    {
+      "files": ["tests/**/*.js"],
+      "env": {
+        "jest": true,
+        "node": true,
+        "browser": true
+      },
+      "parserOptions": {
+        "ecmaVersion": 12
+      },
+      "rules": {
+        "no-unused-vars": "warn"
+      }
+    }
+  ]
+}

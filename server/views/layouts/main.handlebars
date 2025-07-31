@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="description" content="{{pageDescription}}">
     <meta name="theme-color" content="#0f0f0f">
+    <meta name="csrf-token" content="{{csrfToken}}">
     <title>{{title}}</title>
 
     {{!-- Preload critical assets --}}
@@ -186,6 +187,22 @@
 
     <!-- Load critical scripts first -->
     <script src="/js/main.js" defer></script>
+
+    <!-- Plausible Analytics -->
+    {{#if plausibleDomain}}
+        <script defer data-domain="{{plausibleDomain}}" src="https://plausible.io/js/plausible.js"></script>
+    {{/if}}
+
+    <!-- Google Analytics -->
+    {{#if gaTrackingId}}
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{gaTrackingId}}"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '{{gaTrackingId}}', { 'anonymize_ip': true });
+        </script>
+    {{/if}}
 
     <!-- Load non-critical scripts with defer to improve page load performance -->
     <script src="/js/laincore-loader.js" defer></script>

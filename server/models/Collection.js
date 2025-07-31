@@ -92,7 +92,7 @@ class Collection {
             id: formattedItem.creator.id,
             username: formattedItem.creator.username,
             displayName: formattedItem.creator.display_name,
-            avatar: formattedItem.creator.avatar || '/images/default-avatar.png'
+            avatar: formattedItem.creator.avatar || '/images/laincore/default-avatar.png'
           }
         };
       });
@@ -820,7 +820,7 @@ class Collection {
         id: collection.creator.id,
         username: collection.creator.username,
         displayName: collection.creator.display_name,
-        avatar: collection.creator.avatar || '/images/default-avatar.png'
+        avatar: collection.creator.avatar || '/images/laincore/default-avatar.png'
       }
     };
   }

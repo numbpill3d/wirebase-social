@@ -5,6 +5,7 @@
 
 const dbMonitor = require('./db-monitor');
 const dbHealth = require('./db-health');
+const logger = require('./logger');
 
 // Store knex instance to avoid circular dependency
 let knexInstance = null;
@@ -53,10 +54,16 @@ const handleError = async (error, context = 'unknown') => {
 
   // Get pool status - use stored knex instance or fallback to global
   const kInstance = knexInstance || global.knex;
+
+  if (!kInstance) {
+    logger.warn('WARN: No knex instance available for error handling');
+    return error;
+  }
+
   const poolStatus = dbMonitor.getPoolStatus(kInstance);
 
   // Log error with context and pool status
-  console.error(`Database error in ${context}:`, {
+  logger.error(`Database error in ${context}:`, {
     message: error.message,
     code: errorCode,
     stack: error.stack,
@@ -65,8 +72,8 @@ const handleError = async (error, context = 'unknown') => {
 
   // Check database health on connection errors
   if (errorStats.connectionErrors > 0 && errorStats.connectionErrors % 5 === 0) {
-    console.log('Triggering health check due to connection errors');
-    dbHealth.checkHealth(kInstance).catch(console.error);
+    logger.info('Triggering health check due to connection errors');
+    dbHealth.checkHealth(kInstance).catch((err) => logger.error(err));
   }
 
   // Add context to error
@@ -82,6 +89,12 @@ const handleError = async (error, context = 'unknown') => {
  */
 const getErrorStats = (knex = null) => {
   const kInstance = knex || knexInstance || global.knex;
+
+  if (!kInstance) {
+    logger.warn('WARN: No knex instance available for error statistics');
+    return { ...errorStats, poolStatus: null };
+  }
+
   return {
     ...errorStats,
     poolStatus: dbMonitor.getPoolStatus(kInstance)
@@ -147,7 +160,7 @@ const errorHandlerMiddleware = () => {
 const initialize = (knex) => {
   if (knex) {
     knexInstance = knex;
-    console.log('Database error handler initialized with knex instance');
+    logger.info('Database error handler initialized with knex instance');
   }
 };
 
