@@ -14,7 +14,8 @@ try {
   }
 }
 
-// Setup logger and pipe console output to it
+// Setup logger and pipe console output through it for legacy modules
+
 console.log = logger.info.bind(logger);
 console.info = logger.info.bind(logger);
 console.warn = logger.warn.bind(logger);
@@ -267,6 +268,43 @@ function initServer() {
     serializer: JSON.stringify,
     deserializer: JSON.parse
   // Remove separate pool configuration to use the main knex pool
+});
+
+const sessionSecret = process.env.SESSION_SECRET;
+if (!sessionSecret) {
+  throw new Error('SESSION_SECRET environment variable is required');
+}
+
+app.use(session({
+  store: store,
+  secret: sessionSecret,
+  resave: false,
+  saveUninitialized: false, // Only save sessions when necessary
+  rolling: false, // Disable rolling to reduce database writes
+  name: 'wirebase.sid', // Custom cookie name for better security
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    httpOnly: true, // Prevent client-side JS from accessing cookie
+    path: '/'
+  },
+  // Add touch option to reduce database writes
+  touchAfter: 24 * 3600 // Only update session once per day
+}));
+
+// Initialize passport for authentication
+app.use(passport.initialize());
+app.use(passport.session());
+
+// CSRF protection (disabled during tests)
+if (NODE_ENV !== 'test') {
+  app.use(csurf());
+  app.use((req, res, next) => {
+    res.locals.csrfToken = req.csrfToken();
+    next();
+  });
+}
+
   });
 
   app.use(session({

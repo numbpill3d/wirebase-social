@@ -5,6 +5,7 @@
 
 const { supabase } = require('../utils/database');
 const Thread = require('./Thread');
+const logger = require('../utils/logger');
 
 class Reply {
   /**
@@ -51,7 +52,7 @@ class Reply {
         replyId: reply.id
       };
     } catch (error) {
-      console.error('Error creating reply:', error);
+      logger.error('Error creating reply:', error);
       return {
         success: false,
         error: error.message
@@ -91,7 +92,7 @@ class Reply {
       // Format the reply data
       return this.formatReply(reply);
     } catch (error) {
-      console.error('Error getting reply by ID:', error);
+      logger.error('Error getting reply by ID:', error);
       return null;
     }
   }
@@ -137,7 +138,7 @@ class Reply {
         success: true
       };
     } catch (error) {
-      console.error('Error updating reply:', error);
+      logger.error('Error updating reply:', error);
       return {
         success: false,
         error: error.message
@@ -182,7 +183,7 @@ class Reply {
         success: true
       };
     } catch (error) {
-      console.error('Error deleting reply:', error);
+      logger.error('Error deleting reply:', error);
       return {
         success: false,
         error: error.message
@@ -217,7 +218,7 @@ class Reply {
       // Format the replies data
       return replies.map(reply => this.formatReply(reply));
     } catch (error) {
-      console.error('Error getting replies by thread ID:', error);
+      logger.error('Error getting replies by thread ID:', error);
       return [];
     }
   }
@@ -244,7 +245,7 @@ class Reply {
 
       return count || 0;
     } catch (error) {
-      console.error('Error counting replies:', error);
+      logger.error('Error counting replies:', error);
       return 0;
     }
   }
