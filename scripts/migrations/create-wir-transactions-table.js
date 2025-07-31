@@ -6,59 +6,20 @@ const { supabaseAdmin } = require('../../server/utils/database');
 
 async function createWIRTransactionsTable() {
   try {
-    console.log('Checking if market_wir_transactions table exists...');
-    
-    // Check if table exists
-    const { error } = await supabaseAdmin
-      .from('market_wir_transactions')
-      .select('id')
-      .limit(1);
-    
-    if (error && error.code === '42P01') {
-      // Table doesn't exist, create it
-      console.log('Creating market_wir_transactions table...');
-      
-      await supabaseAdmin.query(`
-        CREATE TABLE market_wir_transactions (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-          amount INTEGER NOT NULL,
-          transaction_type TEXT NOT NULL,
-          reference_id UUID,
-          notes TEXT,
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-          
-          -- Add constraints
-          CONSTRAINT valid_transaction_type CHECK (
-            transaction_type IN (
-              'purchase', 
-              'sale', 
-              'transfer', 
-              'reward', 
-              'listing_fee', 
-              'featured_fee',
-              'loot_to_wir_conversion',
-              'wir_to_loot_conversion'
-            )
-          )
-        );
-        
-        -- Create indexes
-        CREATE INDEX idx_wir_transactions_user_id ON market_wir_transactions(user_id);
-        CREATE INDEX idx_wir_transactions_reference_id ON market_wir_transactions(reference_id);
-        CREATE INDEX idx_wir_transactions_created_at ON market_wir_transactions(created_at);
-        CREATE INDEX idx_wir_transactions_type ON market_wir_transactions(transaction_type);
-      `);
-      
-      console.log('market_wir_transactions table created successfully!');
-    } else {
-      console.log('market_wir_transactions table already exists.');
-    }
-    
-    return { success: true, message: 'WIR transactions table migration completed' };
+console.log('Running create_wir_transactions_table RPC...');
+const { data, error } = await supabaseAdmin.rpc('create_wir_transactions_table');
+
+if (error) {
+  console.error('Error running create_wir_transactions_table RPC:', error);
+  return { success: false, error: error.message };
+}
+
+console.log('create_wir_transactions_table RPC executed successfully');
+return { success: true, message: 'WIR transactions table migration completed', data };
+
   } catch (error) {
     console.error('Error creating market_wir_transactions table:', error);
-    return { success: false, error: error.message };
+    return { error: error.message };
   }
 }
 
@@ -67,7 +28,7 @@ if (require.main === module) {
   createWIRTransactionsTable()
     .then(result => {
       console.log(result);
-      process.exit(result.success ? 0 : 1);
+      process.exit(result.error ? 1 : 0);
     })
     .catch(error => {
       console.error('Migration failed:', error);

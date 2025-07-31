@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const ScrapyardItem = require('../models/ScrapyardItem');
+const Visit = require('../models/Visit');
+const Thread = require('../models/Thread');
+const Reply = require('../models/Reply');
+
 
 // Enhanced error middleware
 const errorHandler = (err, req, res, next) => {
@@ -28,6 +32,8 @@ const errorHandler = (err, req, res, next) => {
 // Home page route
 router.get('/', async (req, res) => {
   try {
+    await Visit.record(req.path);
+
     // Get data for widgets and main content
     const [
       recentUsers,
@@ -35,6 +41,8 @@ router.get('/', async (req, res) => {
       featuredItems,
       userCount,
       itemCount,
+      threadCount,
+      commentCount,
       recentActivity
     ] = await Promise.all([
       User.findRecent(),
@@ -42,6 +50,8 @@ router.get('/', async (req, res) => {
       ScrapyardItem.findFeatured(),
       User.countDocuments(),
       ScrapyardItem.countDocuments(),
+      Thread.countDocuments(),
+      Reply.countDocuments(),
       User.find({}, { sort: { lastActive: -1 }, limit: 10 })
     ]).catch(err => {
       throw new Error('Failed to fetch homepage data: ' + err.message);
@@ -63,15 +73,9 @@ router.get('/', async (req, res) => {
     else if (activeUsers > 2) siteMood = 'calm';
     else siteMood = 'quiet';
 
-    // Generate hourly traffic data (mock data for now)
-    const hourlyTraffic = Array.from({ length: 24 }, (_, i) => {
-      // Generate random but somewhat realistic traffic pattern
-      let value = Math.floor(Math.random() * 10);
-      // Increase values during typical high-traffic hours
-      if (i >= 8 && i <= 11) value += 5; // Morning peak
-      if (i >= 19 && i <= 22) value += 8; // Evening peak
-      return { hour: i, value };
-    });
+    // Get hourly traffic data from visits
+    const visitCounts = await Visit.getHourlyCounts();
+    const hourlyTraffic = visitCounts.map(v => ({ hour: v.hour, value: v.count }));
 
     res.render('index', {
       title: 'Wirebase - Medieval Dungeon Fantasy Social Platform',
@@ -83,8 +87,8 @@ router.get('/', async (req, res) => {
       stats: {
         userCount,
         itemCount,
-        threadCount: Math.floor(itemCount * 1.5), // Mock data for now
-        commentCount: Math.floor(itemCount * 4.2) // Mock data for now
+        threadCount,
+        commentCount
       },
       traffic: {
         hourlyData: hourlyTraffic,
@@ -123,7 +127,7 @@ router.get('/about', (req, res) => {
 // Global discovery feed
 router.get('/discover', async (req, res) => {
   try {
-    console.log('Discover route accessed');
+    if (process.env.DEBUG) console.log('Discover route accessed');
     // Validate and sanitize pagination params
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.min(50, parseInt(req.query.limit) || 20);
@@ -139,12 +143,13 @@ router.get('/discover', async (req, res) => {
         .select('username displayName avatar customGlyph statusMessage lastActive'),
 
       // Recent Scrapyard submissions
-      ScrapyardItem.find()
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .populate('creator', 'username displayName avatar customGlyph')
-        .select('title category previewImage createdAt creator')
+ScrapyardItem.find({})
+  .sort({ createdAt: -1 })
+  .skip(skip)
+  .limit(limit)  // ← no semicolon here
+
+
+
     ]);
 
     // Count total documents for pagination
@@ -170,7 +175,7 @@ router.get('/discover', async (req, res) => {
 
     const totalPages = Math.ceil(Math.max(userCount, itemCount) / limit);
 
-    console.log('Attempting to render discover template');
+    if (process.env.DEBUG) console.log('Attempting to render discover template');
     res.render('discover', {
       title: 'Discover - Wirebase',
       updates,

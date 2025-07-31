@@ -2,11 +2,12 @@
  * Performance optimization utilities for Wirebase
  */
 // Try to load compression module, fallback to a simple middleware if not available
+const logger = require('./logger');
 let compression;
 try {
   compression = require('compression');
 } catch (err) {
-  console.warn('Compression module not found, using fallback implementation');
+  logger.warn('Compression module not found, using fallback implementation');
   // Simple fallback implementation
   compression = () => (req, res, next) => next();
   compression.filter = () => true;
@@ -17,17 +18,31 @@ let NodeCache;
 try {
   NodeCache = require('node-cache');
 } catch (err) {
-  console.warn('NodeCache module not found, using fallback implementation');
+  logger.warn('NodeCache module not found, using fallback implementation');
   // Simple fallback implementation
   NodeCache = class SimpleCache {
-    constructor() {
+    constructor(options = {}) {
       this.cache = new Map();
+      this.stdTTL = options.stdTTL || 0;
+      this.checkperiod = options.checkperiod || 0;
+
+      if (this.checkperiod > 0) {
+        this.cleanupTimer = setInterval(() => {
+          const now = Date.now();
+          for (const [key, entry] of this.cache.entries()) {
+            if (entry.expires && now > entry.expires) {
+              this.cache.delete(key);
+            }
+          }
+        }, this.checkperiod * 1000);
+      }
     }
 
     set(key, value, ttl) {
+      const effectiveTtl = ttl !== undefined ? ttl : this.stdTTL;
       this.cache.set(key, {
         value,
-        expires: ttl ? Date.now() + (ttl * 1000) : null
+        expires: effectiveTtl ? Date.now() + (effectiveTtl * 1000) : null
       });
       return true;
     }
@@ -52,6 +67,13 @@ try {
 
     keys() {
       return Array.from(this.cache.keys());
+    }
+
+    close() {
+      if (this.cleanupTimer) {
+        clearInterval(this.cleanupTimer);
+        this.cleanupTimer = null;
+      }
     }
   };
 }

@@ -1,5 +1,6 @@
 const { createClient } = require('@supabase/supabase-js');
 const dotenv = require('dotenv');
+const logger = require('./logger');
 
 // Load environment variables
 dotenv.config();
@@ -11,7 +12,7 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
 
 // Validate required environment variables
 if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
-  console.error('Missing required Supabase environment variables');
+  logger.error('Missing required Supabase environment variables');
   process.exit(1);
 }
 
@@ -49,14 +50,14 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, clientOption
     try {
       const { data, error } = await supabase.from('users').select('id').limit(1);
       if (error) throw error;
-      console.log('Supabase connection established successfully');
+      logger.info('Supabase connection established successfully');
       break; // Connection successful, exit the loop
     } catch (error) {
       retries++;
-      console.warn(`Supabase connection attempt ${retries}/${maxRetries} failed: ${error.message}`);
+      logger.warn(`Supabase connection attempt ${retries}/${maxRetries} failed: ${error.message}`);
 
       if (retries >= maxRetries) {
-        console.error('All Supabase connection attempts failed. Using fallback mechanism.');
+        logger.error('All Supabase connection attempts failed. Using fallback mechanism.');
         // We don't exit the process here as we'll try to use fallback mechanisms
       } else {
         // Wait before retrying
@@ -72,15 +73,15 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, clientOption
 async function initializeDatabase() {
   try {
     // Try to directly check if the users table exists instead of using RPC
-    console.log('Checking if users table exists...');
+    logger.debug('Checking if users table exists...');
     const { error } = await supabaseAdmin
       .from('users')
       .select('id')
       .limit(1);
 
     if (error && error.code === '42P01') { // Table doesn't exist
-      console.log('Creating users table...');
-      await supabaseAdmin.query(`
+      logger.info('Creating users table...');
+      await supabaseAdmin.rpc('execute_sql', { sql: `
         CREATE TABLE users (
           id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
           username TEXT UNIQUE NOT NULL,
@@ -89,7 +90,7 @@ async function initializeDatabase() {
           display_name TEXT,
           profile_html TEXT,
           profile_css TEXT,
-          avatar TEXT DEFAULT '/images/default-avatar.png',
+          avatar TEXT DEFAULT '/images/laincore/default-avatar.png',
           custom_glyph TEXT DEFAULT '⚔️',
           status_message TEXT DEFAULT 'Just joined Wirebase',
           status_icon TEXT DEFAULT 'online',
@@ -111,7 +112,7 @@ async function initializeDatabase() {
         -- Create index on username and email
         CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
         CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-      `);
+      ` });
     }
 
     // Create scrapyard_items table if not exists
@@ -121,8 +122,8 @@ async function initializeDatabase() {
       .limit(1);
 
     if (itemsError && itemsError.code === '42P01') { // Table doesn't exist
-      console.log('Creating scrapyard_items table...');
-      await supabaseAdmin.query(`
+      logger.info('Creating scrapyard_items table...');
+      await supabaseAdmin.rpc('execute_sql', { sql: `
         CREATE TABLE scrapyard_items (
           id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
           title TEXT NOT NULL,
@@ -146,7 +147,7 @@ async function initializeDatabase() {
         -- Create indexes
         CREATE INDEX IF NOT EXISTS idx_scrapyard_items_creator ON scrapyard_items(creator);
         CREATE INDEX IF NOT EXISTS idx_scrapyard_items_category ON scrapyard_items(category);
-      `);
+      ` });
     }
 
     // Create sessions table if not exists
@@ -156,8 +157,8 @@ async function initializeDatabase() {
       .limit(1);
 
     if (sessionsError && sessionsError.code === '42P01') { // Table doesn't exist
-      console.log('Creating sessions table...');
-      await supabaseAdmin.query(`
+      logger.info('Creating sessions table...');
+      await supabaseAdmin.rpc('execute_sql', { sql: `
         CREATE TABLE sessions (
           sid varchar NOT NULL PRIMARY KEY,
           sess json NOT NULL,
@@ -165,17 +166,17 @@ async function initializeDatabase() {
         );
 
         CREATE INDEX IF NOT EXISTS idx_sessions_expired ON sessions(expired);
-      `);
+      ` });
     }
 
-    console.log('Database initialization complete');
+    logger.info('Database initialization complete');
   } catch (error) {
-    console.error('Error initializing database:', error);
+    logger.error('Error initializing database:', error);
   }
 }
 
 // Call this function when the app starts
-initializeDatabase().catch(console.error);
+initializeDatabase().catch((err) => logger.error(err));
 
 module.exports = {
   supabase,

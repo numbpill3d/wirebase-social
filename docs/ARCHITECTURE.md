@@ -23,7 +23,7 @@ Wirebase is a social media platform that combines medieval dungeon fantasy aesth
 ## Directory Structure
 
 ```
-wirebase/
+wirebase-social/
 ├── docs/                  # Documentation
 ├── public/                # Static assets
 │   ├── css/               # Stylesheets

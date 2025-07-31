@@ -13,6 +13,7 @@ const { formatDate, truncateText } = require('../utils/format-helpers');
 const MarketItem = require('../models/MarketItem');
 const Collection = require('../models/Collection');
 const WIRTransaction = require('../models/WIRTransaction');
+const User = require('../models/User');
 
 /**
  * GET /market
@@ -176,8 +177,12 @@ router.get('/item/:id', async (req, res) => {
     let userCollections = [];
 
     if (req.isAuthenticated()) {
+      // Fetch fresh user data before verifying balance
+      const currentUser = await User.findById(req.user.id);
+
       // Check if user has enough WIR
-      canPurchase = req.user.wirBalance >= item.wirPrice;
+      const wirBalance = currentUser ? currentUser.wirBalance : req.user.wirBalance;
+      canPurchase = wirBalance >= item.wirPrice;
 
       // Check if item is in user's wishlist
       isInWishlist = await MarketItem.isInWishlist(itemId, req.user.id);
@@ -260,8 +265,19 @@ router.get('/item/:id/download', ensureAuthenticated, async (req, res) => {
  */
 router.post('/item/:id/purchase', ensureAuthenticated, async (req, res) => {
   try {
+    const { _csrf } = req.body; // ensure CSRF token is read
     const itemId = req.params.id;
     const userId = req.user.id;
+
+    // Refresh user's balance from the database
+    const freshUser = await User.findById(userId);
+    if (!freshUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    req.user.wirBalance = freshUser.wirBalance;
 
     // Get the item details
     const item = await MarketItem.getById(itemId);
@@ -273,8 +289,17 @@ router.post('/item/:id/purchase', ensureAuthenticated, async (req, res) => {
       });
     }
 
+    // Fetch fresh user data before verifying balance
+    const currentUser = await User.findById(req.user.id);
+    if (!currentUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
     // Check if user has enough WIR
-    if (req.user.wirBalance < item.wirPrice) {
+    if (currentUser.wirBalance < item.wirPrice) {
       return res.status(400).json({
         success: false,
         message: 'Insufficient WIR balance'
@@ -299,6 +324,24 @@ router.post('/item/:id/purchase', ensureAuthenticated, async (req, res) => {
 
       // Update user's WIR balance in session
       req.user.wirBalance = result.newBalance;
+      req.session.save(err => {
+        if (err) {
+          console.error('Session save error after purchase:', err);
+        }
+      });
+
+      // Refresh session data
+      const updatedUser = await User.findById(userId);
+      if (updatedUser) {
+        await new Promise(resolve => {
+          req.login(updatedUser, err => {
+            if (err) {
+              console.error('Error updating session after purchase:', err);
+            }
+            resolve();
+          });
+        });
+      }
 
       return res.json({
         success: true,
@@ -312,6 +355,12 @@ router.post('/item/:id/purchase', ensureAuthenticated, async (req, res) => {
       });
     }
   } catch (error) {
+    if (error.code === 'EBADCSRFTOKEN') {
+      return res.status(403).json({
+        success: false,
+        message: 'Invalid CSRF token'
+      });
+    }
     console.error('Error purchasing item:', error);
     res.status(500).json({
       success: false,
@@ -456,6 +505,7 @@ router.get('/collections/:id', async (req, res) => {
  */
 router.post('/collections/:id/follow', ensureAuthenticated, async (req, res) => {
   try {
+    const { _csrf } = req.body; // ensure CSRF token is read
     const collectionId = req.params.id;
     const userId = req.user.id;
 
@@ -477,6 +527,12 @@ router.post('/collections/:id/follow', ensureAuthenticated, async (req, res) => 
       message: 'Collection followed successfully'
     });
   } catch (error) {
+    if (error.code === 'EBADCSRFTOKEN') {
+      return res.status(403).json({
+        success: false,
+        message: 'Invalid CSRF token'
+      });
+    }
     console.error('Error following collection:', error);
     res.status(500).json({
       success: false,
@@ -591,6 +647,7 @@ router.get('/submit', ensureAuthenticated, async (req, res) => {
  */
 router.post('/submit', ensureAuthenticated, async (req, res) => {
   try {
+    const { _csrf } = req.body; // ensure CSRF token is read
     const userId = req.user.id;
     const {
       title,
@@ -611,6 +668,31 @@ router.post('/submit', ensureAuthenticated, async (req, res) => {
       });
     }
 
+    // Validate title length
+    if (title.length > 100) {
+      return res.status(400).json({
+        success: false,
+        message: 'Title must be 100 characters or less'
+      });
+    }
+
+    // Validate description length
+    if (description.length > 1000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Description must be 1000 characters or less'
+      });
+    }
+
+    // Validate category is allowed
+    const allowedCategories = await MarketItem.getCategories();
+    if (!allowedCategories.includes(category)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid category'
+      });
+    }
+
     // Parse WIR price
     const price = parseInt(wirPrice) || 0;
 
@@ -619,7 +701,10 @@ router.post('/submit', ensureAuthenticated, async (req, res) => {
     const featuredFee = featuredInMarket ? 5 : 0;
     const totalFee = listingFee + featuredFee;
 
-    if (req.user.wirBalance < totalFee) {
+    const currentUser = await User.findById(req.user.id);
+    const wirBalance = currentUser ? currentUser.wirBalance : req.user.wirBalance;
+
+    if (wirBalance < totalFee) {
       return res.status(400).json({
         success: false,
         message: 'Insufficient WIR balance for listing fees'
@@ -659,6 +744,12 @@ router.post('/submit', ensureAuthenticated, async (req, res) => {
       });
     }
   } catch (error) {
+    if (error.code === 'EBADCSRFTOKEN') {
+      return res.status(403).json({
+        success: false,
+        message: 'Invalid CSRF token'
+      });
+    }
     console.error('Error submitting item:', error);
     res.status(500).json({
       success: false,
@@ -700,6 +791,7 @@ router.get('/user/wishlist', ensureAuthenticated, async (req, res) => {
  */
 router.post('/user/wishlist/add/:id', ensureAuthenticated, async (req, res) => {
   try {
+    const { _csrf } = req.body; // ensure CSRF token is read
     const itemId = req.params.id;
     const userId = req.user.id;
 
@@ -730,6 +822,12 @@ router.post('/user/wishlist/add/:id', ensureAuthenticated, async (req, res) => {
       message: 'Item added to wishlist'
     });
   } catch (error) {
+    if (error.code === 'EBADCSRFTOKEN') {
+      return res.status(403).json({
+        success: false,
+        message: 'Invalid CSRF token'
+      });
+    }
     console.error('Error adding to wishlist:', error);
     res.status(500).json({
       success: false,
@@ -796,8 +894,8 @@ router.get('/wir', ensureAuthenticated, async (req, res) => {
  */
 router.post('/wir/convert', ensureAuthenticated, async (req, res) => {
   try {
+    const { _csrf, direction, amount } = req.body; // read CSRF token
     const userId = req.user.id;
-    const { direction, amount } = req.body;
 
     // Validate input
     if (!direction || !amount || isNaN(amount) || amount <= 0) {
@@ -828,6 +926,12 @@ router.post('/wir/convert', ensureAuthenticated, async (req, res) => {
       });
     }
   } catch (error) {
+    if (error.code === 'EBADCSRFTOKEN') {
+      return res.status(403).json({
+        success: false,
+        message: 'Invalid CSRF token'
+      });
+    }
     console.error('Error converting currency:', error);
     res.status(500).json({
       success: false,

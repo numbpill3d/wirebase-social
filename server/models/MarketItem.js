@@ -1187,7 +1187,7 @@ class MarketItem {
         id: item.creator.id,
         username: item.creator.username,
         displayName: item.creator.display_name,
-        avatar: item.creator.avatar || '/images/default-avatar.png'
+        avatar: item.creator.avatar || '/images/laincore/default-avatar.png'
       }
     };
   }

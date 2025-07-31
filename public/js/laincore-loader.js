@@ -36,6 +36,5 @@
   meta.content = '#0f0f0f';
   document.head.appendChild(meta);
   
-  // Log initialization
-  console.log('%c[wirebase.city] Laincore initialized', 'color: #00ff00; background: #0f0f0f;');
+  // Initialization complete
 })();

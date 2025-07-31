@@ -3,18 +3,25 @@
  */
 // Import DOMPurify for HTML sanitization
 let DOMPurify;
+const logger = require('./logger');
+// Flag to ensure fallback warning only logs once
+let fallbackWarningShown = false;
 try {
   // DOMPurify requires a DOM environment, so we need to use jsdom in Node.js
   const createDOMPurify = require('dompurify');
   const { JSDOM } = require('jsdom');
   const window = new JSDOM('').window;
   DOMPurify = createDOMPurify(window);
-  console.log('DOMPurify initialized with JSDOM');
+  logger.debug('DOMPurify initialized with JSDOM');
 } catch (err) {
-  console.warn('DOMPurify module not found, using fallback implementation:', err.message);
+  const warningMessage = 'DOMPurify module not found, using fallback implementation: ' + err.message;
   // Simple fallback implementation
   DOMPurify = {
     sanitize: function(content, options) {
+      if (!fallbackWarningShown) {
+        logger.warn(warningMessage);
+        fallbackWarningShown = true;
+      }
       // Basic sanitization - in a real app, use a proper HTML sanitizer
       return content
         .replace(/&/g, '&amp;')
@@ -137,7 +144,7 @@ module.exports = {
       // We can just return the sanitized string and use triple braces in the template: {{{allowedHTML content}}}
       return sanitized;
     } catch (err) {
-      console.error('HTML sanitization error:', err);
+      logger.error('HTML sanitization error:', err);
       return '';
     }
   },
