@@ -164,7 +164,12 @@ const server = http.createServer((req, res) => {
   // Log all requests using the shared logger
   // Disabled by default when NODE_ENV is 'production'
   if (process.env.LOG_REQUESTS === 'true' || process.env.NODE_ENV !== 'production') {
-    logger.debug(`Request: ${req.method} ${pathname}`);
+// Import the DOMPurify library for sanitizing user input
+// const DOMPurify = require('dompurify');
+
+if (process.env.LOG_REQUESTS === 'true' || process.env.NODE_ENV !== 'production') {
+  logger.debug(`Request: ${DOMPurify.sanitize(req.method)} ${DOMPurify.sanitize(pathname)}`);
+}
   }
 
   // Special case for favicon
