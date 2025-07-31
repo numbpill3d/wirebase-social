@@ -11,15 +11,18 @@
     "sourceType": "module"
   },
   "rules": {
-    "indent": ["error", 2],
-    "quotes": ["error", "single"],
-    "semi": ["error", "always"],
-    "no-var": "error",
-    "prefer-const": "error",
-    "linebreak-style": ["error", "unix"],
-    "eol-last": ["error", "always"],
-    "no-trailing-spaces": "error",
-    "max-len": ["error", { "code": 100 }]
+    "indent": ["warn", 2],
+    "quotes": ["warn", "single"],
+    "semi": ["warn", "always"],
+    "no-var": "warn",
+    "prefer-const": "warn",
+    "linebreak-style": ["warn", "unix"],
+    "eol-last": ["warn", "always"],
+    "no-trailing-spaces": "warn",
+    "keyword-spacing": "warn",
+    "space-infix-ops": "warn",
+    "no-inner-declarations": "warn",
+    "max-len": ["warn", { "code": 100 }]
   },
   "overrides": [
     {
@@ -67,7 +70,8 @@
       "files": ["tests/**/*.js"],
       "env": {
         "jest": true,
-        "node": true
+        "node": true,
+        "browser": true
       },
       "parserOptions": {
         "ecmaVersion": 12
