@@ -150,7 +150,16 @@ class Thread {
         `, { count: 'exact' })
         .eq('category', category)
         .order('is_pinned', { ascending: false })
-        .range(offset, offset + limit - 1);
+      // For 'replies', we sort in JS. This is only sorting the current page.
+      // For accurate global sorting by replies, consider adding a `reply_count`
+      // column to the `forum_threads` table and updating it with a trigger.
+      let sortedThreads = formattedThreads;
+      if (sort === 'replies') {
+        const pinned = formattedThreads.filter(t => t.isPinned);
+        const regular = formattedThreads.filter(t => !t.isPinned);
+        regular.sort((a, b) => b.replyCount - a.replyCount);
+        sortedThreads = [...pinned, ...regular];
+      }
 
       if (error) throw error;
 
