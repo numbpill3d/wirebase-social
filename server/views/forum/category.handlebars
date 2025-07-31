@@ -113,13 +113,14 @@
 
       <!-- Pagination -->
       <div class="pagination">
-        <a href="?page=1&sort={{sort}}" class="cyber-button pagination-button {{#if (eq pagination.currentPage 1)}}disabled{{/if}}">First</a>
-        <a href="?page={{subtract pagination.currentPage 1}}&sort={{sort}}" class="cyber-button pagination-button {{#if (eq pagination.currentPage 1)}}disabled{{/if}}">Previous</a>
+<a href="?page=1&sort={{sort}}" class="cyber-button pagination-button {{#unless pagination.hasPrev}}disabled{{/unless}}">First</a>
+<a href="?page={{pagination.prevPage}}&sort={{sort}}" class="cyber-button pagination-button {{#unless pagination.hasPrev}}disabled{{/unless}}">Previous</a>
 
-        <div class="pagination-info">Page {{pagination.currentPage}} of {{pagination.totalPages}}</div>
+<div class="pagination-info">Page {{pagination.currentPage}} of {{pagination.totalPages}}</div>
 
-        <a href="?page={{add pagination.currentPage 1}}&sort={{sort}}" class="cyber-button pagination-button {{#if (eq pagination.currentPage pagination.totalPages)}}disabled{{/if}}">Next</a>
-        <a href="?page={{pagination.totalPages}}&sort={{sort}}" class="cyber-button pagination-button {{#if (eq pagination.currentPage pagination.totalPages)}}disabled{{/if}}">Last</a>
+<a href="?page={{pagination.nextPage}}&sort={{sort}}" class="cyber-button pagination-button {{#unless pagination.hasNext}}disabled{{/unless}}">Next</a>
+<a href="?page={{pagination.totalPages}}&sort={{sort}}" class="cyber-button pagination-button {{#unless pagination.hasNext}}disabled{{/unless}}">Last</a>
+
       </div>
     </div>
   </div>
@@ -141,5 +142,6 @@
         document.getElementById('sort-form').submit();
       });
     }
+
   });
 </script>

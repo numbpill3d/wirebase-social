@@ -1,6 +1,7 @@
 // Custom error-handling middleware
+const logger = require('../utils/logger');
 module.exports = (err, req, res, next) => {
-  console.error('Server Error:', err);
+  logger.error('Server Error:', err);
 
   if (res.headersSent) {
     return next(err);

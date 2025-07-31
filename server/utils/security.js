@@ -2,11 +2,12 @@
  * Enhanced security utilities for Wirebase
  */
 // Try to load helmet module, fallback to a simple middleware if not available
+const logger = require('./logger');
 let helmet;
 try {
   helmet = require('helmet');
 } catch (err) {
-  console.warn('Helmet module not found, using fallback implementation');
+  logger.warn('Helmet module not found, using fallback implementation');
   // Simple fallback implementation
   helmet = (config) => (req, res, next) => {
     // Set some basic security headers
@@ -21,7 +22,7 @@ let rateLimit;
 try {
   rateLimit = require('express-rate-limit');
 } catch (err) {
-  console.warn('Express-rate-limit module not found, using fallback implementation');
+  logger.warn('Express-rate-limit module not found, using fallback implementation');
   // Simple fallback implementation
   rateLimit = (config) => (req, res, next) => next();
 }
@@ -31,7 +32,7 @@ let xss;
 try {
   xss = require('xss-clean');
 } catch (err) {
-  console.warn('XSS-clean module not found, using fallback implementation');
+  logger.warn('XSS-clean module not found, using fallback implementation');
   // Simple fallback implementation
   xss = () => (req, res, next) => next();
 }

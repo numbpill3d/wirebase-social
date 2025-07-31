@@ -18,12 +18,11 @@ process.memoryUsage = jest.fn().mockReturnValue({
   external: 1024 * 1024 * 10 // 10MB
 });
 
-// Mock console methods
-const originalConsoleWarn = console.warn;
-console.warn = jest.fn();
-
-const originalConsoleLog = console.log;
-console.log = jest.fn();
+// Mock logger methods
+const logger = require('../../../server/utils/logger');
+jest.spyOn(logger, 'warn').mockImplementation(() => {});
+jest.spyOn(logger, 'info').mockImplementation(() => {});
+jest.spyOn(logger, 'debug').mockImplementation(() => {});
 
 // Import the module under test
 const memoryMonitor = require('../../../server/utils/memory-monitor');
@@ -36,11 +35,9 @@ describe('Memory Monitor', () => {
   });
 
   afterAll(() => {
-    // Stop any running monitor and restore original functions
     memoryMonitor.stop();
     process.memoryUsage = originalMemoryUsage;
-    console.warn = originalConsoleWarn;
-    console.log = originalConsoleLog;
+    jest.restoreAllMocks();
   });
 
   describe('getMemoryUsage', () => {
@@ -70,8 +67,8 @@ describe('Memory Monitor', () => {
       
       memoryMonitor.logMemoryUsage(50); // Threshold of 50%
       
-      expect(console.warn).toHaveBeenCalledTimes(2);
-      expect(console.warn).toHaveBeenCalledWith('⚠️ High memory usage: 60.00%');
+      expect(logger.warn).toHaveBeenCalledTimes(2);
+      expect(logger.warn).toHaveBeenCalledWith('⚠️ High memory usage: 60.00%');
     });
     
     it('should not log a warning when memory usage is below threshold', () => {
@@ -84,7 +81,7 @@ describe('Memory Monitor', () => {
       
       memoryMonitor.logMemoryUsage(50); // Threshold of 50%
       
-      expect(console.warn).not.toHaveBeenCalled();
+      expect(logger.warn).not.toHaveBeenCalled();
     });
     
     it('should force garbage collection when memory usage exceeds 90%', () => {
@@ -100,9 +97,9 @@ describe('Memory Monitor', () => {
       
       memoryMonitor.logMemoryUsage(50); // Threshold of 50%
       
-      expect(console.warn).toHaveBeenCalledTimes(2);
+      expect(logger.warn).toHaveBeenCalledTimes(2);
       expect(global.gc).toHaveBeenCalledTimes(1);
-      expect(console.log).toHaveBeenCalledWith(
+      expect(logger.debug).toHaveBeenCalledWith(
         '🧹 Forced garbage collection triggered'
       );
       

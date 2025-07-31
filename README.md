@@ -38,23 +38,6 @@ Visit the live demo at: [https://wirebase.city](https://wirebase.city)
   <img src="docs/screenshots/profile.png" alt="Profile Page" width="45%">
 </div>
 
-## Demo Accounts
-
-You can use these accounts to explore the platform:
-
-- **Username**: DungeonMaster
-  - **Email**: master@wirebase.com
-  - **Password**: password123
-  - **Role**: Admin
-
-- **Username**: PixelKnight
-  - **Email**: knight@wirebase.com
-  - **Password**: password123
-
-- **Username**: RetroQueen
-  - **Email**: queen@wirebase.com
-  - **Password**: password123
-
 ## Local Development
 
 ### Prerequisites
@@ -82,30 +65,60 @@ You can use these accounts to explore the platform:
    SUPABASE_SERVICE_KEY=your-service-role-key
    SESSION_SECRET=your-session-secret
    NODE_ENV=development
-   # Optional: full Postgres connection string
-   DATABASE_URL=postgres://user:password@localhost:5432/database
-   # URL where your site will be hosted
-   SITE_URL=http://localhost:3000
-   # File upload limit (bytes)
-   MAX_UPLOAD_SIZE=5242880
-   # Image size limits for marketplace previews
-   MARKET_PREVIEW_MAX_WIDTH=1000
-   MARKET_PREVIEW_MAX_HEIGHT=1000
-   # Default theme slug
-   DEFAULT_THEME=dark-dungeon
-   # Rate limiting controls
-   RATE_LIMIT_WINDOW_MS=900000
-   RATE_LIMIT_MAX_REQUESTS=100
-   # Comma separated list of trusted IPs
-   TRUSTED_IPS=
-   # Enable additional logging
-   DEBUG=false
+# Optional: full Postgres connection string
+DATABASE_URL=postgres://user:password@localhost:5432/database
+
+# URL where your site will be hosted
+SITE_URL=http://localhost:3000
+
+# File upload limit (bytes)
+MAX_UPLOAD_SIZE=5242880
+
+# Image size limits for marketplace previews
+MARKET_PREVIEW_MAX_WIDTH=1000
+MARKET_PREVIEW_MAX_HEIGHT=1000
+
+# Default theme slug
+DEFAULT_THEME=dark-dungeon
+
+# Rate limiting controls
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+
+# Comma separated list of trusted IPs
+TRUSTED_IPS=
+
+# Enable additional logging
+DEBUG=false
+
+# Optional seed credentials (development only)
+SEED_ADMIN_USERNAME=admin
+SEED_ADMIN_EMAIL=admin@example.com
+SEED_ADMIN_PASSWORD=changeMe
+
+SEED_USER_USERNAME=user
+SEED_USER_EMAIL=user@example.com
+SEED_USER_PASSWORD=changeMe
+
+SEED_USER1_USERNAME=dungeonmaster
+SEED_USER1_EMAIL=master@example.com
+SEED_USER1_PASSWORD=
+
+SEED_USER2_USERNAME=pixelknight
+SEED_USER2_EMAIL=knight@example.com
+SEED_USER2_PASSWORD=
+
+SEED_USER3_USERNAME=retroqueen
+SEED_USER3_EMAIL=queen@example.com
+SEED_USER3_PASSWORD=
+
    ```
 
-4. Seed the database with initial data
+4. Seed the database with initial data (optional)
    ```
    node scripts/seed-defaults.js
    ```
+   See [docs/SEEDING.md](docs/SEEDING.md) for guidance on generating secure seed data.
 
 5. Start the development server
    ```
@@ -127,8 +140,10 @@ You can use these accounts to explore the platform:
 
 3. Configure environment variables in Render dashboard if needed
    - Include `TRUSTED_IPS` if you want certain IPs to bypass rate limiting. The server will check `x-forwarded-for` when behind a proxy.
-   - Set `PLAUSIBLE_DOMAIN` for analytics tracking.
-   - Optionally configure `LOGFLARE_API_KEY` and `LOGFLARE_SOURCE_TOKEN` to forward logs.
+  - Set `PLAUSIBLE_DOMAIN` for analytics tracking.
+  - Set `GA_TRACKING_ID` to enable Google Analytics (optional).
+  - Optionally configure `LOGFLARE_API_KEY` and `LOGFLARE_SOURCE_TOKEN` to forward logs.
+  - Optionally set `LOG_FILE_PATH` to write logs to a file.
 
 ### Manual Deployment
 
@@ -145,8 +160,10 @@ You can use these accounts to explore the platform:
    - `SUPABASE_KEY`: your Supabase anon key
    - `SUPABASE_SERVICE_KEY`: your service role key
    - `PLAUSIBLE_DOMAIN`: your analytics domain
+   - `GA_TRACKING_ID`: Google Analytics ID (optional)
    - `LOGFLARE_API_KEY`: API key for Logflare (optional)
    - `LOGFLARE_SOURCE_TOKEN`: source token for Logflare (optional)
+   - `LOG_FILE_PATH`: path to a log file (optional)
 
 ## Customization
 
