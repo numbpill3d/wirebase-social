@@ -351,7 +351,21 @@ class Thread {
       sorts.forEach(sort => {
         cache.del(`threads:category:${category}:20:${i}:${sort}`);
       });
-    }
+static clearCategoryCache(category) {
+    // Clear all possible cache entries for this category
+    const sorts = ['newest', 'oldest', 'replies', 'activity'];
+    const limits = [20, 50, 100]; // Adjust based on actual usage
+    limits.forEach(limit => {
+      for (let offset = 0; offset < 100; offset += limit) {
+        cache.del(`threads:category:${category}:${limit}:${offset}`);
+        sorts.forEach(sort => {
+          cache.del(`threads:category:${category}:${limit}:${offset}:${sort}`);
+        });
+      }
+    });
+  }
+
+  /**
   }
 
   /**
