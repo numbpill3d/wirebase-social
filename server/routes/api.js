@@ -17,8 +17,10 @@ const ensureAuthenticated = (req, res, next) => {
 // GET all users (public API)
 router.get('/users', async (req, res) => {
   try {
-    const users = await User.find({}, { sort: { createdAt: -1 } })
-      .select('username displayName avatar customGlyph statusMessage');
+const users = await User.find({})
+  .sort({ createdAt: -1 })
+  .select('username displayName avatar customGlyph statusMessage');
+
 
     res.json(users);
   } catch (err) {
@@ -74,8 +76,7 @@ router.get('/scrapyard', async (req, res) => {
 
     const items = await ScrapyardItem.find(query)
       .sort({ createdAt: -1 })
-      .limit(20)
-      .populate('creator', 'username displayName avatar customGlyph');
+      .limit(20);
 
 
     res.json(items);
