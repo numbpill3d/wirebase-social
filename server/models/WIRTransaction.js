@@ -3,7 +3,7 @@
  * Handles WIR currency transactions for the Vivid Market
  */
 
-const { supabase } = require('../utils/database');
+const { supabaseAdmin } = require('../utils/database');
 
 class WIRTransaction {
   /**
@@ -22,7 +22,7 @@ class WIRTransaction {
       } = transactionData;
 
       // Insert the transaction
-      const { data: transaction, error } = await supabase
+      const { data: transaction, error } = await supabaseAdmin
         .from('market_wir_transactions')
         .insert({
           user_id,
@@ -52,7 +52,8 @@ class WIRTransaction {
    */
   static async getByUser(userId, limit = 50, offset = 0) {
     try {
-      const { data: transactions, error, count } = await supabase
+const { data: transactions, error, count } = await supabaseAdmin
+
         .from('market_wir_transactions')
         .select(`
           *,
@@ -103,7 +104,7 @@ class WIRTransaction {
   static async transfer(senderId, receiverUsername, amount, notes) {
     try {
       // Get the sender's current WIR balance
-      const { data: sender, error: senderError } = await supabase
+      const { data: sender, error: senderError } = await supabaseAdmin
         .from('users')
         .select('wir_balance')
         .eq('id', senderId)
@@ -119,7 +120,7 @@ class WIRTransaction {
       }
 
       // Get the receiver by username
-      const { data: receiver, error: receiverError } = await supabase
+      const { data: receiver, error: receiverError } = await supabaseAdmin
         .from('users')
         .select('id, wir_balance')
         .eq('username', receiverUsername)
@@ -150,7 +151,7 @@ class WIRTransaction {
       });
 
       // Get the sender's username for better transaction notes
-      const { data: senderData, error: senderDataError } = await supabase
+      const { data: senderData, error: senderDataError } = await supabaseAdmin
         .from('users')
         .select('username')
         .eq('id', senderId)
@@ -169,7 +170,7 @@ class WIRTransaction {
 
       // Update sender's balance
       const newSenderBalance = sender.wir_balance - amount;
-      const { error: updateSenderError } = await supabase
+      const { error: updateSenderError } = await supabaseAdmin
         .from('users')
         .update({ wir_balance: newSenderBalance })
         .eq('id', senderId);
@@ -178,7 +179,7 @@ class WIRTransaction {
 
       // Update receiver's balance
       const newReceiverBalance = receiver.wir_balance + amount;
-      const { error: updateReceiverError } = await supabase
+      const { error: updateReceiverError } = await supabaseAdmin
         .from('users')
         .update({ wir_balance: newReceiverBalance })
         .eq('id', receiver.id);
@@ -208,7 +209,7 @@ class WIRTransaction {
   static async convert(userId, direction, amount) {
     try {
       // Get the user's current balances
-      const { data: user, error: userError } = await supabase
+      const { data: user, error: userError } = await supabaseAdmin
         .from('users')
         .select('wir_balance, loot_tokens')
         .eq('id', userId)
@@ -266,7 +267,7 @@ class WIRTransaction {
       }
 
       // Update user's balances
-      const { error: updateError } = await supabase
+      const { error: updateError } = await supabaseAdmin
         .from('users')
         .update({
           wir_balance: newWirBalance,
@@ -296,7 +297,7 @@ class WIRTransaction {
    */
   static async getCount() {
     try {
-      const { count, error } = await supabase
+      const { count, error } = await supabaseAdmin
         .from('market_wir_transactions')
         .select('id', { count: 'exact', head: true });
 
@@ -315,7 +316,7 @@ class WIRTransaction {
    */
   static async getStats() {
     try {
-      const { data, error } = await supabase.rpc('get_wir_transaction_stats');
+      const { data, error } = await supabaseAdmin.rpc('get_wir_transaction_stats');
 
       if (error) throw error;
 
