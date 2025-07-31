@@ -16,7 +16,7 @@ const ensureAuthenticated = (req, res, next) => {
 // GET all users (public API)
 router.get('/users', async (req, res) => {
   try {
-    const users = await User.find({}, { sort: { createdAt: -1 } });
+    const users = await User.find({}).sort({ createdAt: -1 });
 
     res.json(users);
   } catch (err) {
