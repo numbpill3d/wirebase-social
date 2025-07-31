@@ -260,9 +260,14 @@ const store = new KnexSessionStore({
   // Remove separate pool configuration to use the main knex pool
 });
 
+const sessionSecret = process.env.SESSION_SECRET;
+if (!sessionSecret) {
+  throw new Error('SESSION_SECRET environment variable is required');
+}
+
 app.use(session({
   store: store,
-  secret: process.env.SESSION_SECRET || 'wirebase-dev-secret',
+  secret: sessionSecret,
   resave: false,
   saveUninitialized: false, // Only save sessions when necessary
   rolling: false, // Disable rolling to reduce database writes
