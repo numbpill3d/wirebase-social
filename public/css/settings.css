@@ -1,0 +1,35 @@
+.account-settings-container {
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px 20px;
+    position: relative;
+}
+
+.settings-window {
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+    position: relative;
+    z-index: 10;
+}
+
+.settings-errors {
+    background-color: rgba(255, 0, 0, 0.2);
+    border: 1px solid var(--cyber-red);
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.settings-errors .error-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.section-divider {
+    margin: 30px 0;
+    border: none;
+    border-top: 1px solid var(--cyber-purple);
+}

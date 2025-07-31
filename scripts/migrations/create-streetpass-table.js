@@ -6,19 +6,20 @@ const { supabaseAdmin } = require('../../server/utils/database');
 
 async function createStreetpassTable() {
   try {
-    console.log('Running create_streetpass_table RPC...');
-    const { data, error } = await supabaseAdmin.rpc('create_streetpass_table');
+console.log('Running create_streetpass_table RPC...');
+const { data, error } = await supabaseAdmin.rpc('create_streetpass_table');
 
-    if (error) {
-      console.error('Error running create_streetpass_table RPC:', error);
-      return { success: false, error: error.message };
-    }
+if (error) {
+  console.error('Error running create_streetpass_table RPC:', error);
+  return { success: false, error: error.message };
+}
 
-    console.log('create_streetpass_table RPC executed successfully');
-    return { success: true, message: 'Streetpass table migration completed', data };
+console.log('create_streetpass_table RPC executed successfully');
+return { success: true, message: 'Streetpass table migration completed', data };
+
   } catch (error) {
     console.error('Error creating streetpass_visits table:', error);
-    return { success: false, error: error.message };
+    return { error: error.message };
   }
 }
 
@@ -27,7 +28,7 @@ if (require.main === module) {
   createStreetpassTable()
     .then(result => {
       console.log(result);
-      process.exit(result.success ? 0 : 1);
+      process.exit(result.error ? 1 : 0);
     })
     .catch(error => {
       console.error('Migration failed:', error);

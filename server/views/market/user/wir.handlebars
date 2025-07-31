@@ -812,10 +812,16 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     // Hidden input fields for JavaScript calculations
-    document.write(`
-      <input type="hidden" id="user-wir-balance" value="${{user.wirBalance}}">
-      <input type="hidden" id="user-loot-balance" value="${{user.lootTokens}}">
-    `);
+    const wirInput = document.createElement("input");
+    wirInput.type = "hidden";
+    wirInput.id = "user-wir-balance";
+    wirInput.value = "{{user.wirBalance}}";
+    document.body.appendChild(wirInput);
+    const lootInput = document.createElement("input");
+    lootInput.type = "hidden";
+    lootInput.id = "user-loot-balance";
+    lootInput.value = "{{user.lootTokens}}";
+    document.body.appendChild(lootInput);
 
     // Modal functionality
     const transferButton = document.getElementById('transfer-wir-button');

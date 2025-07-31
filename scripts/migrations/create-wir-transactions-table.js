@@ -6,19 +6,20 @@ const { supabaseAdmin } = require('../../server/utils/database');
 
 async function createWIRTransactionsTable() {
   try {
-    console.log('Running create_wir_transactions_table RPC...');
-    const { data, error } = await supabaseAdmin.rpc('create_wir_transactions_table');
+console.log('Running create_wir_transactions_table RPC...');
+const { data, error } = await supabaseAdmin.rpc('create_wir_transactions_table');
 
-    if (error) {
-      console.error('Error running create_wir_transactions_table RPC:', error);
-      return { success: false, error: error.message };
-    }
+if (error) {
+  console.error('Error running create_wir_transactions_table RPC:', error);
+  return { success: false, error: error.message };
+}
 
-    console.log('create_wir_transactions_table RPC executed successfully');
-    return { success: true, message: 'WIR transactions table migration completed', data };
+console.log('create_wir_transactions_table RPC executed successfully');
+return { success: true, message: 'WIR transactions table migration completed', data };
+
   } catch (error) {
     console.error('Error creating market_wir_transactions table:', error);
-    return { success: false, error: error.message };
+    return { error: error.message };
   }
 }
 
@@ -27,7 +28,7 @@ if (require.main === module) {
   createWIRTransactionsTable()
     .then(result => {
       console.log(result);
-      process.exit(result.success ? 0 : 1);
+      process.exit(result.error ? 1 : 0);
     })
     .catch(error => {
       console.error('Migration failed:', error);
