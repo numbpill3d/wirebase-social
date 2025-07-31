@@ -4,6 +4,7 @@
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
+const logger = require('./logger');
 
 module.exports = function(passport) {
   passport.use(
@@ -30,11 +31,11 @@ module.exports = function(passport) {
             return done(null, false, { message: 'Password incorrect' });
           }
         } catch (bcryptErr) {
-          console.error('Password comparison error:', bcryptErr);
+          logger.error('Password comparison error:', bcryptErr);
           return done(bcryptErr);
         }
       } catch (err) {
-        console.error('Authentication error:', err);
+        logger.error('Authentication error:', err);
         return done(err);
       }
     })
@@ -54,7 +55,7 @@ module.exports = function(passport) {
       }
       done(null, user);
     } catch (err) {
-      console.error('Deserialize user error:', err);
+      logger.error('Deserialize user error:', err);
       done(err, null);
     }
   });

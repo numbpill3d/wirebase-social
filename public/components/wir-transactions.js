@@ -27,7 +27,7 @@ class WIRTransactions extends HTMLElement {
     } else if (name === 'page') {
       this.page = parseInt(newValue || '1');
     }
-    
+
     if (oldValue !== newValue && this.isConnected) {
       this.loadTransactions();
     }
@@ -226,7 +226,7 @@ class WIRTransactions extends HTMLElement {
   addEventListeners() {
     const prevButton = this.shadowRoot.getElementById('prev-page');
     const nextButton = this.shadowRoot.getElementById('next-page');
-    
+
     prevButton.addEventListener('click', this.handlePrevPage.bind(this));
     nextButton.addEventListener('click', this.handleNextPage.bind(this));
   }
@@ -234,7 +234,7 @@ class WIRTransactions extends HTMLElement {
   removeEventListeners() {
     const prevButton = this.shadowRoot.getElementById('prev-page');
     const nextButton = this.shadowRoot.getElementById('next-page');
-    
+
     prevButton.removeEventListener('click', this.handlePrevPage.bind(this));
     nextButton.removeEventListener('click', this.handleNextPage.bind(this));
   }
@@ -256,20 +256,23 @@ class WIRTransactions extends HTMLElement {
 
   async loadTransactions() {
     if (!this.userId) return;
-    
+
     this.isLoading = true;
     this.updateLoadingState();
-    
+
     try {
       const offset = (this.page - 1) * this.limit;
-      const response = await fetch(`/api/market/wir/transactions?userId=${this.userId}&limit=${this.limit}&offset=${offset}`);
-      
+      const url =
+          `/api/market/wir/transactions?userId=${this.userId}` +
+          `&limit=${this.limit}&offset=${offset}`;
+      const response = await fetch(url);
+
       if (!response.ok) {
         throw new Error(`Failed to load transactions: ${response.status} ${response.statusText}`);
       }
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         this.transactions = data.transactions;
         this.totalTransactions = data.total;
@@ -296,7 +299,7 @@ class WIRTransactions extends HTMLElement {
 
   renderTransactions() {
     const transactionsList = this.shadowRoot.getElementById('transactions-list');
-    
+
     if (this.transactions.length === 0) {
       transactionsList.innerHTML = `
         <div class="empty-state">
@@ -305,19 +308,21 @@ class WIRTransactions extends HTMLElement {
       `;
       return;
     }
-    
+
     let html = '';
-    
+
     this.transactions.forEach(transaction => {
       const isPositive = transaction.amount > 0;
       const icon = this.getTransactionIcon(transaction.transactionType, isPositive);
       const formattedDate = new Date(transaction.createdAt).toLocaleString();
-      
+
       html += `
         <div class="transaction">
           <div class="transaction-icon">${icon}</div>
           <div class="transaction-details">
-            <div class="transaction-type">${this.formatTransactionType(transaction.transactionType)}</div>
+          <div class="transaction-type">
+            ${this.formatTransactionType(transaction.transactionType)}
+          </div>
             <div class="transaction-notes">${transaction.notes || ''}</div>
             <div class="transaction-date">${formattedDate}</div>
           </div>
@@ -327,13 +332,13 @@ class WIRTransactions extends HTMLElement {
         </div>
       `;
     });
-    
+
     transactionsList.innerHTML = html;
   }
 
   renderError(message) {
     const transactionsList = this.shadowRoot.getElementById('transactions-list');
-    
+
     transactionsList.innerHTML = `
       <div class="empty-state">
         Error: ${message}
@@ -345,60 +350,63 @@ class WIRTransactions extends HTMLElement {
     const paginationInfo = this.shadowRoot.getElementById('pagination-info');
     const prevButton = this.shadowRoot.getElementById('prev-page');
     const nextButton = this.shadowRoot.getElementById('next-page');
-    
+
     const totalPages = Math.ceil(this.totalTransactions / this.limit);
     const start = (this.page - 1) * this.limit + 1;
     const end = Math.min(start + this.limit - 1, this.totalTransactions);
-    
-    paginationInfo.textContent = `Showing ${this.totalTransactions > 0 ? start : 0}-${end} of ${this.totalTransactions} transactions`;
-    
+
+    paginationInfo.textContent =
+      `Showing ${this.totalTransactions > 0 ? start : 0}-${end} of ${
+        this.totalTransactions
+      } transactions`;
+
     prevButton.disabled = this.page <= 1;
     nextButton.disabled = this.page >= totalPages;
   }
 
   getTransactionIcon(type, isPositive) {
     switch (type) {
-      case 'purchase':
-        return '🛒';
-      case 'sale':
-        return '💰';
-      case 'transfer':
-        return isPositive ? '📥' : '📤';
-      case 'reward':
-        return '🏆';
-      case 'listing_fee':
-        return '📋';
-      case 'featured_fee':
-        return '⭐';
-      case 'loot_to_wir_conversion':
-        return '🔄';
-      case 'wir_to_loot_conversion':
-        return '🔄';
-      default:
-        return '💱';
+    case 'purchase':
+      return '🛒';
+    case 'sale':
+      return '💰';
+    case 'transfer':
+      return isPositive ? '📥' : '📤';
+    case 'reward':
+      return '🏆';
+    case 'listing_fee':
+      return '📋';
+    case 'featured_fee':
+      return '⭐';
+    case 'loot_to_wir_conversion':
+      return '🔄';
+    case 'wir_to_loot_conversion':
+      return '🔄';
+    default:
+      return '💱';
     }
   }
 
   formatTransactionType(type) {
     switch (type) {
-      case 'purchase':
-        return 'Purchase';
-      case 'sale':
-        return 'Sale';
-      case 'transfer':
-        return 'Transfer';
-      case 'reward':
-        return 'Reward';
-      case 'listing_fee':
-        return 'Listing Fee';
-      case 'featured_fee':
-        return 'Featured Fee';
-      case 'loot_to_wir_conversion':
-        return 'Loot to WIR Conversion';
-      case 'wir_to_loot_conversion':
-        return 'WIR to Loot Conversion';
-      default:
-        return type.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    case 'purchase':
+      return 'Purchase';
+    case 'sale':
+      return 'Sale';
+    case 'transfer':
+      return 'Transfer';
+    case 'reward':
+      return 'Reward';
+    case 'listing_fee':
+      return 'Listing Fee';
+    case 'featured_fee':
+      return 'Featured Fee';
+    case 'loot_to_wir_conversion':
+      return 'Loot to WIR Conversion';
+    case 'wir_to_loot_conversion':
+      return 'WIR to Loot Conversion';
+    default:
+      return type.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     }
   }
 }

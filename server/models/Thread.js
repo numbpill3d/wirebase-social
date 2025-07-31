@@ -124,10 +124,10 @@ class Thread {
    * @param {number} offset - Number of threads to skip
    * @returns {Promise<Object>} Object with threads array and total count
    */
-  static async getByCategory(category, limit = 20, offset = 0) {
+  static async getByCategory(category, limit = 20, offset = 0, sort = 'newest') {
     try {
       // Check cache first
-      const cacheKey = `threads:category:${category}:${limit}:${offset}`;
+      const cacheKey = `threads:category:${category}:${limit}:${offset}:${sort}`;
       const cachedThreads = cache.get(cacheKey);
 
       if (cachedThreads) {
@@ -150,7 +150,47 @@ class Thread {
         `, { count: 'exact' })
         .eq('category', category)
         .order('is_pinned', { ascending: false })
-        .order('created_at', { ascending: false })
+      // For 'replies', we sort in JS. This is only sorting the current page.
+      // For accurate global sorting by replies, consider adding a `reply_count`
+      // column to the `forum_threads` table and updating it with a trigger.
+      let sortedThreads = formattedThreads;
+      if (sort === 'replies') {
+        const pinned = formattedThreads.filter(t => t.isPinned);
+        const regular = formattedThreads.filter(t => !t.isPinned);
+        regular.sort((a, b) => b.replyCount - a.replyCount);
+        sortedThreads = [...pinned, ...regular];
+      }
+
+      if (error) throw error;
+
+
+      // Format the threads data
+      const formattedThreads = threads.map(thread => ({
+        ...this.formatThread(thread),
+        replyCount: thread.replies ? thread.replies.length : 0
+      }));
+
+      // Sort threads based on requested sort option
+      const pinned = formattedThreads.filter(t => t.isPinned);
+      let regular = formattedThreads.filter(t => !t.isPinned);
+
+      switch (sort) {
+        case 'oldest':
+          regular.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+          break;
+        case 'replies':
+          regular.sort((a, b) => b.replyCount - a.replyCount);
+          break;
+        case 'activity':
+          regular.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+          break;
+        default:
+          regular.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+replies:forum_replies (id)
+        `, { count: 'exact' })
+        .eq('category', category)
+        .order('is_pinned', { ascending: false })
+        .order(sort === 'oldest' ? 'created_at' : sort === 'replies' ? 'reply_count' : sort === 'activity' ? 'updated_at' : 'created_at', { ascending: sort === 'oldest' })
         .range(offset, offset + limit - 1);
 
       if (error) throw error;
@@ -163,6 +203,15 @@ class Thread {
 
       const result = {
         threads: formattedThreads,
+        total: count || 0
+      };
+
+      // Cache the result
+
+      const sortedThreads = [...pinned, ...regular];
+
+      const result = {
+        threads: sortedThreads,
         total: count || 0
       };
 
@@ -325,9 +374,27 @@ class Thread {
    */
   static clearCategoryCache(category) {
     // Clear all possible cache entries for this category
+    const sorts = ['newest', 'oldest', 'replies', 'activity'];
     for (let i = 0; i <= 100; i += 20) {
       cache.del(`threads:category:${category}:20:${i}`);
-    }
+      sorts.forEach(sort => {
+        cache.del(`threads:category:${category}:20:${i}:${sort}`);
+      });
+static clearCategoryCache(category) {
+    // Clear all possible cache entries for this category
+    const sorts = ['newest', 'oldest', 'replies', 'activity'];
+    const limits = [20, 50, 100]; // Adjust based on actual usage
+    limits.forEach(limit => {
+      for (let offset = 0; offset < 100; offset += limit) {
+        cache.del(`threads:category:${category}:${limit}:${offset}`);
+        sorts.forEach(sort => {
+          cache.del(`threads:category:${category}:${limit}:${offset}:${sort}`);
+        });
+      }
+    });
+  }
+
+  /**
   }
 
   /**
@@ -336,6 +403,33 @@ class Thread {
   static clearRecentThreadsCache() {
     for (let i = 5; i <= 20; i += 5) {
       cache.del(`threads:recent:${i}`);
+    }
+  }
+
+  /**
+   * Count threads that match a query
+   * @param {Object} query - Query filters
+   * @returns {Promise<number>} - Count of matching threads
+   */
+  static async countDocuments(query = {}) {
+    try {
+      let supabaseQuery = supabase
+        .from('forum_threads')
+        .select('id', { count: 'exact' });
+
+      Object.entries(query).forEach(([key, value]) => {
+        const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+        supabaseQuery = supabaseQuery.eq(snakeKey, value);
+      });
+
+      const { count, error } = await supabaseQuery;
+
+      if (error) throw error;
+
+      return count || 0;
+    } catch (error) {
+      console.error('Error counting threads:', error);
+      return 0;
     }
   }
 
