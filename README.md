@@ -140,8 +140,10 @@ SEED_USER3_PASSWORD=
 
 3. Configure environment variables in Render dashboard if needed
    - Include `TRUSTED_IPS` if you want certain IPs to bypass rate limiting. The server will check `x-forwarded-for` when behind a proxy.
-   - Set `PLAUSIBLE_DOMAIN` for analytics tracking.
-   - Optionally configure `LOGFLARE_API_KEY` and `LOGFLARE_SOURCE_TOKEN` to forward logs.
+  - Set `PLAUSIBLE_DOMAIN` for analytics tracking.
+  - Set `GA_TRACKING_ID` to enable Google Analytics (optional).
+  - Optionally configure `LOGFLARE_API_KEY` and `LOGFLARE_SOURCE_TOKEN` to forward logs.
+  - Optionally set `LOG_FILE_PATH` to write logs to a file.
 
 ### Manual Deployment
 
@@ -158,8 +160,10 @@ SEED_USER3_PASSWORD=
    - `SUPABASE_KEY`: your Supabase anon key
    - `SUPABASE_SERVICE_KEY`: your service role key
    - `PLAUSIBLE_DOMAIN`: your analytics domain
+   - `GA_TRACKING_ID`: Google Analytics ID (optional)
    - `LOGFLARE_API_KEY`: API key for Logflare (optional)
    - `LOGFLARE_SOURCE_TOKEN`: source token for Logflare (optional)
+   - `LOG_FILE_PATH`: path to a log file (optional)
 
 ## Customization
 
