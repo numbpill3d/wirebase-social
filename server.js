@@ -14,8 +14,7 @@ try {
   }
 }
 
-// Setup logger and pipe console output to it
-const logger = require('./server/utils/logger');
+// Pipe console output through logger for legacy modules
 console.log = logger.info.bind(logger);
 console.info = logger.info.bind(logger);
 console.warn = logger.warn.bind(logger);

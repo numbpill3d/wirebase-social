@@ -1,4 +1,5 @@
 const v8 = require('v8');
+const logger = require('./logger');
 
 let monitorTimer = null;
 
@@ -20,15 +21,15 @@ const memoryMonitor = {
     const usagePercent = (stats.heapUsed / stats.heapSizeLimit) * 100;
 
     if (usagePercent > threshold) {
-      console.warn(`⚠️ High memory usage: ${usagePercent.toFixed(2)}%`);
-      console.warn('📊 Memory stats:', stats);
+      logger.warn(`⚠️ High memory usage: ${usagePercent.toFixed(2)}%`);
+      logger.warn('📊 Memory stats:', stats);
 
       if (usagePercent > 90) {
         if (global.gc) {
           global.gc();
-          console.log('🧹 Forced garbage collection triggered');
+          logger.debug('🧹 Forced garbage collection triggered');
         } else {
-          console.warn('🚫 Garbage collection unavailable — run with --expose-gc');
+          logger.warn('🚫 Garbage collection unavailable — run with --expose-gc');
         }
       }
     }
@@ -36,7 +37,7 @@ const memoryMonitor = {
 
   start(interval = 300000, threshold = 80) {
     if (monitorTimer) {
-      console.warn('🔁 Memory monitor is already running');
+      logger.warn('🔁 Memory monitor is already running');
       return false;
     }
 
@@ -44,7 +45,7 @@ const memoryMonitor = {
       this.logMemoryUsage(threshold);
     }, interval);
 
-    console.log(`🟢 Memory monitor started (every ${interval / 1000}s)`);
+    logger.info(`🟢 Memory monitor started (every ${interval / 1000}s)`);
     return true;
   },
 
@@ -52,10 +53,10 @@ const memoryMonitor = {
     if (monitorTimer) {
       clearInterval(monitorTimer);
       monitorTimer = null;
-      console.log('🛑 Memory monitor stopped');
+      logger.info('🛑 Memory monitor stopped');
       return true;
     }
-    console.warn('⛔ Memory monitor is not running');
+    logger.warn('⛔ Memory monitor is not running');
     return false;
   }
 };

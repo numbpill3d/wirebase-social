@@ -12,6 +12,8 @@ const requiredVars = [
   'NODE_ENV'
 ];
 
+const logger = require('./logger');
+
 /**
  * Validate environment variables (non-fatal)
  * @param {string[]} vars - List of variables to validate
@@ -20,7 +22,7 @@ const requiredVars = [
 const validateEnv = (vars = requiredVars) => {
   const missing = vars.filter((v) => !process.env[v] || !process.env[v].trim());
   if (missing.length) {
-    console.error(`Missing required environment variables: ${missing.join(', ')}`);
+    logger.error(`Missing required environment variables: ${missing.join(', ')}`);
     return false;
   }
   return true;
@@ -33,7 +35,7 @@ const checkRequiredEnv = (vars = requiredVars) => {
   const missing = vars.filter((v) => !process.env[v] || !process.env[v].trim());
   if (missing.length) {
     const error = new Error(`Missing required environment variables: ${missing.join(', ')}`);
-    console.error(error.message);
+    logger.error(error.message);
     throw error;
   }
 };

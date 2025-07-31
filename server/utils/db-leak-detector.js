@@ -5,6 +5,7 @@
 
 // Remove direct import of knex to break circular dependency
 const dbMonitor = require('./db-monitor');
+const logger = require('./logger');
 
 // Store knex instance to avoid circular dependency
 let knexInstance = null;
@@ -85,7 +86,7 @@ const checkForLeaks = (knex = null) => {
       potentialLeaks.count++;
       potentialLeaks.lastDetected = new Date();
 
-      console.warn('Potential database connection leak detected', {
+      logger.warn('Potential database connection leak detected', {
         highUsageCount,
         lowFreeCount,
         growingConnections,
@@ -105,7 +106,7 @@ const checkForLeaks = (knex = null) => {
       potentialLeaks
     };
   } catch (error) {
-    console.error('Error checking for connection leaks:', error);
+    logger.error('Error checking for connection leaks:', error);
     return { error: error.message };
   }
 };
@@ -141,7 +142,7 @@ const fixLeaks = async (knex = null, force = false) => {
       };
     }
 
-    console.log('Attempting to fix database connection leaks');
+    logger.info('Attempting to fix database connection leaks');
 
     // Get pool
     const { client: { pool } } = kInstance;
@@ -149,7 +150,7 @@ const fixLeaks = async (knex = null, force = false) => {
     // Force pool to release idle connections
     if (pool && typeof pool.drain === 'function') {
       await pool.drain();
-      console.log('Pool drained successfully');
+      logger.info('Pool drained successfully');
     }
 
     // Update stats
@@ -166,7 +167,7 @@ const fixLeaks = async (knex = null, force = false) => {
       after: newStatus
     };
   } catch (error) {
-    console.error('Error fixing connection leaks:', error);
+    logger.error('Error fixing connection leaks:', error);
     return { error: error.message };
   }
 };
@@ -183,7 +184,7 @@ const startLeakDetection = (knex = null, checkInterval = 30000, fixInterval = 30
   const kInstance = knex || knexInstance || global.knex;
 
   if (!kInstance) {
-    console.error('ERROR: No knex instance available for leak detection');
+    logger.error('ERROR: No knex instance available for leak detection');
     return { checkTimer: null, fixTimer: null };
   }
 
@@ -210,7 +211,7 @@ const startLeakDetection = (knex = null, checkInterval = 30000, fixInterval = 30
     }
   }, fixInterval);
 
-  console.log(`Database connection leak detection started (check: ${checkInterval}ms, fix: ${fixInterval}ms)`);
+  logger.info(`Database connection leak detection started (check: ${checkInterval}ms, fix: ${fixInterval}ms)`);
 
   return { checkTimer, fixTimer };
 };
@@ -222,7 +223,7 @@ const startLeakDetection = (knex = null, checkInterval = 30000, fixInterval = 30
 const initialize = (knex) => {
   if (knex) {
     knexInstance = knex;
-    console.log('Database leak detector initialized with knex instance');
+    logger.info('Database leak detector initialized with knex instance');
   }
 };
 
