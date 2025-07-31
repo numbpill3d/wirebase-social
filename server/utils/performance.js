@@ -2,11 +2,12 @@
  * Performance optimization utilities for Wirebase
  */
 // Try to load compression module, fallback to a simple middleware if not available
+const logger = require('./logger');
 let compression;
 try {
   compression = require('compression');
 } catch (err) {
-  console.warn('Compression module not found, using fallback implementation');
+  logger.warn('Compression module not found, using fallback implementation');
   // Simple fallback implementation
   compression = () => (req, res, next) => next();
   compression.filter = () => true;
@@ -17,7 +18,7 @@ let NodeCache;
 try {
   NodeCache = require('node-cache');
 } catch (err) {
-  console.warn('NodeCache module not found, using fallback implementation');
+  logger.warn('NodeCache module not found, using fallback implementation');
   // Simple fallback implementation
   NodeCache = class SimpleCache {
     constructor(options = {}) {

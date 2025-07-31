@@ -4,6 +4,7 @@
  */
 
 const knex = require('../../server').knex;
+const logger = require('./logger');
 
 /**
  * Execute a function within a transaction
@@ -32,9 +33,9 @@ const withTransaction = async (callback, options = {}) => {
     try {
       await trx.rollback();
     } catch (rollbackError) {
-      console.error('Transaction rollback error:', rollbackError);
+      logger.error('Transaction rollback error:', rollbackError);
     }
-    console.error('Transaction error:', error);
+    logger.error('Transaction error:', error);
     throw error;
   }
 };
@@ -58,7 +59,7 @@ const executeQuery = async (queryFn, timeout = 30000) => {
       timeoutPromise
     ]);
   } catch (error) {
-    console.error('Query execution error:', error);
+    logger.error('Query execution error:', error);
     throw error;
   }
 };
