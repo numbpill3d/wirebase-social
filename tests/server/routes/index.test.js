@@ -6,13 +6,15 @@ const express = require('express');
 
 jest.mock('../../../server/models/User', () => ({
   findRecent: jest.fn().mockResolvedValue([
-    { username: 'user1', displayName: 'User 1' },
-    { username: 'user2', displayName: 'User 2' }
+jest.mock('../../../server/models/User', () => ({
+  findAll: jest.fn().mockResolvedValue([
+    { username: 'testuser1', displayName: 'Test User 1' },
+    { username: 'testuser2', displayName: 'Test User 2' }
   ]),
   countDocuments: jest.fn().mockResolvedValue(2),
   find: jest.fn().mockResolvedValue([
-    { username: 'active1', lastActive: new Date() },
-    { username: 'active2', lastActive: new Date() }
+    { username: 'testuser1', displayName: 'Test User 1', lastActive: new Date() },
+    { username: 'testuser2', displayName: 'Test User 2', lastActive: new Date() }
   ])
 }));
 
@@ -36,11 +38,12 @@ jest.mock('../../../server/models/ScrapyardItem', () => ({
     { id: 3, title: 'Featured Item 1' },
     { id: 4, title: 'Featured Item 2' }
   ]),
-  countDocuments: jest.fn().mockResolvedValue(2),
-  find: jest.fn().mockResolvedValue([
-    { username: 'active1', lastActive: new Date() },
-    { username: 'active2', lastActive: new Date() }
-  ])
+countDocuments: jest.fn().mockResolvedValue(2),
+find: jest.fn().mockResolvedValue([
+  { username: 'active1', lastActive: new Date() },
+  { username: 'active2', lastActive: new Date() }
+])
+
 }));
 
 jest.mock('../../../server/models/Visit', () => ({
