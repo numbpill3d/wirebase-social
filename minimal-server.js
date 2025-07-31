@@ -161,8 +161,11 @@ const server = http.createServer((req, res) => {
   const parsedUrl = url.parse(req.url, true);
   const pathname = parsedUrl.pathname;
 
-  // Log all requests
-  if (process.env.DEBUG) logger.debug(`Request: ${req.method} ${pathname}`);
+  // Log all requests using the shared logger
+  // Disabled by default when NODE_ENV is 'production'
+  if (process.env.LOG_REQUESTS === 'true' || process.env.NODE_ENV !== 'production') {
+    logger.debug(`Request: ${req.method} ${pathname}`);
+  }
 
   // Special case for favicon
   if (req.method === 'GET' && pathname === '/favicon.ico') {
