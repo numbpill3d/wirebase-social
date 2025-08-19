@@ -13,7 +13,7 @@ try {
     const { stream } = logflare;
     logger = pino({ level: process.env.LOG_LEVEL || 'info' }, stream);
 
-    console.log('Using Pino with Logflare for logging');
+    // Logger initialized with Pino and Logflare
   } else {
     const { createLogger, format, transports } = require('winston');
 
@@ -25,7 +25,7 @@ try {
       try {
         transportList.push(new transports.File({ filename: process.env.LOG_FILE_PATH }));
       } catch (err) {
-        console.error(`Failed to create log file transport: ${err.message}`);
+        // Failed to create log file transport, will continue with console only
       }
     }
 
@@ -41,18 +41,12 @@ try {
       transports: transportList
     });
 
-    if (process.env.LOG_FILE_PATH) {
-      console.log(`Using Winston for logging to console and ${process.env.LOG_FILE_PATH}`);
-    } else {
-      console.log('Using Winston for logging');
-    }
+    // Logger initialized with Winston
   }
 } catch (error) {
-  console.error('Error initializing logger:', error);
-  logger = console; // Fallback to basic console logger
+  // Fallback to basic console logger if initialization fails
+  logger = console;
 }
 
-
-module.exports = logger;
 
 module.exports = logger;

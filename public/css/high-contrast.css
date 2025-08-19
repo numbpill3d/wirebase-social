@@ -1,0 +1,58 @@
+/* High contrast mode styles for accessibility */
+
+@media (prefers-contrast: high) {
+  :root {
+    --bg-color: #000000;
+    --text-color: #ffffff;
+    --accent-color: #ffffff;
+    --secondary-color: #ffffff;
+    --border-color: #ffffff;
+    --button-bg: #000000;
+    --button-text: #ffffff;
+    --link-color: #ffffff;
+  }
+
+  /* Ensure all text has maximum contrast */
+  body,
+  .cyber-button,
+  .cyber-window,
+  .market-item,
+  .thread-item {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+  }
+
+  /* Make buttons highly visible */
+  .cyber-button,
+  .action-button,
+  button {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+  }
+
+  .cyber-button:hover,
+  .action-button:hover,
+  button:hover {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Ensure form elements are visible */
+  input,
+  select,
+  textarea {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+  }
+
+  /* Remove decorative effects that reduce contrast */
+  .vignette,
+  .crt-scanlines,
+  .crt-flicker,
+  .glitch-effect {
+    display: none !important;
+  }
+}
