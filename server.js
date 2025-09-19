@@ -29,13 +29,13 @@ if (!validateEnv()) {
   initServer();
 }
 
-let dbMonitor;
-let dbHealth;
-let dbErrorHandler;
-let dbLeakDetector;
-let memoryMonitor;
-let healthCheckTimer;
-let leakDetectionTimers;
+let dbMonitor = null;
+let dbHealth = null;
+let dbErrorHandler = null;
+let dbLeakDetector = null;
+let memoryMonitor = null;
+let healthCheckTimer = null;
+let leakDetectionTimers = null;
 
 function initServer() {
   // Verify required environment variables
