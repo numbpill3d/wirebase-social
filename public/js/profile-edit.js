@@ -7,15 +7,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updatePreview() {
     if (!preview) return;
-    preview.innerHTML = htmlEditor ? htmlEditor.value : preview.innerHTML;
 
-    // Apply CSS if provided
+    // Sanitize HTML input to prevent XSS
+    const sanitizedHTML = htmlEditor ? sanitizeHTML(htmlEditor.value) : preview.innerHTML;
+    preview.innerHTML = sanitizedHTML;
+
+    // Apply CSS if provided (also sanitize CSS)
     const styleTag = preview.querySelector('style[data-preview]') || document.createElement('style');
     styleTag.dataset.preview = 'true';
-    styleTag.textContent = cssEditor ? cssEditor.value : '';
+    styleTag.textContent = cssEditor ? sanitizeCSS(cssEditor.value) : '';
     if (!preview.contains(styleTag)) {
       preview.appendChild(styleTag);
     }
+  }
+
+  // Basic HTML sanitization function
+  function sanitizeHTML(html) {
+    const temp = document.createElement('div');
+    temp.textContent = html;
+    return temp.innerHTML;
+  }
+
+  // Basic CSS sanitization function
+  function sanitizeCSS(css) {
+    // Remove potentially dangerous CSS properties
+    return css.replace(/javascript:|expression:|vbscript:|on\w+\s*:/gi, '');
   }
 
   if (htmlEditor) {

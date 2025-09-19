@@ -10,7 +10,7 @@
   --cyber-gray: #c0c0c0;
   --cyber-red: #ff0000;
   --cyber-green: #00ff00;
-  --cyber-glow: rgba(0, 255极, 0, 0.3);
+  --cyber-glow: rgba(0, 255, 0, 0.3);
 
   /* Additional interface colors */
   --cyber-dark-purple: #2a0033;
@@ -62,7 +62,7 @@ body {
 }
 
 .terminal-content pre {
-  margin: 极;
+  margin: 0;
   font-family: 'VT323', 'Courier New', monospace;
   line-height: 1.3;
   font-size: clamp(0.9rem, 3vw, 1rem);
@@ -204,7 +204,7 @@ body {
 /* Badges */
 .cyber-badge {
   display: inline-block;
-  padding: calc(var(--spacing-unit) * 0.75) calc(var(--spacing极-unit) * 1.5);
+  padding: calc(var(--spacing-unit) * 0.75) calc(var(--spacing-unit) * 1.5);
   background-color: var(--cyber-purple);
   color: var(--cyber-light);
   font-size: clamp(0.8rem, 2.5vw, 0.9rem);

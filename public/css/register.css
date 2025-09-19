@@ -147,6 +147,12 @@
     box-sizing: border-box;
 }
 
+.cyber-input:focus {
+    outline: none;
+    border-color: var(--cyber-green);
+    box-shadow: 0 0 5px var(--cyber-glow);
+}
+
 .input-help {
     display: block;
     font-size: 0.8rem;

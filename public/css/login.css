@@ -127,6 +127,12 @@
     box-sizing: border-box;
 }
 
+.cyber-input:focus {
+    outline: none;
+    border-color: var(--cyber-green);
+    box-shadow: 0 0 5px var(--cyber-glow);
+}
+
 .form-actions {
     display: flex;
     justify-content: space-between;
