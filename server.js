@@ -391,11 +391,11 @@ app.use((req, res, next) => {
 });
 
   // Import database utilities
-  dbMonitor = require('./server/utils/db-monitor');
-  dbHealth = require('./server/utils/db-health');
-  dbErrorHandler = require('./server/utils/db-error-handler');
-  dbLeakDetector = require('./server/utils/db-leak-detector');
-  memoryMonitor = require('./server/utils/memory-monitor');
+  dbMonitor = require(path.join(__dirname, 'server/utils/db-monitor'));
+  dbHealth = require(path.join(__dirname, 'server/utils/db-health'));
+  dbErrorHandler = require(path.join(__dirname, 'server/utils/db-error-handler'));
+  dbLeakDetector = require(path.join(__dirname, 'server/utils/db-leak-detector'));
+  memoryMonitor = require(path.join(__dirname, 'server/utils/memory-monitor'));
   const errorHandler = require('./server/middleware/error-handler');
 
   const { queryTimeoutMiddleware, transactionTimeoutMiddleware } = require('./server/middleware/query-timeout');
