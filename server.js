@@ -305,17 +305,6 @@ if (NODE_ENV !== 'test') {
   });
 }
 
-  });
-
-  // CSRF protection (disabled during tests)
-  if (NODE_ENV !== 'test') {
-    app.use(csurf());
-    app.use((req, res, next) => {
-      res.locals.csrfToken = req.csrfToken();
-      next();
-    });
-  }
-
   // Setup file storage for user uploads
   const storage = multer.diskStorage({
     destination: function (req, _file, cb) {
@@ -383,25 +372,23 @@ if (NODE_ENV !== 'test') {
   });
 
 // Provide Google Analytics tracking ID to templates
-app.use((req, res, next) => {
-  res.locals.gaTrackingId = process.env.GA_TRACKING_ID || null;
-  next();
-});
+  app.use((req, res, next) => {
+    res.locals.gaTrackingId = process.env.GA_TRACKING_ID || null;
+    next();
+  });
 
 // Set default theme
 app.use((req, res, next) => {
   res.locals.theme = req.cookies.theme || 'light';
-  next();
-});
 
   // Check user preference first, then session, then default
-    const userTheme = req.user?.preferences?.theme;
-    const sessionTheme = req.session?.theme;
-    const defaultTheme = process.env.DEFAULT_THEME || 'dark-dungeon';
+  const userTheme = req.user?.preferences?.theme;
+  const sessionTheme = req.session?.theme;
+  const defaultTheme = process.env.DEFAULT_THEME || 'dark-dungeon';
 
-    res.locals.pageTheme = userTheme || sessionTheme || defaultTheme;
-    next();
-  });
+  res.locals.pageTheme = userTheme || sessionTheme || defaultTheme;
+  next();
+});
 
   // Import database utilities
   dbMonitor = require('./server/utils/db-monitor');

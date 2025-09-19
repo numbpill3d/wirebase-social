@@ -4,6 +4,13 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs');
 const url = require('url');
+// Import DOMPurify for sanitizing user input
+const DOMPurify = require('dompurify');
+const { JSDOM } = require('jsdom');
+
+// Setup DOMPurify with JSDOM
+const window = new JSDOM('').window;
+const DOMPurifyInstance = DOMPurify(window);
 
 const PORT = process.env.PORT || 3002; // Changed port to avoid conflicts
 
@@ -164,12 +171,7 @@ const server = http.createServer((req, res) => {
   // Log all requests using the shared logger
   // Disabled by default when NODE_ENV is 'production'
   if (process.env.LOG_REQUESTS === 'true' || process.env.NODE_ENV !== 'production') {
-// Import the DOMPurify library for sanitizing user input
-// const DOMPurify = require('dompurify');
-
-if (process.env.LOG_REQUESTS === 'true' || process.env.NODE_ENV !== 'production') {
-  logger.debug(`Request: ${DOMPurify.sanitize(req.method)} ${DOMPurify.sanitize(pathname)}`);
-}
+    logger.debug(`Request: ${DOMPurifyInstance.sanitize(req.method)} ${DOMPurifyInstance.sanitize(pathname)}`);
   }
 
   // Special case for favicon
