@@ -116,13 +116,17 @@ function initServer() {
 
   // Add better error handling with detailed logging
   global.knex.on('error', (err) => {
-    logger.error('Unexpected database error:', err);
-    logger.error('Error details:', {
-      code: err.code,
-      message: err.message,
-      stack: err.stack,
-      timestamp: new Date().toISOString()
-    });
+      logger.error('Database connection error:', err);
+      logger.error('Error details:', {
+          code: err.code,
+          message: err.message,
+          stack: err.stack,
+          timestamp: new Date().toISOString()
+      });
+      if (process.env.NODE_ENV !== 'production') {
+          process.exit(1);
+      }
+  });
 
     // Log error but don't exit process in production to maintain uptime
     if (process.env.NODE_ENV !== 'production') {
@@ -132,18 +136,18 @@ function initServer() {
 
   // Verify database connection with retry logic
   const verifyDatabaseConnection = async (retries = 5, delay = 5000) => {
-    for (let attempt = 1; attempt <= retries; attempt++) {
-      try {
-      // Try using Supabase first
-        const { data, error } = await supabase.from('users').select('id').limit(1);
-        if (error) {
-        // If Supabase fails, try Knex as fallback
-          await global.knex.raw('SELECT 1');
-        }
-        logger.info('Database connection established successfully');
-        return true;
-      } catch (err) {
-        logger.error(`Database connection attempt ${attempt}/${retries} failed:`, err.message);
+      for (let attempt = 1; attempt <= retries; attempt++) {
+          try {
+              // Try using Supabase first
+              const { data, error } = await supabase.from('users').select('id').limit(1);
+              if (error) {
+                  // If Supabase fails, try Knex as fallback
+                  await global.knex.raw('SELECT 1');
+              }
+              logger.info('Database connection established successfully');
+              return true;
+          } catch (err) {
+              logger.error(`Database connection attempt ${attempt}/${retries} failed:`, err.message);
 
         if (attempt < retries) {
           logger.debug(`Retrying in ${delay / 1000} seconds...`);
