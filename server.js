@@ -29,11 +29,11 @@ if (!validateEnv()) {
   initServer();
 }
 
-let dbMonitor = null;
-let dbHealth = null;
-let dbErrorHandler = null;
-let dbLeakDetector = null;
-let memoryMonitor = null;
+var dbMonitor = null;
+var dbHealth = null;
+var dbErrorHandler = null;
+var dbLeakDetector = null;
+var memoryMonitor = null;
 // Import database utilities
 dbMonitor = require(path.join(__dirname, 'server/utils/db-monitor'));
 dbHealth = require(path.join(__dirname, 'server/utils/db-health'));
