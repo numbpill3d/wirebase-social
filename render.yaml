@@ -22,7 +22,12 @@ services:
         fromDatabase:
           name: wirebase-postgres
           property: connectionString
-
+      - key: LOGFLARE_API_KEY
+        value: ${LOGFLARE_API_KEY}
+      - key: LOGFLARE_SOURCE_TOKEN
+        value: ${LOGFLARE_SOURCE_TOKEN}
+      - key: DEBUG
+        value: false
 databases:
   - name: wirebase-postgres
     plan: free
