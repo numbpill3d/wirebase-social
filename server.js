@@ -22,26 +22,23 @@ console.warn = logger.warn.bind(logger);
 console.error = logger.error.bind(logger);
 
 const { validateEnv } = require('./server/utils/env-check');
+
+// Import database utilities early so that exports at the bottom are populated
+const dbMonitor = require('./server/utils/db-monitor');
+const dbHealth = require('./server/utils/db-health');
+const dbErrorHandler = require('./server/utils/db-error-handler');
+const dbLeakDetector = require('./server/utils/db-leak-detector');
+const memoryMonitor = require('./server/utils/memory-monitor');
+
+let healthCheckTimer = null;
+let leakDetectionTimers = null;
+
 if (!validateEnv()) {
   logger.error('Environment validation failed. Starting minimal server instead.');
   require('./minimal-server');
 } else {
   initServer();
 }
-
-var dbMonitor = null;
-var dbHealth = null;
-var dbErrorHandler = null;
-var dbLeakDetector = null;
-var memoryMonitor = null;
-// Import database utilities
-dbMonitor = require(path.join(__dirname, 'server/utils/db-monitor'));
-dbHealth = require(path.join(__dirname, 'server/utils/db-health'));
-dbErrorHandler = require(path.join(__dirname, 'server/utils/db-error-handler'));
-dbLeakDetector = require(path.join(__dirname, 'server/utils/db-leak-detector'));
-memoryMonitor = require(path.join(__dirname, 'server/utils/memory-monitor'));
-let healthCheckTimer = null;
-let leakDetectionTimers = null;
 
 function initServer() {
   // Verify required environment variables
@@ -71,7 +68,8 @@ function initServer() {
   const multer = require('multer');
   const csurf = require('csurf');
   const fs = require('fs');
-  const { supabase, supabaseAdmin } = require('./server/utils/database');
+  const cookieParser = require('cookie-parser');
+  const { supabase } = require('./server/utils/database');
 
   // Configure Knex with optimized connection pooling and better error handling
   // Make knex instance globally available for utilities
@@ -116,21 +114,19 @@ function initServer() {
 
   // Add better error handling with detailed logging
   global.knex.on('error', (err) => {
-      logger.error('Database connection error:', err);
-      logger.error('Error details:', {
-          code: err.code,
-          message: err.message,
-          stack: err.stack,
-          timestamp: new Date().toISOString()
-      });
-      if (process.env.NODE_ENV !== 'production') {
-          process.exit(1);
-      }
-  });
+    logger.error('Database connection error:', err);
+    logger.error('Error details:', {
+      code: err.code,
+      message: err.message,
+      stack: err.stack,
+      timestamp: new Date().toISOString()
+    });
 
-    // Log error but don't exit process in production to maintain uptime
+    // In development, fail fast so issues surface immediately. In production we
+    // keep the process alive so Render can perform health checks and restart if
+    // needed without dropping all traffic.
     if (process.env.NODE_ENV !== 'production') {
-      process.exit(-1);
+      process.exit(1);
     }
   });
 
@@ -187,6 +183,9 @@ function initServer() {
 
         // Start leak detection (check every 30 seconds, fix every 5 minutes)
         leakDetectionTimers = dbLeakDetector.startLeakDetection(null, 30000, 300000);
+
+        // Begin tracking memory usage once the server is ready
+        memoryMonitor.start();
       });
 
       // Add server timeout to prevent hanging connections
@@ -215,6 +214,7 @@ function initServer() {
   app.use(compressionMiddleware); // Compress responses
   app.use(resourceHints); // Add resource hints
   app.use(xssMiddleware); // Prevent XSS attacks
+  app.use(cookieParser());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(cacheControl); // Add cache control headers
@@ -389,7 +389,8 @@ if (NODE_ENV !== 'test') {
 
 // Set default theme
 app.use((req, res, next) => {
-  res.locals.theme = req.cookies.theme || 'light';
+  const cookieTheme = req.cookies ? req.cookies.theme : undefined;
+  res.locals.theme = cookieTheme || 'light';
 
   // Check user preference first, then session, then default
   const userTheme = req.user?.preferences?.theme;
@@ -499,13 +500,19 @@ app.use((req, res, next) => {
       if (healthCheckTimer && typeof healthCheckTimer.stop === 'function') {
         healthCheckTimer.stop();
       }
-      clearInterval(leakDetectionTimers.checkTimer);
-      clearInterval(leakDetectionTimers.fixTimer);
+      if (leakDetectionTimers) {
+        if (leakDetectionTimers.checkTimer) {
+          clearInterval(leakDetectionTimers.checkTimer);
+        }
+        if (leakDetectionTimers.fixTimer) {
+          clearInterval(leakDetectionTimers.fixTimer);
+        }
+      }
       memoryMonitor.stop();
 
       // Fix any connection leaks before shutdown
       logger.debug('Checking for connection leaks before shutdown...');
-      await dbLeakDetector.fixLeaks(true);
+      await dbLeakDetector.fixLeaks(null, true);
 
       // Close server to stop accepting new connections
       logger.info('Closing HTTP server...');
@@ -530,18 +537,6 @@ app.use((req, res, next) => {
   // Handle termination signals
   process.on('SIGTERM', gracefulShutdown);
   process.on('SIGINT', gracefulShutdown);
-
-  // Initialize timers for health checks and leak detection
-
-
-  // Start health checks (every 60 seconds)
-  healthCheckTimer = dbHealth.startPeriodicHealthChecks(60000);
-
-  // Start leak detection (check every 30 seconds, fix every 5 minutes)
-  leakDetectionTimers = dbLeakDetector.startLeakDetection(null, 30000, 300000);
-
-  // Start memory monitoring
-  memoryMonitor.start();
 
   // Start server after verifying database connection
   startServer();
