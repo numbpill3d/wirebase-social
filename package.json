@@ -23,6 +23,7 @@
     "compression": "^1.7.4",
     "connect-session-knex": "^3.0.1",
     "connect-timeout": "^1.9.0",
+    "cookie-parser": "^1.4.6",
     "csurf": "^1.11.0",
     "dompurify": "^3.0.8",
     "dotenv": "^16.0.3",
